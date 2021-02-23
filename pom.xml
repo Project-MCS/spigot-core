@@ -1,0 +1,261 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.playuniverse.minecraft.mcs</groupId>
+	<artifactId>spigot</artifactId>
+	<version>1.0.0</version>
+	<name>SpigotCore</name>
+
+	<repositories>
+		<repository>
+			<id>central</id>
+			<url>https://repo1.maven.org/maven2/</url>
+		</repository>
+		<repository>
+			<id>github</id>
+			<url></url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+
+		<!-- vCompat -->
+		<dependency>
+			<groupId>net.sourcewriters.minecraft</groupId>
+			<artifactId>vcompat</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<!-- SyntaxApi -->
+
+		<!-- 2.0.6 -->
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>net</artifactId>
+			<version>2.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>java</artifactId>
+			<version>2.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>data-base</artifactId>
+			<version>2.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>data-nbtcontainer</artifactId>
+			<version>2.0.6</version>
+		</dependency>
+
+		<!-- 2.0.5 -->
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>command</artifactId>
+			<version>2.0.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>config-yaml</artifactId>
+			<version>2.0.5</version>
+		</dependency>
+
+		<!-- 2.0.4 -->
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>location</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>nbt</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>json-tools</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>service-base</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>service-download</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>general</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>version</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>cache</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>reflection</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+
+
+		<!-- 2.0.3 -->
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>config-json</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>random</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>exception</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>event</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>thread</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>java-lang</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>io</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>config-base</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>logging</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>alias</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>key</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		
+		<!-- Jedis -->
+	
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+
+		<!-- Stuff -->
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.11</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.pf4j</groupId>
+			<artifactId>pf4j</artifactId>
+			<version>3.6.0</version>
+		</dependency>
+
+		<!-- System -->
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot</artifactId>
+			<version>1.16.5_R3</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libraries/spigot-1.16.5.jar</systemPath>
+		</dependency>
+	</dependencies>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.22.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.1.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
+					<createDependencyReducedPom>true</createDependencyReducedPom>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>11</source>
+					<target>11</target>
+					<annotationProcessors>
+						<annotationProcessor>org.pf4j.processor.ExtensionAnnotationProcessor</annotationProcessor>
+					</annotationProcessors>
+				</configuration>
+			</plugin>
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+</project>

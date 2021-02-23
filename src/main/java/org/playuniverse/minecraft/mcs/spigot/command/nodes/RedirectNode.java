@@ -1,0 +1,23 @@
+package org.playuniverse.minecraft.mcs.spigot.command.nodes;
+
+import org.playuniverse.minecraft.mcs.spigot.command.CommandContext;
+
+public class RedirectNode<S> extends SubNode<S> {
+
+    private final SubNode<S> redirect;
+
+    public RedirectNode(String name, SubNode<S> redirect) {
+        super(name);
+        this.redirect = redirect;
+    }
+
+    public SubNode<S> getRedirect() {
+        return redirect;
+    }
+
+    @Override
+    public int execute(CommandContext<S> context) {
+        return redirect.execute(context);
+    }
+
+}
