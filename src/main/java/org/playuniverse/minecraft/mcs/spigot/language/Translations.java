@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.event.language.SnowyTranslationEvent;
-import org.playuniverse.minecraft.mcs.utils.general.Placeholder;
+import org.playuniverse.minecraft.mcs.spigot.utils.general.Placeholder;
 
 import com.syntaxphoenix.syntaxapi.config.yaml.YamlConfig;
 

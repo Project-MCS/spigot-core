@@ -1,6 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.language;
 
-import org.playuniverse.minecraft.mcs.utils.general.Placeholder;
+import org.playuniverse.minecraft.mcs.spigot.utils.general.Placeholder;
 
 public interface IVariable extends ITranslatable {
 

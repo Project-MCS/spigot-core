@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.utils.plugin;
+package org.playuniverse.minecraft.mcs.spigot.utils.plugin;
 
 import java.util.ArrayList;
 import java.util.Optional;

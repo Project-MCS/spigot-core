@@ -17,8 +17,8 @@ import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.config.Config;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
-import org.playuniverse.minecraft.mcs.utils.java.ReflectionProvider;
-import org.playuniverse.minecraft.mcs.utils.log.ConsoleLogger;
+import org.playuniverse.minecraft.mcs.spigot.utils.java.ReflectionProvider;
+import org.playuniverse.minecraft.mcs.spigot.utils.log.ConsoleLogger;
 
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;

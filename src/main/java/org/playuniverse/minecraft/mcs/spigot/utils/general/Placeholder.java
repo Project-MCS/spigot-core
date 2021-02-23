@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.utils.general;
+package org.playuniverse.minecraft.mcs.spigot.utils.general;
 
 import java.util.function.Function;
 

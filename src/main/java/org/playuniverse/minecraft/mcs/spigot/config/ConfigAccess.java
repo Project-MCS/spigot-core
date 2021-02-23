@@ -12,7 +12,7 @@ import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
-import org.playuniverse.minecraft.mcs.utils.java.ReflectionProvider;
+import org.playuniverse.minecraft.mcs.spigot.utils.java.ReflectionProvider;
 
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.utils.java.Arrays;

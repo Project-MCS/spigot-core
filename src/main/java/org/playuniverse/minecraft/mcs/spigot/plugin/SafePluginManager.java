@@ -16,8 +16,8 @@ import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventExecutor;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
-import org.playuniverse.minecraft.mcs.utils.java.ReflectionProvider;
-import org.playuniverse.minecraft.mcs.utils.wait.Awaiter;
+import org.playuniverse.minecraft.mcs.spigot.utils.java.ReflectionProvider;
+import org.playuniverse.minecraft.mcs.spigot.utils.wait.Awaiter;
 
 import com.syntaxphoenix.syntaxapi.event.Event;
 import com.syntaxphoenix.syntaxapi.event.EventExecutor;

@@ -1,7 +1,7 @@
 package org.playuniverse.minecraft.mcs.spigot;
 
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
-import org.playuniverse.minecraft.mcs.utils.plugin.PluginSettings;
+import org.playuniverse.minecraft.mcs.spigot.utils.plugin.PluginSettings;
 
 public class SpigotCore extends PluginBase<SpigotCore> {
     

@@ -5,7 +5,7 @@ import java.io.File;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.config.Config;
 import org.playuniverse.minecraft.mcs.spigot.config.Migration;
-import org.playuniverse.minecraft.mcs.utils.plugin.PluginPackage;
+import org.playuniverse.minecraft.mcs.spigot.utils.plugin.PluginPackage;
 
 public abstract class CompatibilityAddonConfig<A extends CompatibilityAddon> extends Config {
 

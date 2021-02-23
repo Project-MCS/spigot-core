@@ -8,8 +8,8 @@ import java.util.Optional;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.config.Config;
 import org.playuniverse.minecraft.mcs.spigot.config.config.AddonConfig;
-import org.playuniverse.minecraft.mcs.utils.plugin.PluginPackage;
-import org.playuniverse.minecraft.mcs.utils.plugin.PluginSettings;
+import org.playuniverse.minecraft.mcs.spigot.utils.plugin.PluginPackage;
+import org.playuniverse.minecraft.mcs.spigot.utils.plugin.PluginSettings;
 
 import com.syntaxphoenix.syntaxapi.reflection.Reflect;
 

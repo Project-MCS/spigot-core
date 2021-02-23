@@ -1,7 +1,7 @@
 package org.playuniverse.minecraft.mcs.spigot.compatibility;
 
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
-import org.playuniverse.minecraft.mcs.utils.plugin.PluginPackage;
+import org.playuniverse.minecraft.mcs.spigot.utils.plugin.PluginPackage;
 
 public abstract class CompatibilityAddon {
 

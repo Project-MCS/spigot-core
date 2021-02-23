@@ -1,6 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.compatibility;
 
-import org.playuniverse.minecraft.mcs.utils.plugin.PluginPackage;
+import org.playuniverse.minecraft.mcs.spigot.utils.plugin.PluginPackage;
 
 import net.sourcewriters.minecraft.versiontools.reflection.utils.Tracker;
 

@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.utils.version;
+package org.playuniverse.minecraft.mcs.spigot.utils.version;
 
 import com.syntaxphoenix.syntaxapi.version.DefaultVersion;
 import com.syntaxphoenix.syntaxapi.version.VersionAnalyzer;

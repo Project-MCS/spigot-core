@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.utils.wait;
+package org.playuniverse.minecraft.mcs.spigot.utils.wait;
 
 import java.util.Collections;
 import java.util.HashMap;

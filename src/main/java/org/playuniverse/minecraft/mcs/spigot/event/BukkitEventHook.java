@@ -8,7 +8,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
-import org.playuniverse.minecraft.mcs.utils.wait.Awaiter;
+import org.playuniverse.minecraft.mcs.spigot.utils.wait.Awaiter;
 
 public class BukkitEventHook implements Listener, EventExecutor {
 

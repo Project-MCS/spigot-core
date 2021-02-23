@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.utils.syntax.data;
+package org.playuniverse.minecraft.mcs.spigot.utils.syntax.data;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;

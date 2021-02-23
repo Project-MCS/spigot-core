@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.utils.java;
+package org.playuniverse.minecraft.mcs.spigot.utils.java;
 
 import java.util.HashMap;
 

@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.utils.log;
+package org.playuniverse.minecraft.mcs.spigot.utils.log;
 
 import java.util.function.BiConsumer;
 

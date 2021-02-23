@@ -5,8 +5,8 @@ import java.util.function.Function;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
-import org.playuniverse.minecraft.mcs.utils.general.IEnum;
-import org.playuniverse.minecraft.mcs.utils.general.Placeholder;
+import org.playuniverse.minecraft.mcs.spigot.utils.general.IEnum;
+import org.playuniverse.minecraft.mcs.spigot.utils.general.Placeholder;
 
 import com.syntaxphoenix.syntaxapi.utils.java.Arrays;
 
