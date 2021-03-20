@@ -6,10 +6,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.compatibility.CompatibilityHandler;
 import org.playuniverse.minecraft.mcs.spigot.config.Config;
 import org.playuniverse.minecraft.mcs.spigot.config.migration.AddonMigration;
+import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 
 public final class AddonConfig extends Config {
 
@@ -68,7 +68,7 @@ public final class AddonConfig extends Config {
         }
         try {
             if (refresh) {
-                CompatibilityHandler.handleSettingsUpdate(SpigotCore.SETTINGS);
+                CompatibilityHandler.handleSettingsUpdate(Singleton.General.SETTINGS);
             }
         } finally {
             read.unlock();

@@ -1,20 +1,27 @@
 package org.playuniverse.minecraft.mcs.spigot.language;
 
-import org.playuniverse.minecraft.mcs.spigot.utils.general.Placeholder;
+import org.bukkit.util.Consumer;
 
-public interface IMessage extends ITranslatable {
+import com.syntaxphoenix.syntaxapi.nbt.NbtCompound;
 
+import net.md_5.bungee.api.chat.BaseComponent;
+
+public interface IMessage<T> extends ISendable {
+    
+    MessageBuilder<T> getBuilder();
+
+    BaseComponent[] asComponents();
+
+    NbtCompound getProperties();
+    
+    default IMessage<T> send(Consumer<BaseComponent[]> sender) {
+        sender.accept(asComponents());
+        return this;
+    }
+    
     @Override
-    public default TranslationType type() {
-        return TranslationType.MESSAGE;
-    }
-
-    public default String translate(String language) {
-        return Translations.translate(language, this);
-    }
-
-    public default String translate(String language, Placeholder... placeholders) {
-        return Translations.translate(language, this, placeholders);
+    default IMessage<?> getMessage() {
+        return this;
     }
 
 }

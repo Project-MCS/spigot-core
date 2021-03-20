@@ -1,9 +1,11 @@
+
 package org.playuniverse.minecraft.mcs.spigot.language;
 
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
+import org.playuniverse.minecraft.mcs.spigot.registry.IUnique;
 
-public class Language {
+public class Language implements IUnique {
 
     private final String id;
 
@@ -23,10 +25,12 @@ public class Language {
         return this;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getId() {
         return id;
     }
