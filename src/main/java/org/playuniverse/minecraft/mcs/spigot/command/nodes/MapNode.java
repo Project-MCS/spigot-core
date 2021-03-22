@@ -1,5 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.command.nodes;
 
+import java.util.List;
 import java.util.function.Function;
 
 import org.playuniverse.minecraft.mcs.spigot.command.CommandContext;
@@ -18,6 +19,11 @@ public class MapNode<OS, NS> extends RootNode<OS> {
     @Override
     public int execute(CommandContext<OS> context) {
         return node.execute(new CommandContext<>(function.apply(context.getSource()), context.getReader()));
+    }
+
+    @Override
+    public List<String> complete(CommandContext<OS> context) {
+        return node.complete(new CommandContext<>(function.apply(context.getSource()), context.getReader()));
     }
 
 }

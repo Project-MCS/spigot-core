@@ -1,6 +1,8 @@
 package org.playuniverse.minecraft.mcs.spigot.command.nodes;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.playuniverse.minecraft.mcs.spigot.command.CommandContext;
 
@@ -40,6 +42,15 @@ public class LiteralNode<S> extends RootNode<S> {
             return 0;
         }
         return getChild(name).execute(context);
+    }
+    
+    @Override
+    public List<String> complete(CommandContext<S> context) {
+        String name = context.getReader().skipWhitespace().readUnquoted();
+        if (!hasChild(name) && !hasChild(name = execution)) {
+            return new ArrayList<>(children.keySet());
+        }
+        return getChild(name).complete(context);
     }
 
 }

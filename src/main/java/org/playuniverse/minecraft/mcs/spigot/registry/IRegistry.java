@@ -1,5 +1,7 @@
 package org.playuniverse.minecraft.mcs.spigot.registry;
 
+import java.util.Collection;
+
 public interface IRegistry<K, V> {
 
     V get(K key);
@@ -11,5 +13,13 @@ public interface IRegistry<K, V> {
     boolean unregister(K key);
     
     boolean isRegistered(K key);
+    
+    Collection<V> values();
+    
+    boolean isEmpty();
+    
+    int size();
+    
+    void dispose();
 
 }

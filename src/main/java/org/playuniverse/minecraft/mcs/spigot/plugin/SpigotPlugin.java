@@ -7,6 +7,7 @@ import org.pf4j.Plugin;
 import org.pf4j.PluginWrapper;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
+import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandState;
 import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
@@ -101,4 +102,17 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     public final CommandState register(RootNode<MinecraftInfo> command, String... aliases) {
         return getBase().getCommandManager().register(new PluginNode<>(this, command), aliases);
     }
+
+    public final void register(Injector<?> injector) {
+        getBase().register(injector);
+    }
+
+    public final <T> boolean inject(T object) {
+        return getBase().getInjections().inject(object);
+    }
+
+    public final <T> boolean uninject(T object) {
+        return getBase().getInjections().uninject(object);
+    }
+
 }

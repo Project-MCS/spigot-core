@@ -10,7 +10,7 @@ public class TypedRegistry<T extends ITyped<?>> extends Registry<Class<?>, T> {
         if (clazz.isArray()) {
             clazz = clazz.getComponentType();
         }
-        for (Class<?> key : registry.keySet()) {
+        for (Class<?> key : map.keySet()) {
             if (!clazz.isAssignableFrom(key)) {
                 continue;
             }
@@ -33,19 +33,19 @@ public class TypedRegistry<T extends ITyped<?>> extends Registry<Class<?>, T> {
     }
 
     public boolean register(T typed) {
-        if (registry.containsKey(typed.getType())) {
+        if (map.containsKey(typed.getType())) {
             return false;
         }
-        registry.put(typed.getType(), typed);
+        map.put(typed.getType(), typed);
         return true;
     }
 
     @Override
     public boolean register(Class<?> key, T value) {
-        if (!key.equals(value.getType()) || registry.containsKey(key)) {
+        if (!key.equals(value.getType()) || map.containsKey(key)) {
             return false;
         }
-        registry.put(key, value);
+        map.put(key, value);
         return true;
     }
 

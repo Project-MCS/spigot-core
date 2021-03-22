@@ -11,10 +11,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
+import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Commands;
+import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injections;
+import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inventory.GuiListener;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.config.Config;
+import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.ReflectionProvider;
@@ -41,8 +45,10 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
      * 
      */
 
-    protected final Container<ReflectionProvider> provider = Container.of();
-    
+    protected final Container<ReflectionProvider> javaProvider = Container.of();
+    protected final Container<net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider> minecraftProvider = Container
+        .of();
+
     private org.bukkit.plugin.PluginManager bukkitManager;
 
     private ServiceManager serviceManager;
@@ -50,6 +56,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
     private BukkitEventManager bukkitEventManager;
     private EventManager eventManager;
+    private Injections injections;
 
     private CommandManager<MinecraftInfo> commandManager;
 
@@ -140,7 +147,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
     public final File getPluginDirectory() {
         return pluginDirectory;
     }
-    
+
     public final File getCompatDirectory() {
         return compatDirectory;
     }
@@ -169,12 +176,20 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         return serviceManager;
     }
 
-    public final ReflectionProvider getReflectionProvider() {
-        return provider.get();
+    public final ReflectionProvider getJavaReflectionProvider() {
+        return javaProvider.get();
+    }
+
+    public final net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider getMinecraftReflectionProvider() {
+        return minecraftProvider.get();
     }
 
     public final PluginManager getPluginManager() {
         return pluginManager;
+    }
+
+    public Injections getInjections() {
+        return injections;
     }
 
     /*
@@ -212,19 +227,27 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
         serviceManager = createServiceManager(logger);
 
-        pluginManager = createPluginManager(pluginDirectory.toPath(), logger, provider, commandManager, eventManager, bukkitEventManager,
-            serviceManager);
+        pluginManager = createPluginManager(pluginDirectory.toPath(), logger, javaProvider, commandManager, eventManager,
+            bukkitEventManager, serviceManager);
 
-        provider.replace(ReflectionProvider.of(this));
-        
+        javaProvider.replace(ReflectionProvider.of(this));
+        minecraftProvider.replace(new net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider());
+
         bukkitManager = Bukkit.getPluginManager();
-        
+        injections = new Injections(minecraftProvider.get());
+
         //
         // Registering Events
         //
-        
+
         register(GuiListener.LISTENER);
-        
+
+        //
+        // Register Injections
+        //
+
+        register(new Commands());
+
         //
         // Running the startup of the actual bot logic
         //
@@ -305,11 +328,26 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         bukkitEventManager.getHook().unregister();
 
         //
+        // Uninject everything
+        //
+
+        injections.uninjectAll();
+        injections.dispose();
+
+        //
         // Shutdown reflections
         //
 
-        provider.get().dispose();
-        provider.replace(null);
+        minecraftProvider.get().getReflection().clear();
+        minecraftProvider.replace(null);
+        javaProvider.get().dispose();
+        javaProvider.replace(null);
+
+        //
+        // Flush registries
+        //
+
+        Singleton.Registries.flush();
 
         //
         // Shutdown the logger
@@ -319,15 +357,27 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         logger.close();
 
     }
-    
+
     /*
      * 
      */
-    
+
+    public void register(Injector<?> injector) {
+        injections.getInjectorRegistry().register(injector);
+    }
+
+    public void unregister(Injector<?> injector) {
+        injections.getInjectorRegistry().unregister(injector.getType());
+    }
+
+    /*
+     * 
+     */
+
     public void register(Listener listener) {
         bukkitManager.registerEvents(listener, this);
     }
-    
+
     public void unregister(Listener listener) {
         HandlerList.unregisterAll(listener);
     }

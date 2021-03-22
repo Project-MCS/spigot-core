@@ -1,5 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.command.nodes;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import org.playuniverse.minecraft.mcs.spigot.command.CommandContext;
@@ -21,6 +22,14 @@ public class ConditionalNode<S> extends RootNode<S> {
             return -1;
         }
         return node.execute(context);
+    }
+
+    @Override
+    public List<String> complete(CommandContext<S> context) {
+        if (!predicate.test(context)) {
+            return null;
+        }
+        return node.complete(context);
     }
 
 }

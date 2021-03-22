@@ -1,5 +1,7 @@
 package org.playuniverse.minecraft.mcs.spigot.command.nodes;
 
+import java.util.List;
+
 import org.playuniverse.minecraft.mcs.spigot.command.CommandContext;
 
 public class ForkNode<S> extends RootNode<S> {
@@ -18,6 +20,11 @@ public class ForkNode<S> extends RootNode<S> {
     @Override
     public int execute(CommandContext<S> context) {
         return fork.execute(context);
+    }
+    
+    @Override
+    public List<String> complete(CommandContext<S> context) {
+        return fork.complete(context);
     }
 
 }

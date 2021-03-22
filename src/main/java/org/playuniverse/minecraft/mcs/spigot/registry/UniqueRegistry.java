@@ -1,5 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.registry;
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UniqueRegistry<V extends IUnique> implements IRegistry<String, V> {
@@ -50,6 +51,26 @@ public class UniqueRegistry<V extends IUnique> implements IRegistry<String, V> {
     @Override
     public boolean isRegistered(String key) {
         return map.containsKey(key) ? true : map.values().stream().anyMatch(value -> value.getName().equalsIgnoreCase(key));
+    }
+    
+    @Override
+    public Collection<V> values() {
+        return map.values();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+    
+    @Override
+    public int size() {
+        return map.size();
+    }
+
+    @Override
+    public void dispose() {
+        map.clear();
     }
 
 }

@@ -196,12 +196,12 @@ public final class MessageWrapper<T> {
      */
 
     @SuppressWarnings("unchecked")
-    public static <E> MessageWrapper<E> of(E receiver) {
+    public static <S> MessageWrapper<S> of(S receiver) {
         IMessageHandler<?> handler = Singleton.Registries.MESSAGE_HANDLER.getFor(receiver);
         if (handler == null) {
             return null;
         }
-        return new MessageWrapper<>(receiver, (IMessageHandler<E>) handler);
+        return new MessageWrapper<>(receiver, (IMessageHandler<S>) handler);
     }
 
 }

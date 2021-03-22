@@ -1,5 +1,7 @@
 package org.playuniverse.minecraft.mcs.spigot.command.nodes;
 
+import java.util.List;
+
 import org.playuniverse.minecraft.mcs.spigot.command.CommandContext;
 
 public class RedirectNode<S> extends SubNode<S> {
@@ -18,6 +20,11 @@ public class RedirectNode<S> extends SubNode<S> {
     @Override
     public int execute(CommandContext<S> context) {
         return redirect.execute(context);
+    }
+    
+    @Override
+    public List<String> complete(CommandContext<S> context) {
+        return redirect.complete(context);
     }
 
 }

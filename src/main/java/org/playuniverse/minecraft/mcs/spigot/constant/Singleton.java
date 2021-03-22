@@ -44,12 +44,23 @@ public final class Singleton {
 
         public static final TypedRegistry<IMessageHandler<?>> MESSAGE_HANDLER = new TypedRegistry<>();
         public static final TypedRegistry<MessageBuilder<?>> MESSAGE_BUILDER = new TypedRegistry<>();
-        
+
         public static final Registry<Language, Registry<NamespacedKey, Object>> TRANSLATIONS = new Registry<>();
         public static final Registry<NamespacedKey, Object> MESSAGES = new Registry<>();
         public static final UniqueRegistry<Language> LANGUAGES = new UniqueRegistry<>();
 
         //
+
+        public static void flush() {
+            MESSAGE_HANDLER.dispose();
+            MESSAGE_BUILDER.dispose();
+            LANGUAGES.dispose();
+            MESSAGES.dispose();
+            for (Registry<NamespacedKey, Object> registry : TRANSLATIONS.values()) {
+                registry.dispose();
+            }
+            TRANSLATIONS.dispose();
+        }
 
     }
 

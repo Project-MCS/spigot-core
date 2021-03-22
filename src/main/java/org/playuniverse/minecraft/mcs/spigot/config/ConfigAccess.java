@@ -27,7 +27,7 @@ public class ConfigAccess {
     ConfigAccess() {
         PluginBase<?> base = PluginBase.get(SpigotCore.class);
         logger = base.getPluginLogger();
-        provider = base.getReflectionProvider();
+        provider = base.getJavaReflectionProvider();
         createDefaults(base);
     }
 
