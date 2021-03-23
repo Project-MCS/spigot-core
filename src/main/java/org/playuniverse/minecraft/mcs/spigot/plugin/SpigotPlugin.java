@@ -46,11 +46,13 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     }
 
     private final File dataLocation;
+    private final ILogger logger;
 
     public SpigotPlugin(PluginWrapper wrapper, File dataLocation) {
         super(wrapper);
         this.dataLocation = dataLocation;
         Files.createFolder(dataLocation);
+        this.logger = new PluginLogger(getBase().getPluginLogger(), this);
     }
 
     @Override
@@ -58,10 +60,14 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         return wrapper.getPluginId();
     }
 
+    public String getPrefix() {
+        return "[" + getId() + "]";
+    }
+
     public abstract P getBase();
 
     public final ILogger getLogger() {
-        return getBase().getPluginLogger();
+        return logger;
     }
 
     public final File getDataLocation() {
@@ -69,21 +75,32 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     }
 
     @Override
-    public void start() {
+    public final void start() {
+        logger.log("Starting...");
+        logger.log("Loading configs...");
         Config.ACCESS.load(wrapper);
+        logger.log("Starting logic...");
         onStart();
+        logger.log("Setting up injections...");
         getBase().getInjections().setup();
+        logger.log("Successfully started!");
     }
 
     @Override
-    public void stop() {
+    public final void stop() {
+        logger.log("Stopping...");
+        logger.log("Stopping logic...");
         onStop();
+        logger.log("Unloading configs...");
         Config.ACCESS.unload(wrapper);
+        logger.log("Successfully stopped!");
     }
 
     @Override
-    public void delete() {
+    public final void delete() {
+        logger.log("Deleting...");
         onDelete();
+        logger.log("Successfully deleted!");
     }
 
     protected void onStart() {}

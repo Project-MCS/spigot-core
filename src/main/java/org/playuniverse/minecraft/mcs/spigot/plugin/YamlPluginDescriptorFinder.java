@@ -19,8 +19,8 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
     public static final String DEFAULT_FILE_NAME = "addon.yml";
     public static final String[] DEFAULT_RESOURCE_PATHS = new String[] {
         "",
-        "resources/",
-        "src/main/resources/"
+        "/resources/",
+        "/src/main/resources/"
     };
 
     public static final String PLUGIN_ID = "name";

@@ -10,6 +10,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.pf4j.PluginManager;
+import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Commands;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injections;
@@ -26,6 +27,7 @@ import org.playuniverse.minecraft.mcs.spigot.utils.log.ConsoleLogger;
 
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
+import com.syntaxphoenix.syntaxapi.logging.LogTypeId;
 import com.syntaxphoenix.syntaxapi.logging.LoggerState;
 import com.syntaxphoenix.syntaxapi.logging.SynLogger;
 import com.syntaxphoenix.syntaxapi.service.ServiceManager;
@@ -261,42 +263,15 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
         logger.log("Booted plugin successfully!");
 
-        //
-        // Loading addons
-        //
-
-        logger.log("Loading functionality addons...");
-
-        try {
-            pluginManager.loadPlugins();
-        } catch (Throwable throwable) {
-            logger.log(throwable);
-        }
-
-        int size = pluginManager.getResolvedPlugins().size();
-
-        logger.log("Loaded " + size + " addons to add functionality!");
-
-        //
-        // Enabling addons
-        //
-
-        if (size != 0) {
-
-            logger.log("Enabling functionality addons...");
-
-            try {
-                pluginManager.startPlugins();
-            } catch (Throwable throwable) {
-                logger.log(throwable);
-            }
-
-            size = pluginManager.getStartedPlugins().size();
-
-            logger.log("Enabled " + size + " addons to add functionality!");
-        }
+        loadPlugins();
 
         logger.log("Plugin successfully started!");
+
+        logger.log("Running post startup...");
+        
+        onStarted();
+        
+        logger.log("Post startup executed successfully!");
 
     }
 
@@ -389,13 +364,78 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
      * 
      */
 
-    private final void unloadPlugins() {
+    protected final void unloadPlugins() {
         List<PluginWrapper> plugins = pluginManager.getPlugins();
         if (plugins.isEmpty()) {
             return;
         }
         for (PluginWrapper plugin : plugins) {
             pluginManager.unloadPlugin(plugin.getPluginId());
+        }
+    }
+
+    protected final void loadPlugins() {
+        logger.log("Loading functionality addons...");
+        try {
+            pluginManager.loadPlugins();
+        } catch (Throwable throwable) {
+            logger.log(throwable);
+        }
+        int size = pluginManager.getResolvedPlugins().size();
+        logger.log("Loaded " + size + " addons to add functionality!");
+        if (size != 0) {
+            PluginWrapper[] wrappers = pluginManager.getPlugins().stream()
+                .filter(wrapper -> wrapper.getPluginState() == PluginState.DISABLED)
+                .toArray(PluginWrapper[]::new);
+            if (wrappers.length != 0) {
+                logger.log(LogTypeId.ERROR, "Some plugins failed to load...");
+                logger.log(LogTypeId.ERROR, "");
+                for (int index = 0; index < wrappers.length; index++) {
+                    PluginWrapper wrapper = wrappers[index];
+                    logger.log(LogTypeId.ERROR, "===============================================");
+                    logger.log(LogTypeId.ERROR, "");
+                    logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getPluginId() + "' by " + wrapper.getDescriptor().getProvider());
+                    logger.log(LogTypeId.ERROR, "");
+                    logger.log(LogTypeId.ERROR, "-----------------------------------------------");
+                    logger.log(LogTypeId.ERROR, wrapper.getFailedException());
+                    logger.log(LogTypeId.ERROR, "===============================================");
+                    if (index + 1 != wrappers.length) {
+                        logger.log(LogTypeId.ERROR, "");
+                        logger.log(LogTypeId.ERROR, "");
+                    }
+                }
+                logger.log(LogTypeId.ERROR, "");
+                logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
+            }
+        }
+        if (size != 0) {
+            logger.log("Enabling functionality addons...");
+            pluginManager.startPlugins();
+            size = pluginManager.getStartedPlugins().size();
+            logger.log("Enabled " + size + " addons to add functionality!");
+            PluginWrapper[] wrappers = pluginManager.getPlugins().stream()
+                .filter(wrapper -> wrapper.getPluginState() == PluginState.FAILED)
+                .toArray(PluginWrapper[]::new);
+            if (wrappers.length != 0) {
+                logger.log(LogTypeId.ERROR, "Some plugins failed to start...");
+                logger.log(LogTypeId.ERROR, "");
+                for (int index = 0; index < wrappers.length; index++) {
+                    PluginWrapper wrapper = wrappers[index];
+                    logger.log(LogTypeId.ERROR, "===============================================");
+                    logger.log(LogTypeId.ERROR, "");
+                    logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getPluginId() + "' by " + wrapper.getDescriptor().getProvider());
+                    logger.log(LogTypeId.ERROR, "");
+                    logger.log(LogTypeId.ERROR, "-----------------------------------------------");
+                    logger.log(LogTypeId.ERROR, wrapper.getFailedException());
+                    logger.log(LogTypeId.ERROR, "===============================================");
+                    if (index + 1 != wrappers.length) {
+                        logger.log(LogTypeId.ERROR, "");
+                        logger.log(LogTypeId.ERROR, "");
+                    }
+                }
+                logger.log(LogTypeId.ERROR, "");
+                logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
+            }
         }
     }
 
@@ -441,6 +481,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
     protected abstract void onLoadup();
 
     protected abstract void onStartup();
+
+    protected abstract void onStarted();
 
     protected abstract void onShutdown();
 

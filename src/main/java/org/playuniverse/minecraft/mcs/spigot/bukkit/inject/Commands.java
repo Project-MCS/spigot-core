@@ -1,6 +1,11 @@
 package org.playuniverse.minecraft.mcs.spigot.bukkit.inject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.Plugin;
@@ -41,22 +46,34 @@ public class Commands extends Injector<MinecraftCommand> {
         SimpleCommandMap map = (SimpleCommandMap) provider.getReflect("CraftServer").run(Bukkit.getServer(), "commandMap");
         PluginCommand command = (PluginCommand) provider.getReflect("PluginCommand").init("init", transfer.getId(), transfer.getOwner());
         command.setAliases(JavaHelper.fromArray(transfer.getAliases()));
+        if (!map.register(transfer.getFallbackPrefix(), command)) {
+            throw new IllegalStateException("Failed to register command '" + transfer.getFallbackPrefix() + ':' + command.getName() + "'!");
+        }
         registry.register(transfer);
         commands.register(transfer, command);
-        command.register(map);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void uninject0(ReflectionProvider provider, MinecraftCommand transfer) {
         if (transfer == null || transfer.getId() == null || !registry.isRegistered(transfer.getId())) {
             return;
         }
-        SimpleCommandMap map = (SimpleCommandMap) provider.getReflect("CraftServer").run(Bukkit.getServer(), "commandMap");
+        SimpleCommandMap commandMap = (SimpleCommandMap) provider.getReflect("CraftServer").run(Bukkit.getServer(), "commandMap");
+        Map<String, Command> map = (Map<String, Command>) provider.getReflect("CraftCommandMap").run(commandMap, "sourceMap");
         MinecraftCommand command = registry.get(transfer.getId());
         PluginCommand bukkitCommand = commands.get(command);
         registry.unregister(command.getId());
         commands.unregister(command);
-        bukkitCommand.unregister(map);
+        ArrayList<String> aliases = new ArrayList<>(bukkitCommand.getAliases());
+        aliases.add(command.getName());
+        Collections.addAll(aliases, aliases.stream().map(string -> command.getFallbackPrefix() + ':' + string).toArray(String[]::new));
+        for (String alias : aliases) {
+            if (map.get(alias) != bukkitCommand) {
+                continue;
+            }
+            map.remove(alias);
+        }
     }
 
     @Override

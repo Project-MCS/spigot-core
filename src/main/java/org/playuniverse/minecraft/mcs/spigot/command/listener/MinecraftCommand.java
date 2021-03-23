@@ -26,6 +26,8 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
     private final PluginBase<?> owner;
     private final String name;
     private final String[] aliases;
+    
+    private final String fallbackPrefix;
 
     private BiConsumer<MinecraftInfo, String> nonExistent = (info, name) -> info.getReceiver()
         .send(Placeholder.array(Placeholder.of("command", name)), SpigotCore.getNamespace().create("command.not.existent"));
@@ -36,6 +38,7 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
     private BiConsumer<MinecraftInfo, Throwable> failedCommand = (info, error) -> info.getBase().getPluginLogger().log(error);
 
     public MinecraftCommand(String name) {
+        this.fallbackPrefix = null;
         this.manager = null;
         this.owner = null;
         this.name = name;
@@ -43,6 +46,15 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
     }
 
     public MinecraftCommand(CommandManager<MinecraftInfo> manager, PluginBase<?> owner, String name, String... aliases) {
+        this.fallbackPrefix = owner.getDescription().getName();
+        this.manager = manager;
+        this.owner = owner;
+        this.name = name;
+        this.aliases = aliases;
+    }
+
+    public MinecraftCommand(CommandManager<MinecraftInfo> manager, String fallbackPrefix, PluginBase<?> owner, String name, String... aliases) {
+        this.fallbackPrefix = fallbackPrefix;
         this.manager = manager;
         this.owner = owner;
         this.name = name;
@@ -69,6 +81,10 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
     @Override
     public String getName() {
         return name;
+    }
+    
+    public String getFallbackPrefix() {
+        return fallbackPrefix;
     }
 
     public String[] getAliases() {

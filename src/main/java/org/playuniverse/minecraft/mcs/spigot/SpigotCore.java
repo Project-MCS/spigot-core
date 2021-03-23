@@ -33,14 +33,19 @@ public class SpigotCore extends PluginBase<SpigotCore> {
             getPluginLogger().log("Reloading... (0 / 4)");
             getPluginManager().stopPlugins();
             getPluginLogger().log("Reloading... (1 / 4)");
-            getPluginManager().unloadPlugins();
+            get().unloadPlugins();
             getPluginLogger().log("Reloading... (2 / 4)");
-            getPluginManager().loadPlugins();
+            get().loadPlugins();
             getPluginLogger().log("Reloading... (3 / 4)");
             getPluginManager().startPlugins();
             getPluginLogger().log("Reloading... (4 / 4)");
             getPluginLogger().log("Reload complete!");
         }));
+    }
+
+    @Override
+    protected void onStarted() {
+
     }
 
     @Override
