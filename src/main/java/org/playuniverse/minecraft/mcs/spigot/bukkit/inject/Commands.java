@@ -3,12 +3,11 @@ package org.playuniverse.minecraft.mcs.spigot.bukkit.inject;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.plugin.Plugin;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.registry.Registry;
 import org.playuniverse.minecraft.mcs.spigot.registry.UniqueRegistry;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.JavaHelper;
-
-import com.sun.source.util.Plugin;
 
 import net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider;
 

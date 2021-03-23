@@ -26,7 +26,7 @@ public abstract class Injector<T> implements ITyped<T> {
 
     public final boolean inject(ReflectionProvider provider, T object) {
         if (setup) {
-            inject(provider, object);
+            inject0(provider, object);
             return true;
         }
         return false;
@@ -34,7 +34,7 @@ public abstract class Injector<T> implements ITyped<T> {
 
     public final boolean uninject(ReflectionProvider provider, T object) {
         if (setup) {
-            uninject(provider, object);
+            uninject0(provider, object);
             return true;
         }
         return false;
@@ -43,7 +43,7 @@ public abstract class Injector<T> implements ITyped<T> {
 
     public final boolean uninjectAll(ReflectionProvider provider) {
         if (setup) {
-            uninjectAll(provider);
+            uninjectAll0(provider);
             return true;
         }
         return false;
