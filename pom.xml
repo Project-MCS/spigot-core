@@ -29,6 +29,16 @@
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
 			<artifactId>config-yaml</artifactId>
 			<version>2.0.5</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>reflection</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>java</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
@@ -37,13 +47,30 @@
 		</dependency>
 		<dependency>
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
-			<artifactId>service-base</artifactId>
-			<version>2.0.4</version>
-		</dependency>
-		<dependency>
-			<groupId>com.syntaxphoenix.syntaxapi</groupId>
 			<artifactId>service-download</artifactId>
 			<version>2.0.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>java</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>general</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>reflection</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>exception</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
@@ -60,20 +87,47 @@
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
 			<artifactId>config-json</artifactId>
 			<version>2.0.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>config-base</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>json-tools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>java</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
 			<artifactId>event</artifactId>
 			<version>2.0.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>reflection</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>java</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>general</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.syntaxphoenix.syntaxapi</groupId>
+					<artifactId>logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
 			<artifactId>thread</artifactId>
-			<version>2.0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>com.syntaxphoenix.syntaxapi</groupId>
-			<artifactId>config-base</artifactId>
 			<version>2.0.3</version>
 		</dependency>
 		
