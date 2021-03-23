@@ -31,15 +31,15 @@ public class Commands extends Injector<MinecraftCommand> {
     protected void onSetup(ReflectionProvider provider) {
         provider.createReflect("PluginCommand", "org.bukkit.command.PluginCommand").searchConstructor("init", String.class, Plugin.class);
         provider.createCBReflect("CraftCommandMap", "command.CraftCommandMap").searchMethod("sourceMap", "getKnownCommands");
-        provider.createCBReflect("CraftServer", "CraftServer").searchMethod("commandMap", "getCommandMap");
+        provider.createReflect("CraftServer", "CraftServer").searchField("commandMap", "commandMap");
     }
 
     @Override
-    public void inject(ReflectionProvider provider, MinecraftCommand transfer) {
+    protected void inject0(ReflectionProvider provider, MinecraftCommand transfer) {
         if (transfer == null || !transfer.isValid() || registry.isRegistered(transfer.getId())) {
             return;
         }
-        SimpleCommandMap map = (SimpleCommandMap) provider.getReflect("CraftServer").run(Bukkit.getServer(), "commandMap");
+        SimpleCommandMap map = (SimpleCommandMap) provider.getReflect("CraftServer").getFieldValue("commandMap", Bukkit.getServer());
         PluginCommand command = (PluginCommand) provider.getReflect("PluginCommand").init("init", transfer.getId(), transfer.getOwner());
         command.setAliases(JavaHelper.fromArray(transfer.getAliases()));
         registry.register(transfer);
@@ -48,7 +48,7 @@ public class Commands extends Injector<MinecraftCommand> {
     }
 
     @Override
-    public void uninject(ReflectionProvider provider, MinecraftCommand transfer) {
+    protected void uninject0(ReflectionProvider provider, MinecraftCommand transfer) {
         if (transfer == null || transfer.getId() == null || !registry.isRegistered(transfer.getId())) {
             return;
         }
@@ -61,13 +61,13 @@ public class Commands extends Injector<MinecraftCommand> {
     }
 
     @Override
-    public void uninjectAll(ReflectionProvider provider) {
+    protected void uninjectAll0(ReflectionProvider provider) {
         if (registry.isEmpty()) {
             return;
         }
         MinecraftCommand[] array = registry.values().toArray(MinecraftCommand[]::new);
         for (MinecraftCommand transfer : array) {
-            uninject(provider, transfer);
+            uninject0(provider, transfer);
         }
     }
 

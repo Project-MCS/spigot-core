@@ -28,7 +28,7 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
     private final String[] aliases;
 
     private BiConsumer<MinecraftInfo, String> nonExistent = (info, name) -> info.getReceiver()
-        .send(Placeholder.array(Placeholder.of("command", name)), SpigotCore.NAMESPACE.create("command.not.existent"));
+        .send(Placeholder.array(Placeholder.of("command", name)), SpigotCore.getNamespace().create("command.not.existent"));
 
     private BiConsumer<MinecraftInfo, Integer> execution;
 

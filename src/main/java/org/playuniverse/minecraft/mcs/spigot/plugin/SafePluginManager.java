@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.Plugin;
+import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.PluginState;
 import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginStateListener;
@@ -63,6 +64,11 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
         this.command = command;
         this.bukkitEvent = bukkitEvent;
         super.addPluginStateListener(this);
+    }
+
+    @Override
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
+        return new YamlPluginDescriptorFinder();
     }
 
     /*

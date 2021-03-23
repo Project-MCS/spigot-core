@@ -2,12 +2,19 @@ package org.playuniverse.minecraft.mcs.spigot;
 
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
+import org.playuniverse.minecraft.mcs.spigot.command.nodes.CommandNode;
 
 import com.syntaxphoenix.syntaxapi.utils.key.Namespace;
 
+import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.utils.java.tools.Container;
+
 public class SpigotCore extends PluginBase<SpigotCore> {
 
-    public static final Namespace NAMESPACE = Namespace.of("system");
+    private static final Container<Namespace> NAMESPACE = Container.of();
+
+    public static Namespace getNamespace() {
+        return NAMESPACE.get();
+    }
 
     public static SpigotCore get() {
         return get(SpigotCore.class);
@@ -16,8 +23,25 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     private MinecraftCommand command;
 
     @Override
+    protected void onLoadup() {
+        NAMESPACE.replace(Namespace.of("system")).lock();
+    }
+
+    @Override
     protected void onStartup() {
         getInjections().inject(command = new MinecraftCommand(getCommandManager(), this, "system", "sys", "core"));
+        getCommandManager().register(new CommandNode<>("reload", context -> {
+            getPluginLogger().log("Reloading... (0 / 4)");
+            getPluginManager().stopPlugins();
+            getPluginLogger().log("Reloading... (1 / 4)");
+            getPluginManager().unloadPlugins();
+            getPluginLogger().log("Reloading... (2 / 4)");
+            getPluginManager().loadPlugins();
+            getPluginLogger().log("Reloading... (3 / 4)");
+            getPluginManager().startPlugins();
+            getPluginLogger().log("Reloading... (4 / 4)");
+            getPluginLogger().log("Reload complete!");
+        }));
     }
 
     @Override

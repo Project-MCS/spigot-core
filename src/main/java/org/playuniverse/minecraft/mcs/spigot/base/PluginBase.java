@@ -123,7 +123,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
     @Override
     public final void onLoad() {
-
+        onLoadup();
     }
 
     @Override
@@ -231,7 +231,9 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
             bukkitEventManager, serviceManager);
 
         javaProvider.replace(ReflectionProvider.of(this));
-        minecraftProvider.replace(new net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider());
+        minecraftProvider.replace(new net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider(provider -> {
+            return;
+        }));
 
         bukkitManager = Bukkit.getPluginManager();
         injections = new Injections(minecraftProvider.get());
@@ -247,6 +249,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         //
 
         register(new Commands());
+        injections.setup();
 
         //
         // Running the startup of the actual bot logic
@@ -434,6 +437,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
      */
 
     public void createConfigs(ArrayList<Class<? extends Config>> list) {}
+
+    protected abstract void onLoadup();
 
     protected abstract void onStartup();
 

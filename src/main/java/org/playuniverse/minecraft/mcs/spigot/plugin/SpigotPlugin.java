@@ -70,14 +70,15 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
 
     @Override
     public void start() {
-        onStart();
         Config.ACCESS.load(wrapper);
+        onStart();
+        getBase().getInjections().setup();
     }
 
     @Override
     public void stop() {
-        Config.ACCESS.unload(wrapper);
         onStop();
+        Config.ACCESS.unload(wrapper);
     }
 
     @Override

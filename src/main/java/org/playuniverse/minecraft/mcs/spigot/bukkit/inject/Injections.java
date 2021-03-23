@@ -21,6 +21,15 @@ public class Injections {
         return provider;
     }
 
+    public void setup() {
+        for (Injector<?> injector : injectors.values()) {
+            if (injector.isSetup()) {
+                continue;
+            }
+            injector.setup(provider);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public <T> boolean inject(T object) {
         Injector<?> injector = injectors.getFor(object);
@@ -48,7 +57,7 @@ public class Injections {
     }
 
     public void dispose() {
-        for(Injector<?> injector : injectors.values()) {
+        for (Injector<?> injector : injectors.values()) {
             injector.dispose();
         }
         injectors.dispose();

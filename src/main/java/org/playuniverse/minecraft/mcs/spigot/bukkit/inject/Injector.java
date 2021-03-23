@@ -24,11 +24,36 @@ public abstract class Injector<T> implements ITyped<T> {
 
     public abstract boolean isCompatible(ReflectionProvider provider);
 
-    public abstract void inject(ReflectionProvider provider, T object);
+    public final boolean inject(ReflectionProvider provider, T object) {
+        if (setup) {
+            inject(provider, object);
+            return true;
+        }
+        return false;
+    }
 
-    public abstract void uninject(ReflectionProvider provider, T object);
+    public final boolean uninject(ReflectionProvider provider, T object) {
+        if (setup) {
+            uninject(provider, object);
+            return true;
+        }
+        return false;
 
-    public abstract void uninjectAll(ReflectionProvider provider);
+    }
+
+    public final boolean uninjectAll(ReflectionProvider provider) {
+        if (setup) {
+            uninjectAll(provider);
+            return true;
+        }
+        return false;
+    }
+
+    protected abstract void inject0(ReflectionProvider provider, T object);
+
+    protected abstract void uninject0(ReflectionProvider provider, T object);
+
+    protected abstract void uninjectAll0(ReflectionProvider provider);
 
     protected abstract void dispose();
 
