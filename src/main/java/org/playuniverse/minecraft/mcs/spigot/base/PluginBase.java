@@ -407,7 +407,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
     protected ILogger createLogger() {
         return new SynLogger(LoggerState.CUSTOM).setColored(true)
-            .setCustom(new ConsoleLogger("&c" + getName() + " &8" + UniCode.ARROWS_RIGHT + " "));
+            .setCustom(new ConsoleLogger("&c" + getName() + " &8" + UniCode.ARROWS_RIGHT + "&7 "));
     }
 
     protected EventManager createEventManager(ILogger logger) {
