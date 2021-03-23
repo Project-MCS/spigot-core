@@ -31,7 +31,7 @@ public class Commands extends Injector<MinecraftCommand> {
     protected void onSetup(ReflectionProvider provider) {
         provider.createReflect("PluginCommand", "org.bukkit.command.PluginCommand").searchConstructor("init", String.class, Plugin.class);
         provider.createCBReflect("CraftCommandMap", "command.CraftCommandMap").searchMethod("sourceMap", "getKnownCommands");
-        provider.createReflect("CraftServer", "CraftServer").searchField("commandMap", "commandMap");
+        provider.createCBReflect("CraftServer", "CraftServer").searchMethod("commandMap", "getCommandMap");
     }
 
     @Override
@@ -39,7 +39,7 @@ public class Commands extends Injector<MinecraftCommand> {
         if (transfer == null || !transfer.isValid() || registry.isRegistered(transfer.getId())) {
             return;
         }
-        SimpleCommandMap map = (SimpleCommandMap) provider.getReflect("CraftServer").getFieldValue("commandMap", Bukkit.getServer());
+        SimpleCommandMap map = (SimpleCommandMap) provider.getReflect("CraftServer").run(Bukkit.getServer(), "commandMap");
         PluginCommand command = (PluginCommand) provider.getReflect("PluginCommand").init("init", transfer.getId(), transfer.getOwner());
         command.setAliases(JavaHelper.fromArray(transfer.getAliases()));
         registry.register(transfer);
