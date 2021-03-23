@@ -3,10 +3,9 @@ package org.playuniverse.minecraft.mcs.spigot.utils.plugin;
 import org.bukkit.plugin.Plugin;
 
 import com.syntaxphoenix.syntaxapi.reflection.ReflectCache;
-
-import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.version.DefaultVersion;
-import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.version.Version;
-import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.version.VersionAnalyzer;
+import com.syntaxphoenix.syntaxapi.version.DefaultVersion;
+import com.syntaxphoenix.syntaxapi.version.Version;
+import com.syntaxphoenix.syntaxapi.version.VersionAnalyzer;
 
 public class PluginPackage {
 

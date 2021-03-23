@@ -6,11 +6,11 @@ import org.playuniverse.minecraft.mcs.spigot.language.MessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.StringMessageBuilder;
 
 import com.syntaxphoenix.syntaxapi.nbt.NbtCompound;
+import com.syntaxphoenix.syntaxapi.utils.java.Strings;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.utils.java.Strings;
 
 public final class StringMessage implements IMessage<String> {
 

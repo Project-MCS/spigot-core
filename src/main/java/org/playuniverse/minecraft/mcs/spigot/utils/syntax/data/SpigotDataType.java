@@ -6,10 +6,10 @@ import java.util.function.Function;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.data.DataAdapterContext;
-import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.data.DataType;
-import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.data.IDataContainer;
-import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.data.PrimitiveDataType;
+import com.syntaxphoenix.syntaxapi.data.DataAdapterContext;
+import com.syntaxphoenix.syntaxapi.data.DataType;
+import com.syntaxphoenix.syntaxapi.data.IDataContainer;
+import com.syntaxphoenix.syntaxapi.data.PrimitiveDataType;
 
 public class SpigotDataType<P, C> implements DataType<P, C> {
 

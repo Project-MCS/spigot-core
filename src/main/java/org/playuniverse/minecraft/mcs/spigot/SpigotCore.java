@@ -4,9 +4,8 @@ import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.CommandNode;
 
+import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 import com.syntaxphoenix.syntaxapi.utils.key.Namespace;
-
-import net.sourcewriters.minecraft.versiontools.shaded.syntaxapi.utils.java.tools.Container;
 
 public class SpigotCore extends PluginBase<SpigotCore> {
 
