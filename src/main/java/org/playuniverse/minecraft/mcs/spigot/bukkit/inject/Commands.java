@@ -45,6 +45,8 @@ public class Commands extends Injector<MinecraftCommand> {
         }
         SimpleCommandMap map = (SimpleCommandMap) provider.getReflect("CraftServer").run(Bukkit.getServer(), "commandMap");
         PluginCommand command = (PluginCommand) provider.getReflect("PluginCommand").init("init", transfer.getId(), transfer.getOwner());
+        command.setExecutor(transfer);
+        command.setTabCompleter(transfer);
         command.setAliases(JavaHelper.fromArray(transfer.getAliases()));
         if (!map.register(transfer.getFallbackPrefix(), command)) {
             throw new IllegalStateException("Failed to register command '" + transfer.getFallbackPrefix() + ':' + command.getName() + "'!");
