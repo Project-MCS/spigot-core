@@ -1,7 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.utils.log;
 
 import java.io.PrintStream;
-import java.util.concurrent.BlockingQueue;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
@@ -17,7 +16,6 @@ public class BukkitLogger extends AbstractLogger<BukkitLogger> {
     private final PrintStream file;
 
     private String prefix = "Server";
-    private BlockingQueue<String> queue;
     
     public BukkitLogger(ReflectionProvider provider, PrintStream file) {
         this.file = file;
@@ -53,7 +51,7 @@ public class BukkitLogger extends AbstractLogger<BukkitLogger> {
 
     @Override
     public boolean hasCustom() {
-        return queue != null;
+        return sender != null;
     }
 
     @Override
