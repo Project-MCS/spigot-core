@@ -17,12 +17,14 @@ public class CommandManager<S> {
 
     private final ConcurrentHashMap<String, RootNode<S>> commands = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ArrayList<String>> aliases = new ConcurrentHashMap<>();
+    
+    private String global = null;
 
     public String[] getAliases(IPlugin plugin) {
         ArrayList<String> list = aliases.get(plugin.getId());
         return list == null ? new String[0] : list.toArray(String[]::new);
     }
-    
+
     public HashMap<RootNode<S>, String[]> getCommands() {
         HashMap<RootNode<S>, String[]> map = new HashMap<>();
         for (RootNode<S> node : commands.values()) {
@@ -149,6 +151,27 @@ public class CommandManager<S> {
         }
         commands.remove(name);
         return true;
+    }
+
+    public CommandManager<S> setGlobal(String global) {
+        this.global = global;
+        return this;
+    }
+
+    public boolean hasGlobal() {
+        return global != null;
+    }
+
+    public RootNode<S> getGlobal() {
+        return global != null ? getCommand(global) : null;
+    }
+
+    public RootNode<S> getCommandOrGlobal(String name) {
+        RootNode<S> node = getCommand(name);
+        if (node == null && hasGlobal()) {
+            return getGlobal();
+        }
+        return node;
     }
 
     public RootNode<S> getCommand(String name) {

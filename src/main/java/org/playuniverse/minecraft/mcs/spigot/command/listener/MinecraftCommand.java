@@ -1,6 +1,5 @@
 package org.playuniverse.minecraft.mcs.spigot.command.listener;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -10,23 +9,21 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.plugin.Plugin;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandContext;
-import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
-import org.playuniverse.minecraft.mcs.spigot.command.nodes.RootNode;
+import org.playuniverse.minecraft.mcs.spigot.command.nodes.Node;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.Placeholder;
 import org.playuniverse.minecraft.mcs.spigot.registry.IUnique;
 
 public final class MinecraftCommand implements CommandExecutor, TabCompleter, IUnique {
 
-    private final CommandManager<MinecraftInfo> manager;
+    private final AbstractRedirect redirect;
 
     private final PluginBase<?> owner;
     private final String name;
     private final String[] aliases;
-    
+
     private final String fallbackPrefix;
 
     private BiConsumer<MinecraftInfo, String> nonExistent = (info, name) -> info.getReceiver()
@@ -39,30 +36,30 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
 
     public MinecraftCommand(String name) {
         this.fallbackPrefix = null;
-        this.manager = null;
+        this.redirect = null;
         this.owner = null;
         this.name = name;
         this.aliases = null;
     }
 
-    public MinecraftCommand(CommandManager<MinecraftInfo> manager, PluginBase<?> owner, String name, String... aliases) {
+    public MinecraftCommand(AbstractRedirect redirect, PluginBase<?> owner, String name, String... aliases) {
         this.fallbackPrefix = owner.getDescription().getName();
-        this.manager = manager;
+        this.redirect = redirect;
         this.owner = owner;
         this.name = name;
         this.aliases = aliases;
     }
 
-    public MinecraftCommand(CommandManager<MinecraftInfo> manager, String fallbackPrefix, PluginBase<?> owner, String name, String... aliases) {
+    public MinecraftCommand(AbstractRedirect redirect, String fallbackPrefix, PluginBase<?> owner, String name, String... aliases) {
         this.fallbackPrefix = fallbackPrefix;
-        this.manager = manager;
+        this.redirect = redirect;
         this.owner = owner;
         this.name = name;
         this.aliases = aliases;
     }
 
     public boolean isValid() {
-        return owner != null && manager != null && (name != null && !name.isBlank()) && aliases != null;
+        return owner != null && (redirect != null && redirect.isValid()) && (name != null && !name.isBlank()) && aliases != null;
     }
 
     /*
@@ -74,7 +71,7 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
         return name;
     }
 
-    public Plugin getOwner() {
+    public PluginBase<?> getOwner() {
         return owner;
     }
 
@@ -82,7 +79,7 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
     public String getName() {
         return name;
     }
-    
+
     public String getFallbackPrefix() {
         return fallbackPrefix;
     }
@@ -91,8 +88,12 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
         return aliases;
     }
 
+    public AbstractRedirect getRedirect() {
+        return redirect;
+    }
+
     /*
-     * Setter
+     * Functions
      */
 
     public MinecraftCommand setNonExistent(BiConsumer<MinecraftInfo, String> nonExistent) {
@@ -121,7 +122,7 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command ignore, String label, String[] args) {
-        List<String> output = complete(sender, args);
+        List<String> output = redirectComplete(sender, args);
         if (output == null) {
             return Collections.emptyList();
         }
@@ -139,10 +140,30 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
         return output;
     }
 
+    private List<String> redirectComplete(CommandSender sender, String[] args) {
+        if (args.length == 0 && !redirect.hasGlobal()) {
+            return redirect.handleNullComplete(this, sender, args);
+        }
+        Node<MinecraftInfo> node = args.length == 0 ? redirect.handleComplete(null) : redirect.handleComplete(args[0]);
+        if (node == null) {
+            return redirect.handleNullComplete(this, sender, args);
+        }
+        MinecraftInfo info = new MinecraftInfo(owner, sender);
+        try {
+            return node.complete(new CommandContext<>(info, buildArgs(args)));
+        } catch (Throwable throwable) {
+            if (failedComplete != null) {
+                failedComplete.accept(info, throwable);
+            }
+            return null;
+        }
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command ignore, String label, String[] args) {
         MinecraftInfo info = new MinecraftInfo(owner, sender);
-        RootNode<MinecraftInfo> node = manager.getCommand(args[0]);
+        Node<MinecraftInfo> node = args.length == 0 ? (redirect.hasGlobal() ? redirect.handleCommand(null) : null)
+            : redirect.handleCommand(args[0]);
         if (node == null) {
             if (nonExistent != null) {
                 nonExistent.accept(info, args[0]);
@@ -167,26 +188,7 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
      * Helper
      */
 
-    private List<String> complete(CommandSender sender, String[] args) {
-        if (args.length == 0) {
-            return manager.getCommands().isEmpty() ? null : collectCommands();
-        }
-        RootNode<MinecraftInfo> node = manager.getCommand(args[0]);
-        if (node == null) {
-            return args.length == 1 ? collectCommands() : null;
-        }
-        MinecraftInfo info = new MinecraftInfo(owner, sender);
-        try {
-            return node.complete(new CommandContext<>(info, buildArgs(args)));
-        } catch (Throwable throwable) {
-            if (failedComplete != null) {
-                failedComplete.accept(info, throwable);
-            }
-            return null;
-        }
-    }
-
-    private String buildArgs(String[] args) {
+    public String buildArgs(String[] args) {
         if (args.length <= 1) {
             return "";
         }
@@ -195,12 +197,6 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
             builder.append(args[index]).append(" ");
         }
         return builder.substring(0, builder.length() - 1);
-    }
-
-    private List<String> collectCommands() {
-        ArrayList<String> commands = new ArrayList<>();
-        manager.getCommands().values().forEach(array -> Collections.addAll(commands, array));
-        return commands;
     }
 
 }

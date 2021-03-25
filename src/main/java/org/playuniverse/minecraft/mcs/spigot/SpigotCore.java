@@ -2,6 +2,7 @@ package org.playuniverse.minecraft.mcs.spigot;
 
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
+import org.playuniverse.minecraft.mcs.spigot.command.listener.redirect.ManagerRedirect;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.CommandNode;
 
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
@@ -20,7 +21,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     }
 
     private MinecraftCommand command;
-    
+
     @Override
     protected void onLoadup() {
         NAMESPACE.replace(Namespace.of("system")).lock();
@@ -28,7 +29,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
 
     @Override
     protected void onStartup() {
-        getInjections().inject(command = new MinecraftCommand(getCommandManager(), this, "system", "sys", "core"));
+        getInjections().inject(command = new MinecraftCommand(new ManagerRedirect(getCommandManager()), this, "system", "sys", "core"));
         getCommandManager().register(new CommandNode<>("reload", context -> {
             getPluginLogger().log("Reloading... (0 / 4)");
             getPluginManager().stopPlugins();
@@ -45,7 +46,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
 
     @Override
     protected void onStarted() {
-        
+
     }
 
     @Override
