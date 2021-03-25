@@ -76,6 +76,7 @@ public class Commands extends Injector<MinecraftCommand> {
             }
             map.remove(alias);
         }
+        bukkitCommand.unregister(commandMap);
     }
 
     @Override
