@@ -23,15 +23,13 @@ import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.ReflectionProvider;
-import org.playuniverse.minecraft.mcs.spigot.utils.log.ConsoleLogger;
+import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
+import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
 
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.logging.LogTypeId;
-import com.syntaxphoenix.syntaxapi.logging.LoggerState;
-import com.syntaxphoenix.syntaxapi.logging.SynLogger;
 import com.syntaxphoenix.syntaxapi.service.ServiceManager;
-import com.syntaxphoenix.syntaxapi.utils.java.UniCode;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 import com.syntaxphoenix.syntaxapi.random.Keys;
 
@@ -64,7 +62,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
     private boolean init = false;
 
-    private ILogger logger;
+    private AbstractLogger<?> logger;
 
     protected final File directory;
     protected final File pluginDirectory;
@@ -158,7 +156,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
      * 
      */
 
-    public final ILogger getPluginLogger() {
+    public final AbstractLogger<?> getPluginLogger() {
         return logger;
     }
 
@@ -190,7 +188,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         return pluginManager;
     }
 
-    public Injections getInjections() {
+    public final Injections getInjections() {
         return injections;
     }
 
@@ -206,11 +204,18 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         init = true;
 
         //
+        // Setup Minecraft Provider
+        //
+
+        minecraftProvider.replace(new net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider(provider -> {
+            return;
+        }));
+
+        //
         // Creating logger
         //
 
         logger = createLogger();
-        logger.setColored(false);
 
         //
         // Hooking into shutdown
@@ -233,9 +238,6 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
             bukkitEventManager, serviceManager);
 
         javaProvider.replace(ReflectionProvider.of(this));
-        minecraftProvider.replace(new net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider(provider -> {
-            return;
-        }));
 
         bukkitManager = Bukkit.getPluginManager();
         injections = new Injections(minecraftProvider.get());
@@ -247,7 +249,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         register(GuiListener.LISTENER);
 
         //
-        // Register Injections
+        // Register Injections and apply reflections
         //
 
         register(new Commands());
@@ -268,9 +270,9 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         logger.log("Plugin successfully started!");
 
         logger.log("Running post startup...");
-        
+
         onStarted();
-        
+
         logger.log("Post startup executed successfully!");
 
     }
@@ -385,8 +387,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         logger.log("Loaded " + size + " addons to add functionality!");
         if (size != 0) {
             PluginWrapper[] wrappers = pluginManager.getPlugins().stream()
-                .filter(wrapper -> wrapper.getPluginState() == PluginState.DISABLED)
-                .toArray(PluginWrapper[]::new);
+                .filter(wrapper -> wrapper.getPluginState() == PluginState.DISABLED).toArray(PluginWrapper[]::new);
             if (wrappers.length != 0) {
                 logger.log(LogTypeId.ERROR, "Some plugins failed to load...");
                 logger.log(LogTypeId.ERROR, "");
@@ -413,8 +414,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
             pluginManager.startPlugins();
             size = pluginManager.getStartedPlugins().size();
             logger.log("Enabled " + size + " addons to add functionality!");
-            PluginWrapper[] wrappers = pluginManager.getPlugins().stream()
-                .filter(wrapper -> wrapper.getPluginState() == PluginState.FAILED)
+            PluginWrapper[] wrappers = pluginManager.getPlugins().stream().filter(wrapper -> wrapper.getPluginState() == PluginState.FAILED)
                 .toArray(PluginWrapper[]::new);
             if (wrappers.length != 0) {
                 logger.log(LogTypeId.ERROR, "Some plugins failed to start...");
@@ -441,13 +441,16 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
     /*
      * 
+     */
+
+    /*
+     * 
      * 
      * 
      */
 
-    protected ILogger createLogger() {
-        return new SynLogger(LoggerState.CUSTOM).setColored(true)
-            .setCustom(new ConsoleLogger("&c" + getName() + " &8" + UniCode.ARROWS_RIGHT + "&7 "));
+    protected AbstractLogger<?> createLogger() {
+        return new BukkitLogger(getMinecraftReflectionProvider()).setPrefix(getName());
     }
 
     protected EventManager createEventManager(ILogger logger) {
