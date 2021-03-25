@@ -77,10 +77,10 @@ public abstract class AbstractLogger<T extends AbstractLogger<T>> implements ILo
      */
 
     public T setDefaultTypes() {
-        setType("debug", "#F000FF");
-        setType("info", "#2FE4E7");
         setType("warning", "#E89102");
         setType("error", "#FF0000");
+        setType("debug", "#2FE4E7");
+        setType("info", "#949494");
         return instance();
     }
 
