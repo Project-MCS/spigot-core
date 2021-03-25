@@ -1,10 +1,8 @@
 package org.playuniverse.minecraft.mcs.spigot;
 
-import org.bukkit.Bukkit;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.CommandNode;
-import org.playuniverse.minecraft.mcs.spigot.helper.ColorHelper;
 
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 import com.syntaxphoenix.syntaxapi.utils.key.Namespace;
@@ -47,7 +45,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
 
     @Override
     protected void onStarted() {
-        Bukkit.getConsoleSender().sendMessage(ColorHelper.hexToMinecraftColor("#124F24") + "This is a test");
+        
     }
 
     @Override
