@@ -13,8 +13,7 @@ import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.registry.Registry;
 import org.playuniverse.minecraft.mcs.spigot.registry.UniqueRegistry;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.JavaHelper;
-
-import net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
 public class Commands extends Injector<MinecraftCommand> {
 
@@ -27,24 +26,24 @@ public class Commands extends Injector<MinecraftCommand> {
     }
 
     @Override
-    public boolean isCompatible(ReflectionProvider provider) {
+    public boolean isCompatible(ClassLookupProvider provider) {
         return true;
     }
 
     @Override
-    protected void onSetup(ReflectionProvider provider) {
-        provider.createReflect("PluginCommand", "org.bukkit.command.PluginCommand").searchConstructor("init", String.class, Plugin.class);
-        provider.createCBReflect("CraftCommandMap", "command.CraftCommandMap").searchMethod("sourceMap", "getKnownCommands");
-        provider.createCBReflect("CraftServer", "CraftServer").searchMethod("commandMap", "getCommandMap");
+    protected void onSetup(ClassLookupProvider provider) {
+        provider.createLookup("PluginCommand", "org.bukkit.command.PluginCommand").searchConstructor("init", String.class, Plugin.class);
+        provider.createCBLookup("CraftCommandMap", "command.CraftCommandMap").searchMethod("sourceMap", "getKnownCommands");
+        provider.createCBLookup("CraftServer", "CraftServer").searchMethod("commandMap", "getCommandMap");
     }
 
     @Override
-    protected void inject0(ReflectionProvider provider, MinecraftCommand transfer) {
+    protected void inject0(ClassLookupProvider provider, MinecraftCommand transfer) {
         if (transfer == null || !transfer.isValid() || registry.isRegistered(transfer.getId())) {
             return;
         }
-        SimpleCommandMap map = (SimpleCommandMap) provider.getReflect("CraftServer").run(Bukkit.getServer(), "commandMap");
-        PluginCommand command = (PluginCommand) provider.getReflect("PluginCommand").init("init", transfer.getId(), transfer.getOwner());
+        SimpleCommandMap map = (SimpleCommandMap) provider.getLookup("CraftServer").run(Bukkit.getServer(), "commandMap");
+        PluginCommand command = (PluginCommand) provider.getLookup("PluginCommand").init("init", transfer.getId(), transfer.getOwner());
         command.setExecutor(transfer);
         command.setTabCompleter(transfer);
         command.setAliases(JavaHelper.fromArray(transfer.getAliases()));
@@ -57,12 +56,12 @@ public class Commands extends Injector<MinecraftCommand> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void uninject0(ReflectionProvider provider, MinecraftCommand transfer) {
+    protected void uninject0(ClassLookupProvider provider, MinecraftCommand transfer) {
         if (transfer == null || transfer.getId() == null || !registry.isRegistered(transfer.getId())) {
             return;
         }
-        SimpleCommandMap commandMap = (SimpleCommandMap) provider.getReflect("CraftServer").run(Bukkit.getServer(), "commandMap");
-        Map<String, Command> map = (Map<String, Command>) provider.getReflect("CraftCommandMap").run(commandMap, "sourceMap");
+        SimpleCommandMap commandMap = (SimpleCommandMap) provider.getLookup("CraftServer").run(Bukkit.getServer(), "commandMap");
+        Map<String, Command> map = (Map<String, Command>) provider.getLookup("CraftCommandMap").run(commandMap, "sourceMap");
         MinecraftCommand command = registry.get(transfer.getId());
         PluginCommand bukkitCommand = commands.get(command);
         registry.unregister(command.getId());
@@ -80,7 +79,7 @@ public class Commands extends Injector<MinecraftCommand> {
     }
 
     @Override
-    protected void uninjectAll0(ReflectionProvider provider) {
+    protected void uninjectAll0(ClassLookupProvider provider) {
         if (registry.isEmpty()) {
             return;
         }

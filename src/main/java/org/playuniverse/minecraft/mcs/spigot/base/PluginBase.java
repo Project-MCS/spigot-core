@@ -22,9 +22,9 @@ import org.playuniverse.minecraft.mcs.spigot.config.Config;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
-import org.playuniverse.minecraft.mcs.spigot.utils.java.ReflectionProvider;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
@@ -45,9 +45,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
      * 
      */
 
-    protected final Container<ReflectionProvider> javaProvider = Container.of();
-    protected final Container<net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider> minecraftProvider = Container
-        .of();
+    protected final Container<ClassLookupProvider> lookupProvider = Container.of();
 
     private org.bukkit.plugin.PluginManager bukkitManager;
 
@@ -176,12 +174,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         return serviceManager;
     }
 
-    public final ReflectionProvider getJavaReflectionProvider() {
-        return javaProvider.get();
-    }
-
-    public final net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider getMinecraftReflectionProvider() {
-        return minecraftProvider.get();
+    public final ClassLookupProvider getLookupProvider() {
+        return lookupProvider.get();
     }
 
     public final PluginManager getPluginManager() {
@@ -204,10 +198,10 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         init = true;
 
         //
-        // Setup Minecraft Provider
+        // Setup Lookup Provider
         //
 
-        minecraftProvider.replace(new net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider(provider -> {
+        lookupProvider.replace(new ClassLookupProvider(provider -> {
             return;
         }));
 
@@ -234,13 +228,11 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
         serviceManager = createServiceManager(logger);
 
-        pluginManager = createPluginManager(pluginDirectory.toPath(), logger, javaProvider, commandManager, eventManager,
+        pluginManager = createPluginManager(pluginDirectory.toPath(), logger, lookupProvider, commandManager, eventManager,
             bukkitEventManager, serviceManager);
 
-        javaProvider.replace(ReflectionProvider.of(this));
-
         bukkitManager = Bukkit.getPluginManager();
-        injections = new Injections(minecraftProvider.get());
+        injections = new Injections(lookupProvider.get());
 
         //
         // Registering Events
@@ -318,10 +310,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         // Shutdown reflections
         //
 
-        minecraftProvider.get().getReflection().clear();
-        minecraftProvider.replace(null);
-        javaProvider.get().dispose();
-        javaProvider.replace(null);
+        lookupProvider.get().getReflection().clear();
+        lookupProvider.replace(null);
 
         //
         // Flush registries
@@ -450,7 +440,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
      */
 
     protected AbstractLogger<?> createLogger() {
-        return new BukkitLogger(getMinecraftReflectionProvider()).setPrefix(getName());
+        return new BukkitLogger(getLookupProvider()).setPrefix(getName());
     }
 
     protected EventManager createEventManager(ILogger logger) {
@@ -469,7 +459,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         return new CommandManager<>();
     }
 
-    protected PluginManager createPluginManager(Path path, ILogger logger, Container<ReflectionProvider> provider,
+    protected PluginManager createPluginManager(Path path, ILogger logger, Container<ClassLookupProvider> provider,
         CommandManager<MinecraftInfo> commandManager, EventManager eventManager, BukkitEventManager discordEventManager,
         ServiceManager serviceManager) {
         return new SafePluginManager(path, logger, provider, commandManager, eventManager, discordEventManager, serviceManager);

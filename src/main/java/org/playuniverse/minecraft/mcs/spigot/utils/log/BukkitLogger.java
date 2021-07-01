@@ -4,11 +4,11 @@ import java.io.PrintStream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
 import com.syntaxphoenix.syntaxapi.logging.color.LogType;
 
 import net.md_5.bungee.api.ChatColor;
-import net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider;
 
 public class BukkitLogger extends AbstractLogger<BukkitLogger> {
     
@@ -17,13 +17,13 @@ public class BukkitLogger extends AbstractLogger<BukkitLogger> {
 
     private String prefix = "Server";
     
-    public BukkitLogger(ReflectionProvider provider, PrintStream file) {
+    public BukkitLogger(ClassLookupProvider provider, PrintStream file) {
         this.file = file;
         this.colored = true;
         setDefaultTypes();
     }
 
-    public BukkitLogger(ReflectionProvider provider) {
+    public BukkitLogger(ClassLookupProvider provider) {
         this(provider, null);
     }
 

@@ -18,8 +18,8 @@ import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventExecutor;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
-import org.playuniverse.minecraft.mcs.spigot.utils.java.ReflectionProvider;
 import org.playuniverse.minecraft.mcs.spigot.utils.wait.Awaiter;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
 import com.syntaxphoenix.syntaxapi.event.Event;
 import com.syntaxphoenix.syntaxapi.event.EventExecutor;
@@ -32,7 +32,7 @@ import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 
 public class SafePluginManager extends DefaultPluginManager implements PluginStateListener {
 
-    private final Container<ReflectionProvider> provider;
+    private final Container<ClassLookupProvider> provider;
 
     private final ServiceManager service;
 
@@ -43,7 +43,7 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
 
     private final ILogger logger;
 
-    public SafePluginManager(ILogger logger, Container<ReflectionProvider> provider, CommandManager<MinecraftInfo> command,
+    public SafePluginManager(ILogger logger, Container<ClassLookupProvider> provider, CommandManager<MinecraftInfo> command,
         EventManager event, BukkitEventManager bukkitEvent, ServiceManager service) {
         super();
         this.provider = provider;
@@ -55,7 +55,7 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
         super.addPluginStateListener(this);
     }
 
-    public SafePluginManager(Path pluginsRoot, ILogger logger, Container<ReflectionProvider> provider,
+    public SafePluginManager(Path pluginsRoot, ILogger logger, Container<ClassLookupProvider> provider,
         CommandManager<MinecraftInfo> command, EventManager event, BukkitEventManager bukkitEvent, ServiceManager service) {
         super(pluginsRoot);
         this.provider = provider;
@@ -81,7 +81,7 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
      * Getter
      */
 
-    public ReflectionProvider getProvider() {
+    public ClassLookupProvider getProvider() {
         return provider.get();
     }
 
@@ -186,9 +186,9 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
 
         ClassLoader loader = wrapper.getPluginClassLoader();
         Package[] packages = loader.getDefinedPackages();
-        ReflectionProvider current = provider.get();
+        ClassLookupProvider current = provider.get();
         for (int index = 0; index < packages.length; index++) {
-            current.delete(packages[index].getName());
+            current.deleteByPackage(packages[index].getName());
         }
 
     }

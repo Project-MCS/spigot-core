@@ -21,6 +21,9 @@ import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.utils.java.Files;
 
 public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin implements IPlugin {
+    
+    @SuppressWarnings("unchecked")
+    private static final Class<? extends Config>[] EMPTY_CONFIG = new Class[0];
 
     public static Optional<SpigotPlugin<?>> getAsOptional(String name) {
         return Optional.ofNullable(get(name));
@@ -72,6 +75,10 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
 
     public final File getDataLocation() {
         return dataLocation;
+    }
+    
+    public Class<? extends Config>[] getConfigurations() {
+        return EMPTY_CONFIG;
     }
 
     @Override

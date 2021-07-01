@@ -1,15 +1,14 @@
 package org.playuniverse.minecraft.mcs.spigot.bukkit.inject;
 
 import org.playuniverse.minecraft.mcs.spigot.registry.TypedRegistry;
-
-import net.sourcewriters.minecraft.versiontools.reflection.reflect.ReflectionProvider;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
 public class Injections {
 
     private final TypedRegistry<Injector<?>> injectors = new TypedRegistry<>();
-    private final ReflectionProvider provider;
+    private final ClassLookupProvider provider;
 
-    public Injections(ReflectionProvider provider) {
+    public Injections(ClassLookupProvider provider) {
         this.provider = provider;
     }
 
@@ -17,7 +16,7 @@ public class Injections {
         return injectors;
     }
 
-    public ReflectionProvider getProvider() {
+    public ClassLookupProvider getProvider() {
         return provider;
     }
 

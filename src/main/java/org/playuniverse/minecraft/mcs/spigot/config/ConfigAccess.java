@@ -5,29 +5,24 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.Set;
 
 import org.pf4j.PluginWrapper;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
-import org.playuniverse.minecraft.mcs.spigot.utils.java.ReflectionProvider;
 
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
-import com.syntaxphoenix.syntaxapi.utils.java.Arrays;
 import com.syntaxphoenix.syntaxapi.utils.java.Files;
 
 public class ConfigAccess {
 
     private final HashMap<Class<? extends Config>, Config> configs = new HashMap<>();
-    private final ReflectionProvider provider;
     private final ILogger logger;
 
     ConfigAccess() {
         PluginBase<?> base = PluginBase.get(SpigotCore.class);
         logger = base.getPluginLogger();
-        provider = base.getJavaReflectionProvider();
         createDefaults(base);
     }
 
@@ -115,10 +110,8 @@ public class ConfigAccess {
         if (plugin == null) {
             return this;
         }
-        String[] path = wrapper.getDescriptor().getPluginClass().split("\\.");
-        String packageName = String.join(".", Arrays.subArray(size -> new String[size], path, 0, path.length - 1)) + ".config";
-        Set<Class<? extends Config>> classes = provider.of(wrapper, packageName).getSubTypesOf(Config.class);
-        if (classes.isEmpty()) {
+        Class<? extends Config>[] classes = plugin.getConfigurations();
+        if (classes.length == 0) {
             return this;
         }
         ArrayList<Config> configList = new ArrayList<>();

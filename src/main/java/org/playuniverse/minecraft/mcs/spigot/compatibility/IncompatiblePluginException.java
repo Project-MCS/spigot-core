@@ -1,8 +1,7 @@
 package org.playuniverse.minecraft.mcs.spigot.compatibility;
 
 import org.playuniverse.minecraft.mcs.spigot.utils.plugin.PluginPackage;
-
-import net.sourcewriters.minecraft.versiontools.reflection.utils.Tracker;
+import org.playuniverse.minecraft.vcompat.reflection.utils.Tracker;
 
 public class IncompatiblePluginException extends RuntimeException {
 
