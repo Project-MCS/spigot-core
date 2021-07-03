@@ -4,14 +4,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.bukkit.persistence.PersistentDataContainer;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterContext;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterRegistry;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
+import org.playuniverse.minecraft.vcompat.reflection.VersionControl;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedKey;
 import org.playuniverse.minecraft.vcompat.reflection.data.wrap.SyntaxKey;
 
-import com.syntaxphoenix.syntaxapi.data.DataAdapterContext;
-import com.syntaxphoenix.syntaxapi.data.DataType;
-import com.syntaxphoenix.syntaxapi.data.IDataContainer;
 import com.syntaxphoenix.syntaxapi.utils.key.IKey;
 
 public final class SyntaxContainerImpl extends WrappedContainer implements IDataContainer {
@@ -35,6 +37,11 @@ public final class SyntaxContainerImpl extends WrappedContainer implements IData
     /*
     * 
     */
+    
+    @Override
+    public IDataAdapterRegistry<?> getRegistry() {
+        return VersionControl.get().getDataProvider().getRegistry();
+    }
 
     @Override
     public boolean has(IKey key) {
@@ -42,22 +49,22 @@ public final class SyntaxContainerImpl extends WrappedContainer implements IData
     }
 
     @Override
-    public boolean has(String key, DataType<?, ?> type) {
+    public boolean has(String key, IDataType<?, ?> type) {
         return has(syntaxKey(key), type);
     }
 
     @Override
-    public boolean has(IKey key, DataType<?, ?> type) {
+    public boolean has(IKey key, IDataType<?, ?> type) {
         return has(new SyntaxKey(key), WrappedTypeImpl.wrap(type));
     }
 
     @Override
-    public <C> C get(String key, DataType<?, C> type) {
+    public <C> C get(String key, IDataType<?, C> type) {
         return get(syntaxKey(key), type);
     }
 
     @Override
-    public <C> C get(IKey key, DataType<?, C> type) {
+    public <C> C get(IKey key, IDataType<?, C> type) {
         return get(new SyntaxKey(key), WrappedTypeImpl.wrap(type));
     }
 
@@ -72,12 +79,12 @@ public final class SyntaxContainerImpl extends WrappedContainer implements IData
     }
 
     @Override
-    public <E, V> void set(String key, E value, DataType<V, E> type) {
+    public <V, E> void set(String key, E value, IDataType<V, E> type) {
         set(wrappedKey(key), value, WrappedTypeImpl.wrap(type));
     }
 
     @Override
-    public <E, V> void set(IKey key, E value, DataType<V, E> type) {
+    public <V, E> void set(IKey key, E value, IDataType<V, E> type) {
         set(new SyntaxKey(key), value, WrappedTypeImpl.wrap(type));
     }
 
@@ -102,8 +109,8 @@ public final class SyntaxContainerImpl extends WrappedContainer implements IData
     }
 
     @Override
-    public DataAdapterContext getAdapterContext() {
-        return getContext();
+    public IDataAdapterContext getContext() {
+        return getWrapContext();
     }
 
     /*
@@ -111,7 +118,7 @@ public final class SyntaxContainerImpl extends WrappedContainer implements IData
     */
 
     @Override
-    public SyntaxContextImpl getContext() {
+    public SyntaxContextImpl getWrapContext() {
         return new SyntaxContextImpl(container.getAdapterContext());
     }
 

@@ -6,12 +6,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.bukkit.Bukkit;
+import org.playuniverse.minecraft.vcompat.base.data.nbt.NbtAdapterRegistry;
+import org.playuniverse.minecraft.vcompat.base.data.nbt.NbtContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.persistence.DataDistributor;
 import org.playuniverse.minecraft.vcompat.reflection.data.wrap.SimpleSyntaxContainer;
-
-import com.syntaxphoenix.syntaxapi.data.container.nbt.NbtAdapterRegistry;
-import com.syntaxphoenix.syntaxapi.data.container.nbt.NbtContainer;
 
 public class DataProvider extends VersionHandler<VersionControl> {
 

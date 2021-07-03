@@ -5,9 +5,9 @@ import static org.playuniverse.minecraft.vcompat.utils.constants.DefaultConstant
 import java.util.Optional;
 import java.util.Set;
 
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.wrap.SyntaxKey;
 
-import com.syntaxphoenix.syntaxapi.data.IDataContainer;
 import com.syntaxphoenix.syntaxapi.utils.key.IKey;
 import com.syntaxphoenix.syntaxapi.utils.key.Namespace;
 import com.syntaxphoenix.syntaxapi.utils.key.NamespacedKey;
@@ -16,7 +16,7 @@ public abstract class WrappedContainer {
 
     public abstract Object getHandle();
 
-    public abstract WrappedContext<?> getContext();
+    public abstract WrappedContext<?> getWrapContext();
 
     public abstract IDataContainer getAsSyntaxContainer();
 

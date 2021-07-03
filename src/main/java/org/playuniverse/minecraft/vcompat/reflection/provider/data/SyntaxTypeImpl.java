@@ -2,13 +2,12 @@ package org.playuniverse.minecraft.vcompat.reflection.provider.data;
 
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterContext;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContext;
 
-import com.syntaxphoenix.syntaxapi.data.DataAdapterContext;
-import com.syntaxphoenix.syntaxapi.data.DataType;
-
 public class SyntaxTypeImpl<P0, P1, C0, C1> extends WrappedTypeImpl<PersistentDataType<P1, C1>, P0, P1, C0, C1>
-    implements DataType<P0, C0> {
+    implements IDataType<P0, C0> {
 
     private final PersistentDataType<P1, C1> type;
 
@@ -47,12 +46,12 @@ public class SyntaxTypeImpl<P0, P1, C0, C1> extends WrappedTypeImpl<PersistentDa
     }
 
     @Override
-    public P0 toPrimitive(DataAdapterContext context, C0 complex) {
+    public P0 toPrimitive(IDataAdapterContext context, C0 complex) {
         return wrapToPrimitive(complex, new BukkitContextImpl(context));
     }
 
     @Override
-    public C0 fromPrimitive(DataAdapterContext context, P0 primitive) {
+    public C0 fromPrimitive(IDataAdapterContext context, P0 primitive) {
         return wrapToComplex(primitive, new BukkitContextImpl(context));
     }
 

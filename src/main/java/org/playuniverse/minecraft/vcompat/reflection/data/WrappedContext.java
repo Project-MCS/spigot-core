@@ -1,11 +1,11 @@
 package org.playuniverse.minecraft.vcompat.reflection.data;
 
-import com.syntaxphoenix.syntaxapi.data.DataAdapterContext;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterContext;
 
-public abstract class WrappedContext<H> implements DataAdapterContext {
+public abstract class WrappedContext<H> implements IDataAdapterContext {
 
     public abstract H getHandle();
 
-    public abstract WrappedContainer newContainer();
+    public abstract WrappedContainer newWrapContainer();
 
 }

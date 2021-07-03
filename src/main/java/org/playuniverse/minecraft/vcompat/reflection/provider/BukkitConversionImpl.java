@@ -2,6 +2,8 @@ package org.playuniverse.minecraft.vcompat.reflection.provider;
 
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterContext;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
 import org.playuniverse.minecraft.vcompat.reflection.BukkitConversion;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContext;
@@ -9,8 +11,6 @@ import org.playuniverse.minecraft.vcompat.reflection.entity.NmsEntityType;
 import org.playuniverse.minecraft.vcompat.reflection.provider.data.BukkitContextImpl;
 import org.playuniverse.minecraft.vcompat.reflection.provider.data.BukkitTypeImpl;
 
-import com.syntaxphoenix.syntaxapi.data.DataAdapterContext;
-import com.syntaxphoenix.syntaxapi.data.DataType;
 import com.syntaxphoenix.syntaxapi.nbt.NbtByte;
 import com.syntaxphoenix.syntaxapi.nbt.NbtByteArray;
 import com.syntaxphoenix.syntaxapi.nbt.NbtCompound;
@@ -198,12 +198,12 @@ public class BukkitConversionImpl extends BukkitConversion<VersionControlImpl> {
     }
 
     @Override
-    public WrappedContext<DataAdapterContext> createContext(DataAdapterContext context) {
+    public WrappedContext<IDataAdapterContext> createContext(IDataAdapterContext context) {
         return new BukkitContextImpl(context);
     }
 
     @Override
-    public <P, C> WrapType<P, C> wrap(DataType<P, C> dataType) {
+    public <P, C> WrapType<P, C> wrap(IDataType<P, C> dataType) {
         return new BukkitTypeImpl<>(dataType);
     }
 

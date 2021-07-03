@@ -1,17 +1,15 @@
 package org.playuniverse.minecraft.vcompat.reflection.data.type;
 
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterContext;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
 import org.playuniverse.minecraft.vcompat.reflection.VersionControl;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.utils.minecraft.Skin;
 
-import com.syntaxphoenix.syntaxapi.data.DataAdapterContext;
-import com.syntaxphoenix.syntaxapi.data.DataType;
-import com.syntaxphoenix.syntaxapi.data.IDataContainer;
-import com.syntaxphoenix.syntaxapi.data.PrimitiveDataType;
+public final class SkinDataType implements IDataType<IDataContainer, Skin> {
 
-public final class SkinDataType implements DataType<IDataContainer, Skin> {
-
-    public static final DataType<IDataContainer, Skin> INSTANCE = new SkinDataType();
+    public static final IDataType<IDataContainer, Skin> INSTANCE = new SkinDataType();
     public static final WrapType<?, Skin> WRAPPED_INSTANCE = VersionControl.get().getBukkitConversion().wrap(INSTANCE);
 
     private SkinDataType() {}
@@ -27,19 +25,19 @@ public final class SkinDataType implements DataType<IDataContainer, Skin> {
     }
 
     @Override
-    public IDataContainer toPrimitive(DataAdapterContext context, Skin complex) {
-        IDataContainer container = context.newDataContainer();
-        container.set("name", complex.getName(), PrimitiveDataType.STRING);
-        container.set("value", complex.getValue(), PrimitiveDataType.STRING);
-        container.set("signature", complex.getSignature(), PrimitiveDataType.STRING);
+    public IDataContainer toPrimitive(IDataAdapterContext context, Skin complex) {
+        IDataContainer container = context.newContainer();
+        container.set("name", complex.getName(), IDataType.STRING);
+        container.set("value", complex.getValue(), IDataType.STRING);
+        container.set("signature", complex.getSignature(), IDataType.STRING);
         return container;
     }
 
     @Override
-    public Skin fromPrimitive(DataAdapterContext context, IDataContainer container) {
-        String name = container.get("name", PrimitiveDataType.STRING);
-        String value = container.get("value", PrimitiveDataType.STRING);
-        String signature = container.get("signature", PrimitiveDataType.STRING);
+    public Skin fromPrimitive(IDataAdapterContext context, IDataContainer container) {
+        String name = container.get("name", IDataType.STRING);
+        String value = container.get("value", IDataType.STRING);
+        String signature = container.get("signature", IDataType.STRING);
         if(name == null || value == null || signature == null) {
             return null;
         }

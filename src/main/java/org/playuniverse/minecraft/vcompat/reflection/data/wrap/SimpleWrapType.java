@@ -1,15 +1,14 @@
 package org.playuniverse.minecraft.vcompat.reflection.data.wrap;
 
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContext;
 
-import com.syntaxphoenix.syntaxapi.data.DataType;
-
 public class SimpleWrapType<P, C> implements WrapType<P, C> {
 
-    private final DataType<P, C> type;
+    private final IDataType<P, C> type;
 
-    public SimpleWrapType(DataType<P, C> type) {
+    public SimpleWrapType(IDataType<P, C> type) {
         this.type = type;
     }
 

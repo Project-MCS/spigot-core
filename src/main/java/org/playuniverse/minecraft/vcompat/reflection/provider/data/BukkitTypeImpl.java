@@ -2,22 +2,21 @@ package org.playuniverse.minecraft.vcompat.reflection.provider.data;
 
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContext;
 
-import com.syntaxphoenix.syntaxapi.data.DataType;
-
-public class BukkitTypeImpl<P0, P1, C0, C1> extends WrappedTypeImpl<DataType<P1, C1>, P0, P1, C0, C1>
+public class BukkitTypeImpl<P0, P1, C0, C1> extends WrappedTypeImpl<IDataType<P1, C1>, P0, P1, C0, C1>
     implements PersistentDataType<P0, C0> {
 
-    private final DataType<P1, C1> type;
+    private final IDataType<P1, C1> type;
 
-    public BukkitTypeImpl(DataType<P1, C1> type) {
+    public BukkitTypeImpl(IDataType<P1, C1> type) {
         super(type.getPrimitive(), type.getComplex());
         this.type = type;
     }
 
     @Override
-    public DataType<P1, C1> getHandle() {
+    public IDataType<P1, C1> getHandle() {
         return type;
     }
 

@@ -1,32 +1,31 @@
 package org.playuniverse.minecraft.vcompat.reflection.data.wrap;
 
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterContext;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContext;
 
-import com.syntaxphoenix.syntaxapi.data.DataAdapterContext;
-import com.syntaxphoenix.syntaxapi.data.IDataContainer;
+public class SimpleSyntaxContext extends WrappedContext<IDataAdapterContext> {
 
-public class SimpleSyntaxContext extends WrappedContext<DataAdapterContext> {
+    private final IDataAdapterContext context;
 
-    private final DataAdapterContext context;
-
-    public SimpleSyntaxContext(DataAdapterContext context) {
+    public SimpleSyntaxContext(IDataAdapterContext context) {
         this.context = context;
     }
 
     @Override
-    public DataAdapterContext getHandle() {
+    public IDataAdapterContext getHandle() {
         return context;
     }
 
     @Override
-    public IDataContainer newDataContainer() {
-        return context.newDataContainer();
+    public IDataContainer newContainer() {
+        return context.newContainer();
     }
 
     @Override
-    public WrappedContainer newContainer() {
-        return new SimpleSyntaxContainer<>(context.newDataContainer());
+    public WrappedContainer newWrapContainer() {
+        return new SimpleSyntaxContainer<>(context.newContainer());
     }
 
 }

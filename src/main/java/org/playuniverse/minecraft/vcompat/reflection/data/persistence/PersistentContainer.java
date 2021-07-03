@@ -7,8 +7,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
-import com.syntaxphoenix.syntaxapi.data.container.nbt.NbtAdapterRegistry;
-import com.syntaxphoenix.syntaxapi.data.container.nbt.NbtContainer;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterRegistry;
+import org.playuniverse.minecraft.vcompat.base.data.nbt.NbtContainer;
+
 import com.syntaxphoenix.syntaxapi.nbt.NbtCompound;
 import com.syntaxphoenix.syntaxapi.nbt.NbtTag;
 import com.syntaxphoenix.syntaxapi.utils.key.IKey;
@@ -26,7 +27,7 @@ public class PersistentContainer<K> extends NbtContainer {
     @SuppressWarnings("rawtypes")
     protected Consumer<PersistentContainer> consumer;
 
-    public PersistentContainer(K key, File location, NbtAdapterRegistry registry) {
+    public PersistentContainer(K key, File location, IDataAdapterRegistry<NbtTag> registry) {
         super(registry);
         this.key = key;
         this.location = location;

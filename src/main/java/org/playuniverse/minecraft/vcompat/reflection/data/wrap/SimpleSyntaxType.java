@@ -1,12 +1,11 @@
 package org.playuniverse.minecraft.vcompat.reflection.data.wrap;
 
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterContext;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
 import org.playuniverse.minecraft.vcompat.reflection.VersionControl;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 
-import com.syntaxphoenix.syntaxapi.data.DataAdapterContext;
-import com.syntaxphoenix.syntaxapi.data.DataType;
-
-public class SimpleSyntaxType<P, C> implements DataType<P, C> {
+public class SimpleSyntaxType<P, C> implements IDataType<P, C> {
 
     private final WrapType<P, C> type;
 
@@ -25,12 +24,12 @@ public class SimpleSyntaxType<P, C> implements DataType<P, C> {
     }
 
     @Override
-    public P toPrimitive(DataAdapterContext context, C complex) {
+    public P toPrimitive(IDataAdapterContext context, C complex) {
         return type.wrapToPrimitive(complex, VersionControl.get().getBukkitConversion().createContext(context));
     }
 
     @Override
-    public C fromPrimitive(DataAdapterContext context, P primitive) {
+    public C fromPrimitive(IDataAdapterContext context, P primitive) {
         return type.wrapToComplex(primitive, VersionControl.get().getBukkitConversion().createContext(context));
     }
 

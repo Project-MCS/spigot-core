@@ -2,11 +2,10 @@ package org.playuniverse.minecraft.vcompat.reflection.data.wrap;
 
 import java.util.Set;
 
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedKey;
-
-import com.syntaxphoenix.syntaxapi.data.IDataContainer;
 
 public final class SimpleSyntaxContainer<E extends IDataContainer> extends WrappedContainer {
 
@@ -31,8 +30,8 @@ public final class SimpleSyntaxContainer<E extends IDataContainer> extends Wrapp
     */
 
     @Override
-    public SimpleSyntaxContext getContext() {
-        return new SimpleSyntaxContext(container.getAdapterContext());
+    public SimpleSyntaxContext getWrapContext() {
+        return new SimpleSyntaxContext(container.getContext());
     }
 
     @Override

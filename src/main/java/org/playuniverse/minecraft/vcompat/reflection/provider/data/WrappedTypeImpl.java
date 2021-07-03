@@ -4,10 +4,9 @@ import java.util.Arrays;
 
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
-
-import com.syntaxphoenix.syntaxapi.data.DataType;
-import com.syntaxphoenix.syntaxapi.data.IDataContainer;
 
 public abstract class WrappedTypeImpl<H, P0, P1, C0, C1> implements WrapType<P0, C0> {
 
@@ -138,7 +137,7 @@ public abstract class WrappedTypeImpl<H, P0, P1, C0, C1> implements WrapType<P0,
         return 0;
     }
 
-    public static <A, B, C, D> BukkitTypeImpl<C, A, D, B> wrap(DataType<A, B> type) {
+    public static <A, B, C, D> BukkitTypeImpl<C, A, D, B> wrap(IDataType<A, B> type) {
         return new BukkitTypeImpl<>(type);
     }
 

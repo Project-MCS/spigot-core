@@ -10,7 +10,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 public class BukkitDataType<T, V> implements PersistentDataType<T, V> {
 
-	public static final BukkitDataType<Byte, Boolean> BOOLEAN = of(Byte.class, Boolean.class, number -> number > 0, state -> (byte) (state ? 0 : 1));
+	public static final BukkitDataType<Byte, Boolean> BOOLEAN = of(Byte.class, Boolean.class, number -> number > 0, state -> (byte) (state ? 1 : 0));
 
 	public static final BukkitDataType<byte[], UUID> UNIQUE_ID = of(byte[].class, UUID.class, array -> {
 		ByteBuffer buffer = ByteBuffer.wrap(array);

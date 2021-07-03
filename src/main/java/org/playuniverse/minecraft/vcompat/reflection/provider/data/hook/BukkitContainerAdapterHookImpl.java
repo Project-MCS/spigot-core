@@ -9,14 +9,14 @@ import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_17_R1.persistence.CraftPersistentDataContainer;
 import org.bukkit.craftbukkit.v1_17_R1.persistence.CraftPersistentDataTypeRegistry;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
+import org.playuniverse.minecraft.vcompat.base.data.nbt.NbtContainer;
 import org.playuniverse.minecraft.vcompat.reflection.VersionControl;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
 import org.playuniverse.minecraft.vcompat.reflection.provider.data.BukkitContainerImpl;
 import org.playuniverse.minecraft.vcompat.reflection.provider.data.SyntaxContainerImpl;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.handle.ClassLookup;
 
-import com.syntaxphoenix.syntaxapi.data.IDataContainer;
-import com.syntaxphoenix.syntaxapi.data.container.nbt.NbtContainer;
 import com.syntaxphoenix.syntaxapi.nbt.NbtCompound;
 
 import net.minecraft.nbt.CompoundTag;

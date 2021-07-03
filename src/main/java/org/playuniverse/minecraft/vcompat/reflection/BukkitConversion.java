@@ -2,12 +2,12 @@ package org.playuniverse.minecraft.vcompat.reflection;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterContext;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContext;
 import org.playuniverse.minecraft.vcompat.reflection.entity.NmsEntityType;
 
-import com.syntaxphoenix.syntaxapi.data.DataAdapterContext;
-import com.syntaxphoenix.syntaxapi.data.DataType;
 import com.syntaxphoenix.syntaxapi.nbt.NbtCompound;
 import com.syntaxphoenix.syntaxapi.nbt.NbtList;
 import com.syntaxphoenix.syntaxapi.nbt.NbtTag;
@@ -38,8 +38,8 @@ public abstract class BukkitConversion<V extends VersionControl> extends Version
 
     public abstract NbtCompound itemToCompound(ItemStack itemStack);
 
-    public abstract WrappedContext<DataAdapterContext> createContext(DataAdapterContext context);
+    public abstract WrappedContext<IDataAdapterContext> createContext(IDataAdapterContext context);
     
-    public abstract <P, C> WrapType<P, C> wrap(DataType<P, C> dataType);
+    public abstract <P, C> WrapType<P, C> wrap(IDataType<P, C> dataType);
 
 }

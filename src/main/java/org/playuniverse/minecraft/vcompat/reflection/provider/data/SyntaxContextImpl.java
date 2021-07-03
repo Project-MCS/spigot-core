@@ -2,9 +2,8 @@ package org.playuniverse.minecraft.vcompat.reflection.provider.data;
 
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContext;
-
-import com.syntaxphoenix.syntaxapi.data.IDataContainer;
 
 public final class SyntaxContextImpl extends WrappedContext<PersistentDataAdapterContext> implements PersistentDataAdapterContext {
 
@@ -25,12 +24,12 @@ public final class SyntaxContextImpl extends WrappedContext<PersistentDataAdapte
     }
 
     @Override
-    public IDataContainer newDataContainer() {
+    public IDataContainer newContainer() {
         return newContainer();
     }
 
     @Override
-    public SyntaxContainerImpl newContainer() {
+    public SyntaxContainerImpl newWrapContainer() {
         return new SyntaxContainerImpl(context.newPersistentDataContainer());
     }
 

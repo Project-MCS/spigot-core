@@ -9,12 +9,11 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedKey;
 import org.playuniverse.minecraft.vcompat.reflection.data.wrap.SyntaxKey;
-
-import com.syntaxphoenix.syntaxapi.data.IDataContainer;
 
 public final class BukkitContainerImpl extends WrappedContainer implements PersistentDataContainer {
 
@@ -70,7 +69,7 @@ public final class BukkitContainerImpl extends WrappedContainer implements Persi
 
     @Override
     public PersistentDataAdapterContext getAdapterContext() {
-        return getContext();
+        return getWrapContext();
     }
 
     /*
@@ -78,8 +77,8 @@ public final class BukkitContainerImpl extends WrappedContainer implements Persi
     */
 
     @Override
-    public BukkitContextImpl getContext() {
-        return new BukkitContextImpl(container.getAdapterContext());
+    public BukkitContextImpl getWrapContext() {
+        return new BukkitContextImpl(container.getContext());
     }
 
     @Override
