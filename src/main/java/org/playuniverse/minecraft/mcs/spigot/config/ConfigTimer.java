@@ -14,7 +14,7 @@ public final class ConfigTimer extends Thread {
 
     public static final ConfigTimer TIMER = new ConfigTimer();
 
-    private final ArrayList<Config> reload = new ArrayList<>();
+    private final ArrayList<ConfigBase<?, ?>> reload = new ArrayList<>();
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final ReadLock read = lock.readLock();
@@ -26,7 +26,7 @@ public final class ConfigTimer extends Thread {
         start();
     }
 
-    public boolean load(Config config) {
+    public boolean load(ConfigBase<?, ?> config) {
         boolean output;
         read.lock();
         if (output = !reload.contains(config)) {
@@ -41,7 +41,7 @@ public final class ConfigTimer extends Thread {
         return output;
     }
 
-    public boolean unload(Config config) {
+    public boolean unload(ConfigBase<?, ?> config) {
         boolean output;
         read.lock();
         if (output = reload.contains(config)) {
@@ -62,7 +62,7 @@ public final class ConfigTimer extends Thread {
             read.lock();
             try {
                 ILogger logger = SpigotCore.get().getPluginLogger();
-                for (Config config : reload) {
+                for (ConfigBase<?, ?> config : reload) {
                     if (config.loaded < config.file.lastModified()) {
                         logger.log(LogTypeId.INFO, "Loading config '" + config.getName() + "'...");
                         try {

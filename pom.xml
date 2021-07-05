@@ -56,6 +56,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
+			<artifactId>config-json</artifactId>
+			<version>2.0.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.syntaxphoenix.syntaxapi</groupId>
 			<artifactId>key</artifactId>
 			<version>2.0.9</version>
 		</dependency>

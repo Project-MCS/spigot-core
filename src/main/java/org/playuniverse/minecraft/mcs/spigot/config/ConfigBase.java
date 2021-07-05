@@ -1,16 +1,15 @@
 package org.playuniverse.minecraft.mcs.spigot.config;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import com.syntaxphoenix.syntaxapi.config.yaml.YamlConfig;
-import com.syntaxphoenix.syntaxapi.config.yaml.YamlConfigSection;
+import com.syntaxphoenix.syntaxapi.config.BaseConfig;
+import com.syntaxphoenix.syntaxapi.config.BaseSection;
 import com.syntaxphoenix.syntaxapi.reflection.Reflect;
 import com.syntaxphoenix.syntaxapi.utils.java.Times;
 
-public abstract class Config {
+public abstract class ConfigBase<C extends BaseConfig, B extends BaseSection> {
 
     public static final ConfigAccess ACCESS = new ConfigAccess();
 
@@ -19,17 +18,24 @@ public abstract class Config {
     protected long loaded = -1;
 
     protected File file;
-    protected YamlConfig config = new YamlConfig();
 
     protected final int latestVersion;
     protected int version;
 
-    public Config(File file, Class<? extends Migration> clazz, int latestVersion) {
+    public ConfigBase(File file, Class<? extends Migration> clazz, int latestVersion) {
         this.file = file;
         this.migrationRef = new Reflect(clazz);
         this.latestVersion = latestVersion;
         this.version = latestVersion;
     }
+    
+    /*
+     * Abstract Getter
+     */
+    
+    public abstract C getConfig();
+    
+    public abstract B getStorage();
 
     /*
      * Getter
@@ -56,36 +62,36 @@ public abstract class Config {
      */
 
     public <E> E check(String path, E input) {
-        if (config.contains(path))
+        if (getStorage().contains(path))
             return safeCast(input, get(path));
         set(path, input);
         return input;
     }
 
     public Number check(String path, Number input) {
-        if (config.contains(path))
+        if (getStorage().contains(path))
             return safeCast(input, get(path));
         set(path, input);
         return input;
     }
 
     public <E> E get(String path, E input) {
-        if (config.contains(path))
+        if (getStorage().contains(path))
             return safeCast(input, get(path));
         return input;
     }
 
     public Object get(String path) {
-        return config.get(path);
+        return getStorage().get(path);
     }
 
     public String[] getKeys(String path) {
-        return Optional.of(config).filter(config -> config.isInstance(path, YamlConfigSection.class))
+        return Optional.of(getStorage()).filter(config -> config.isInstance(path, BaseSection.class))
             .map(config -> config.getSection(path).getKeys().toArray(new String[0])).orElseGet(() -> new String[0]);
     }
 
     public void set(String path, Object input) {
-        config.set(path, input);
+        getStorage().set(path, input);
     }
 
     /*
@@ -104,17 +110,17 @@ public abstract class Config {
             version = check("version", 1).intValue();
 
         if (latestVersion > version) {
-            MigrationContext context = new MigrationContext(config);
+            MigrationContext context = new MigrationContext(getStorage());
             while (latestVersion > version) {
                 String method = "update" + version++;
                 migrationRef.searchMethod(method, method, MigrationContext.class).execute(method, context);
             }
             file.delete();
-            config.clear();
+            getStorage().clear();
             context.remove("version");
-            config.set("version", version);
+            getStorage().set("version", version);
             for (Entry<String, Object> entry : context.getValues().entrySet())
-                config.set(entry.getKey(), entry.getValue());
+                getStorage().set(entry.getKey(), entry.getValue());
         } else if (latestVersion < version) {
             backupAndClear();
         }
@@ -132,7 +138,7 @@ public abstract class Config {
         ConfigTimer.TIMER.unload(this);
 
         loaded = -1;
-        config.clear();
+        getStorage().clear();
     }
 
     private final void backupAndClear() {
@@ -146,20 +152,20 @@ public abstract class Config {
             backupFile = new File(parent, name.replace("%count%", (tries++) + ""));
 
         try {
-            config.save(backupFile);
+            getConfig().save(backupFile);
             file.delete();
-        } catch (IOException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
-        config.clear();
+        getStorage().clear();
     }
 
     private final void load() {
         if (!file.exists())
             return;
         try {
-            config.load(file);
-        } catch (IOException e) {
+            getConfig().load(file);
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -172,8 +178,8 @@ public abstract class Config {
                     parent.mkdirs();
                 file.createNewFile();
             }
-            config.save(file);
-        } catch (IOException e) {
+            getConfig().save(file);
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

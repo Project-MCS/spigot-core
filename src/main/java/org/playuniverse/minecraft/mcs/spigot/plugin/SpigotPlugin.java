@@ -13,7 +13,7 @@ import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.PluginNode;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.RootNode;
-import org.playuniverse.minecraft.mcs.spigot.config.Config;
+import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 
 import com.syntaxphoenix.syntaxapi.event.EventManager;
@@ -23,7 +23,7 @@ import com.syntaxphoenix.syntaxapi.utils.java.Files;
 public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin implements IPlugin {
     
     @SuppressWarnings("unchecked")
-    private static final Class<? extends Config>[] EMPTY_CONFIG = new Class[0];
+    private static final Class<? extends ConfigBase<?, ?>>[] EMPTY_CONFIG = new Class[0];
 
     public static Optional<SpigotPlugin<?>> getAsOptional(String name) {
         return Optional.ofNullable(get(name));
@@ -77,7 +77,7 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         return dataLocation;
     }
     
-    public Class<? extends Config>[] getConfigurations() {
+    public Class<? extends ConfigBase<?, ?>>[] getConfigurations() {
         return EMPTY_CONFIG;
     }
 
@@ -85,7 +85,7 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     public final void start() {
         logger.log("Starting...");
         logger.log("Loading configs...");
-        Config.ACCESS.load(wrapper);
+        ConfigBase.ACCESS.load(wrapper);
         logger.log("Starting logic...");
         onStart();
         logger.log("Setting up injections...");
@@ -99,7 +99,7 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         logger.log("Stopping logic...");
         onStop();
         logger.log("Unloading configs...");
-        Config.ACCESS.unload(wrapper);
+        ConfigBase.ACCESS.unload(wrapper);
         logger.log("Successfully stopped!");
     }
 

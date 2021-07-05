@@ -17,7 +17,7 @@ import com.syntaxphoenix.syntaxapi.utils.java.Files;
 
 public class ConfigAccess {
 
-    private final HashMap<Class<? extends Config>, Config> configs = new HashMap<>();
+    private final HashMap<Class<? extends ConfigBase<?, ?>>, ConfigBase<?, ?>> configs = new HashMap<>();
     private final ILogger logger;
 
     ConfigAccess() {
@@ -27,15 +27,15 @@ public class ConfigAccess {
     }
 
     private final void createDefaults(PluginBase<?> base) {
-        ArrayList<Class<? extends Config>> list = new ArrayList<>();
+        ArrayList<Class<? extends ConfigBase<?, ?>>> list = new ArrayList<>();
         base.createConfigs(list);
         if (list.isEmpty()) {
             return;
         }
         File configFolder = new File(base.getDirectory(), "config");
         Files.createFolder(configFolder);
-        ArrayList<Config> configs = new ArrayList<>();
-        for (Class<? extends Config> clazz : list) {
+        ArrayList<ConfigBase<?, ?>> configs = new ArrayList<>();
+        for (Class<? extends ConfigBase<?, ?>> clazz : list) {
             try {
                 configs.add(load0(configFolder, clazz));
             } catch (Exception e) {
@@ -43,7 +43,7 @@ public class ConfigAccess {
             }
         }
         sort(configs);
-        for (Config config : configs) {
+        for (ConfigBase<?, ?> config : configs) {
             ConfigTimer.TIMER.load(config);
         }
     }
@@ -53,7 +53,7 @@ public class ConfigAccess {
      */
 
     @SuppressWarnings("deprecation")
-    private Config load0(File folder, Class<? extends Config> clazz) throws Exception {
+    private ConfigBase<?, ?> load0(File folder, Class<? extends ConfigBase<?, ?>> clazz) throws Exception {
         Constructor<?>[] constructors = clazz.getDeclaredConstructors();
         if (constructors.length == 0) {
             return null;
@@ -94,7 +94,7 @@ public class ConfigAccess {
         if (!access) {
             execute.setAccessible(true);
         }
-        Config config = (Config) (execute.getParameterCount() == 0 ? execute.newInstance()
+        ConfigBase<?, ?> config = (ConfigBase<?, ?>) (execute.getParameterCount() == 0 ? execute.newInstance()
             : (execute.getParameterCount() == 2 ? execute.newInstance(folder, logger) : execute.newInstance(paramFile ? folder : logger)));
         execute.setAccessible(access);
         configs.put(clazz, config);
@@ -110,13 +110,13 @@ public class ConfigAccess {
         if (plugin == null) {
             return this;
         }
-        Class<? extends Config>[] classes = plugin.getConfigurations();
+        Class<? extends ConfigBase<?, ?>>[] classes = plugin.getConfigurations();
         if (classes.length == 0) {
             return this;
         }
-        ArrayList<Config> configList = new ArrayList<>();
-        for (Class<? extends Config> clazz : classes) {
-            Config config = null;
+        ArrayList<ConfigBase<?, ?>> configList = new ArrayList<>();
+        for (Class<? extends ConfigBase<?, ?>> clazz : classes) {
+            ConfigBase<?, ?> config = null;
             try {
                 config = load0(plugin.getDataLocation(), clazz);
             } catch (Exception e) {
@@ -127,19 +127,19 @@ public class ConfigAccess {
             }
             configList.add(config);
         }
-        Config[] configs = sort(configList);
-        for (Config config : configs) {
+        ConfigBase<?, ?>[] configs = sort(configList);
+        for (ConfigBase<?, ?> config : configs) {
             ConfigTimer.TIMER.load(config);
         }
         return this;
     }
 
-    private Config[] sort(ArrayList<Config> configs) {
-        Config[] output = new Config[configs.size()];
-        Config[] waiting = new Config[configs.size()];
+    private ConfigBase<?, ?>[] sort(ArrayList<ConfigBase<?, ?>> configs) {
+        ConfigBase<?, ?>[] output = new ConfigBase[configs.size()];
+        ConfigBase<?, ?>[] waiting = new ConfigBase[configs.size()];
         int id = 0, wait = 0;
         for (int index = 0; index < output.length; index++) {
-            Config config = configs.get(index);
+            ConfigBase<?, ?> config = configs.get(index);
             Class<?> dependency0 = config.loadAfter();
             if (dependency0 != null) {
                 if (index == 0) {
@@ -148,7 +148,7 @@ public class ConfigAccess {
                 }
                 boolean found = false;
                 for (int filter = 0; filter < id; filter++) {
-                    Config possible = output[filter];
+                    ConfigBase<?, ?> possible = output[filter];
                     if (dependency0.isInstance(possible)) {
                         output[id++] = possible;
                         found = true;
@@ -163,7 +163,7 @@ public class ConfigAccess {
                 output[id++] = config;
             }
             for (int waiter = 0; waiter < wait; waiter++) {
-                Config current = waiting[waiter];
+                ConfigBase<?, ?> current = waiting[waiter];
                 Class<?> dependency1 = current.loadAfter();
                 if (dependency1.isInstance(config)) {
                     output[id++] = current;
@@ -200,13 +200,13 @@ public class ConfigAccess {
      */
 
     @SuppressWarnings("unchecked")
-    public <E extends Config> E get(Class<E> config) {
+    public <E extends ConfigBase<?, ?>> E get(Class<E> config) {
         synchronized (configs) {
             return (E) configs.get(config);
         }
     }
 
-    public <E extends Config> Optional<E> optional(Class<E> config) {
+    public <E extends ConfigBase<?, ?>> Optional<E> optional(Class<E> config) {
         return Optional.ofNullable(get(config));
     }
 

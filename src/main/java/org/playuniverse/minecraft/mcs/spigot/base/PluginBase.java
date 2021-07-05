@@ -18,7 +18,7 @@ import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inventory.GuiListener;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
-import org.playuniverse.minecraft.mcs.spigot.config.Config;
+import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
@@ -469,7 +469,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
      * 
      */
 
-    public void createConfigs(ArrayList<Class<? extends Config>> list) {}
+    public void createConfigs(ArrayList<Class<? extends ConfigBase<?, ?>>> list) {}
 
     protected abstract void onLoadup();
 

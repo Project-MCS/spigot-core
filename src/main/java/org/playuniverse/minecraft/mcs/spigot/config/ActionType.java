@@ -36,7 +36,7 @@ public enum ActionType {
 		return ActionType.DISABLED;
 	}
 
-	public static ActionType check(Config config, String path, ActionType value) {
+	public static ActionType check(ConfigBase<?, ?> config, String path, ActionType value) {
 		return byName(config.check(path, value.value()));
 	}
 

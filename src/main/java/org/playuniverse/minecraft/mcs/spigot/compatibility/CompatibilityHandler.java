@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
-import org.playuniverse.minecraft.mcs.spigot.config.Config;
+import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.config.config.AddonConfig;
 import org.playuniverse.minecraft.mcs.spigot.utils.plugin.PluginPackage;
 import org.playuniverse.minecraft.mcs.spigot.utils.plugin.PluginSettings;
@@ -47,7 +47,7 @@ public abstract class CompatibilityHandler {
 
 	public static void handleSettingsUpdate(PluginSettings settings) {
 		Optional<PluginPackage> optional;
-		AddonConfig addonConfig = Config.ACCESS.get(AddonConfig.class);
+		AddonConfig addonConfig = ConfigBase.ACCESS.get(AddonConfig.class);
 		for (String name : COMPAT.keySet()) {
 			if (!(optional = settings.searchPackage(name)).isPresent()) {
 				CompatAddon<?> addon = COMPAT.get(name);

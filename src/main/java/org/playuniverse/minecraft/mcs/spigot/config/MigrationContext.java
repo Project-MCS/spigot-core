@@ -2,17 +2,49 @@ package org.playuniverse.minecraft.mcs.spigot.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 
-import com.syntaxphoenix.syntaxapi.config.yaml.YamlConfig;
-import com.syntaxphoenix.syntaxapi.config.yaml.YamlConfigSection;
+import com.syntaxphoenix.syntaxapi.config.BaseSection;
+import com.syntaxphoenix.syntaxapi.config.SectionMap;
 
 public class MigrationContext {
 
-    private final Map<String, Object> values;
+    protected final Map<String, Object> values = new LinkedHashMap<>();
 
-    public MigrationContext(YamlConfig configuration) {
-        this.values = mapRootSection(configuration);
+    public MigrationContext(BaseSection section) {
+        mapRootSection(section.toMap());
+    }
+
+    @SuppressWarnings("unchecked")
+    private final void mapRootSection(SectionMap<String, Object> map) {
+        for (Entry<String, Object> entry : map.entrySet()) {
+            Object obj = entry.getValue();
+            if (obj == null) {
+                continue;
+            }
+            if (obj instanceof SectionMap) {
+                mapSection(entry.getKey(), (SectionMap<String, Object>) obj);
+                continue;
+            }
+            values.put(entry.getKey(), obj);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private final void mapSection(String previous, SectionMap<String, Object> map) {
+        previous = previous + '.';
+        for (Entry<String, Object> entry : map.entrySet()) {
+            Object obj = entry.getValue();
+            if (obj == null) {
+                continue;
+            }
+            if (obj instanceof SectionMap) {
+                mapSection(previous + entry.getKey(), (SectionMap<String, Object>) obj);
+                continue;
+            }
+            values.put(previous + entry.getKey(), obj);
+        }
     }
 
     public Map<String, Object> getValues() {
@@ -48,37 +80,6 @@ public class MigrationContext {
 
     private <E> E safeCast(Class<E> sample, Object value) {
         return sample.isInstance(value) ? sample.cast(value) : null;
-    }
-
-    /*
-     * Mapping
-     */
-
-    public static final String KEY = "%s.%s";
-
-    public static Map<String, Object> mapRootSection(YamlConfigSection section) {
-        LinkedHashMap<String, Object> output = new LinkedHashMap<>();
-        for (String key : section.getKeys()) {
-            Object value = section.get(key);
-            if (value instanceof YamlConfigSection) {
-                mapSubSection(key, output, (YamlConfigSection) value);
-                continue;
-            }
-            output.put(key, value);
-        }
-        return output;
-    }
-
-    public static void mapSubSection(String previous, Map<String, Object> output, YamlConfigSection section) {
-        String path = previous;
-        for (String key : section.getKeys()) {
-            Object value = section.get(key);
-            if (value instanceof YamlConfigSection) {
-                mapSubSection(path + '.' + section.getName(), output, (YamlConfigSection) value);
-                continue;
-            }
-            output.put(String.format(KEY, path, key), value);
-        }
     }
 
 }

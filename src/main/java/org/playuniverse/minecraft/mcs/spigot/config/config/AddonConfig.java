@@ -7,11 +7,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.playuniverse.minecraft.mcs.spigot.compatibility.CompatibilityHandler;
-import org.playuniverse.minecraft.mcs.spigot.config.Config;
+import org.playuniverse.minecraft.mcs.spigot.config.base.yaml.YamlConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.config.migration.AddonMigration;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 
-public final class AddonConfig extends Config {
+public final class AddonConfig extends YamlConfigBase {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ArrayList<String> disabled = new ArrayList<>();
