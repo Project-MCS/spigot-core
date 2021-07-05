@@ -2,9 +2,11 @@ package org.playuniverse.minecraft.vcompat.base.data.api;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -33,6 +35,18 @@ public interface IDataType<P extends Object, C extends Object> {
 
     public static final IDataType<IDataContainer, IDataContainer> CONTAINER = of(IDataContainer.class);
     public static final IDataType<IDataContainer[], IDataContainer[]> CONTAINER_ARRAY = of(IDataContainer[].class);
+    
+    public static final IDataType<byte[], UUID> UUID = of(byte[].class, UUID.class, array -> {
+        ByteBuffer buffer = ByteBuffer.wrap(array);
+        long mostSignificant = buffer.getLong();
+        long leastSignificant = buffer.getLong();
+        return new UUID(mostSignificant, leastSignificant);
+    }, uniqueId -> {
+        ByteBuffer buffer = ByteBuffer.wrap(new byte[16]);
+        buffer.putLong(uniqueId.getMostSignificantBits());
+        buffer.putLong(uniqueId.getLeastSignificantBits());
+        return buffer.array();
+    });
 
     public static final IDataType<?, ?>[] PRIMITIVES = new IDataType<?, ?>[] {
         BYTE,
