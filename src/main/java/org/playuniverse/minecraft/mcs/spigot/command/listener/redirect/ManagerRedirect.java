@@ -64,6 +64,11 @@ public class ManagerRedirect extends AbstractRedirect {
         return manager.hasGlobal();
     }
 
+    @Override
+    protected String getGlobal() {
+        return manager.getGlobal().getName();
+    }
+
     private List<String> collectCommands() {
         if (manager.getCommands().isEmpty()) {
             return null;

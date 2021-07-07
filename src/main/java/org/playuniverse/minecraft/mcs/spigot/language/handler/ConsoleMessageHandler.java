@@ -4,7 +4,11 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.playuniverse.minecraft.mcs.spigot.language.IMessage;
 import org.playuniverse.minecraft.mcs.spigot.language.MessageType;
 
-public class ConsoleMessageHandler implements ICommandMessageHandler<ConsoleCommandSender> {
+public final class ConsoleMessageHandler implements ICommandMessageHandler<ConsoleCommandSender> {
+    
+    public static final ConsoleMessageHandler INSTANCE = new ConsoleMessageHandler();
+    
+    private ConsoleMessageHandler() {}
 
     @Override
     public Class<ConsoleCommandSender> getType() {

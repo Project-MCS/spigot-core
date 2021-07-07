@@ -16,6 +16,10 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public final class PlayerMessageHandler implements ICommandMessageHandler<Player> {
+    
+    public static final PlayerMessageHandler INSTANCE = new PlayerMessageHandler();
+    
+    private PlayerMessageHandler() {}
 
     @Override
     public Class<Player> getType() {

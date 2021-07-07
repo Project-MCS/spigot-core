@@ -21,6 +21,12 @@ import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
+import org.playuniverse.minecraft.mcs.spigot.language.handler.BlockMessageHandler;
+import org.playuniverse.minecraft.mcs.spigot.language.handler.ConsoleMessageHandler;
+import org.playuniverse.minecraft.mcs.spigot.language.handler.EntityMessageHandler;
+import org.playuniverse.minecraft.mcs.spigot.language.handler.PlayerMessageHandler;
+import org.playuniverse.minecraft.mcs.spigot.language.message.builder.ComponentMessageBuilder;
+import org.playuniverse.minecraft.mcs.spigot.language.message.builder.StringMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
@@ -246,6 +252,18 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
         register(new Commands());
         injections.setup();
+        
+        //
+        // Register default handler for registries
+        //
+
+        Singleton.Registries.MESSAGE_BUILDER.register(ComponentMessageBuilder.INSTANCE);
+        Singleton.Registries.MESSAGE_BUILDER.register(StringMessageBuilder.INSTANCE);
+        
+        Singleton.Registries.MESSAGE_HANDLER.register(BlockMessageHandler.INSTANCE);
+        Singleton.Registries.MESSAGE_HANDLER.register(ConsoleMessageHandler.INSTANCE);
+        Singleton.Registries.MESSAGE_HANDLER.register(EntityMessageHandler.INSTANCE);
+        Singleton.Registries.MESSAGE_HANDLER.register(PlayerMessageHandler.INSTANCE);
 
         //
         // Running the startup of the actual bot logic

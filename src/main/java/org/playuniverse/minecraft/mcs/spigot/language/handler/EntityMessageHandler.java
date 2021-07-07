@@ -4,7 +4,11 @@ import org.bukkit.entity.Entity;
 import org.playuniverse.minecraft.mcs.spigot.language.IMessage;
 import org.playuniverse.minecraft.mcs.spigot.language.MessageType;
 
-public class EntityMessageHandler implements ICommandMessageHandler<Entity> {
+public final class EntityMessageHandler implements ICommandMessageHandler<Entity> {
+    
+    public static final EntityMessageHandler INSTANCE = new EntityMessageHandler();
+    
+    private EntityMessageHandler() {}
 
     @Override
     public Class<Entity> getType() {

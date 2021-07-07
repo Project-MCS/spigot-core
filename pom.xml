@@ -56,7 +56,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
-			<artifactId>config-json</artifactId>
+			<artifactId>json-lib</artifactId>
 			<version>2.0.9</version>
 		</dependency>
 		<dependency>
@@ -160,14 +160,6 @@
 						<relocation>
 							<pattern>org.slf4j</pattern>
 							<shadedPattern>${project.groupId}.shaded.slf4j</shadedPattern>
-						</relocation>
-						<relocation>
-							<pattern>org.pf4j</pattern>
-							<shadedPattern>${project.groupId}.shaded.pf4j</shadedPattern>
-						</relocation>
-						<relocation>
-							<pattern>org.apache</pattern>
-							<shadedPattern>${project.groupId}.shaded.apache</shadedPattern>
 						</relocation>
 						<relocation>
 							<pattern>com.google</pattern>

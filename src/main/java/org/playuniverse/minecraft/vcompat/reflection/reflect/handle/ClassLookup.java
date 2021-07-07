@@ -234,7 +234,14 @@ public class ClassLookup {
         }
         if (constructor != null) {
             try {
+                boolean access = constructor.canAccess(null);
+                if (!access) {
+                    constructor.setAccessible(true);
+                }
                 constructors.put(name, LOOKUP.unreflectConstructor(constructor));
+                if (!access) {
+                    constructor.setAccessible(false);
+                }
             } catch (IllegalAccessException e) {
             }
         }
@@ -255,7 +262,14 @@ public class ClassLookup {
             }
             try {
                 if (ReflectionTools.hasSameArguments(arguments, args)) {
+                    boolean access = constructor.canAccess(null);
+                    if (!access) {
+                        constructor.setAccessible(true);
+                    }
                     this.constructors.put(base + current, LOOKUP.unreflectConstructor(constructor));
+                    if (!access) {
+                        constructor.setAccessible(false);
+                    }
                     current++;
                 }
             } catch (IllegalAccessException e) {
@@ -419,8 +433,8 @@ public class ClassLookup {
         if (option.isPresent()) {
             ClassCache.CLASSES.remove(option.get().getKey());
         }
-    }    
-    
+    }
+
     public static Object[] mergeBack(Object[] array1, Object... array2) {
         Object[] output = new Object[array1.length + array2.length];
         System.arraycopy(array2, 0, output, 0, array2.length);

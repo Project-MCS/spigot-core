@@ -32,4 +32,9 @@ public class NodeRedirect extends AbstractRedirect {
         return true;
     }
 
+    @Override
+    protected String getGlobal() {
+        return node.getName();
+    }
+
 }

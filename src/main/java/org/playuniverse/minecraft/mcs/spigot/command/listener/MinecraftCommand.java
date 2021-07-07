@@ -166,7 +166,7 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
             : redirect.handleCommand(args[0]);
         if (node == null) {
             if (nonExistent != null) {
-                nonExistent.accept(info, args[0]);
+                nonExistent.accept(info, args.length == 0 ? redirect.getGlobal() : args[0]);
             }
             return false;
         }

@@ -43,7 +43,7 @@ public class Commands extends Injector<MinecraftCommand> {
             return;
         }
         SimpleCommandMap map = (SimpleCommandMap) provider.getLookup("CraftServer").run(Bukkit.getServer(), "commandMap");
-        PluginCommand command = (PluginCommand) provider.getLookup("PluginCommand").init("init", transfer.getId(), transfer.getOwner());
+        PluginCommand command = (PluginCommand) provider.getLookup("PluginCommand").init("init", transfer.getId(), (Plugin) transfer.getOwner());
         command.setExecutor(transfer);
         command.setTabCompleter(transfer);
         command.setAliases(JavaHelper.fromArray(transfer.getAliases()));
