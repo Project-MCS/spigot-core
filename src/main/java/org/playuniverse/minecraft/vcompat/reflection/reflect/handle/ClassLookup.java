@@ -155,7 +155,7 @@ public class ClassLookup {
     }
 
     public ClassLookup execute(Object source, String name, Object... args) {
-        run(source, name, mergeBack(args, source));
+        run(source, name, args);
         return this;
     }
 
