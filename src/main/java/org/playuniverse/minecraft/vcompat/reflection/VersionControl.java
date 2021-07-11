@@ -1,5 +1,10 @@
 package org.playuniverse.minecraft.vcompat.reflection;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.playuniverse.minecraft.vcompat.reflection.provider.VersionControlImpl;
 
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
@@ -16,10 +21,24 @@ public abstract class VersionControl {
         return CURRENT.replace(new VersionControlImpl()).lock().get();
     }
 
+    protected final Properties properties = new Properties();
+
+    public VersionControl() {
+        try (FileReader reader = new FileReader(new File("server.properties"))) {
+            properties.load(reader);
+        } catch (IOException e) {
+            // Who cares
+        }
+    }
+
     protected final DataProvider dataProvider = new DataProvider(this);
 
     public DataProvider getDataProvider() {
         return dataProvider;
+    }
+    
+    public Properties getServerProperties() {
+        return properties;
     }
 
     public abstract ToolProvider<?> getToolProvider();
@@ -31,7 +50,7 @@ public abstract class VersionControl {
     public abstract TextureProvider<?> getTextureProvider();
 
     public abstract BukkitConversion<?> getBukkitConversion();
-    
+
     public void shutdown() {}
 
 }

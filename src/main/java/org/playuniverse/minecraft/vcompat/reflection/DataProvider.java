@@ -18,11 +18,12 @@ public class DataProvider extends VersionHandler<VersionControl> {
     public static final Supplier<UUID> DEFAULT_RANDOM = UUID::randomUUID;
 
     protected final NbtAdapterRegistry registry = new NbtAdapterRegistry();
-    protected final DataDistributor<UUID> defaultDistributor = createDistributor(
-        new File(Bukkit.getWorlds().get(0).getWorldFolder(), "pluginData"));
+    protected final DataDistributor<UUID> defaultDistributor;
 
     protected DataProvider(VersionControl versionControl) {
         super(versionControl);
+        defaultDistributor = createDistributor(new File(Bukkit.getServer().getWorldContainer(),
+            versionControl.getServerProperties().getProperty("level-name", "world") + "/pluginData"));
     }
 
     public final NbtAdapterRegistry getRegistry() {

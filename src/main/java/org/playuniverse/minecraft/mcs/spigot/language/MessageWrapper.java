@@ -182,7 +182,7 @@ public final class MessageWrapper<T> {
                 if (placeholder == null || placeholder.getKey() == null) {
                     continue;
                 }
-                compound.set(placeholder.getKey(), placeholder.getValue());
+                compound.set('$' + placeholder.getKey(), placeholder.getValue());
             }
             if (!compound.isEmpty()) {
                 data.set("placeholders", compound);

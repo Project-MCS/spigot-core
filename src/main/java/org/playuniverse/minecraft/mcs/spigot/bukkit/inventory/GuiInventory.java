@@ -9,75 +9,126 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.playuniverse.minecraft.mcs.spigot.bukkit.inventory.utils.ColorString;
 import org.playuniverse.minecraft.mcs.spigot.data.properties.IProperties;
+
+import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 
 public final class GuiInventory implements InventoryHolder, ItemStorage<GuiInventory> {
 
-	private final IProperties properties;
+    private final IProperties properties;
 
-	private final GuiHandler handler;
-	private final Inventory inventory;
+    private final GuiHandler handler;
+    private final Container<Inventory> inventory = Container.of();
 
-	private final int size;
+    private int size;
+    private String name;
+    private InventoryType type;
+    
+    private boolean inventoryChanged = false;
 
-	protected GuiInventory(GuiBuilder builder) {
-		this.properties = builder.properties();
-		this.handler = Objects.requireNonNull(builder.handler());
-		if (!builder.isInventoryValid()) {
-			throw new IllegalStateException("Configured inventory is invalid");
-		}
-		if (builder.type() == InventoryType.CHEST) {
-			this.inventory = Bukkit.createInventory(this, builder.size(), builder.nameAsString());
-		} else {
-			this.inventory = Bukkit.createInventory(this, builder.type(), builder.nameAsString());
-		}
-		if (inventory.getHolder() != this) {
-			throw new IllegalStateException("InventoryHolder isn't GuiInventory?");
-		}
-		this.size = inventory.getSize();
-		handler.onInit(this);
-	}
+    protected GuiInventory(GuiBuilder builder) {
+        this.properties = builder.properties();
+        this.handler = Objects.requireNonNull(builder.handler());
+        if (!builder.isInventoryValid()) {
+            throw new IllegalStateException("Configured inventory is invalid");
+        }
+        this.name = builder.nameAsString();
+        this.size = builder.size();
+        this.type = builder.type();
+        updateInventory(false);
+        if (inventory.get().getHolder() != this) {
+            throw new IllegalStateException("InventoryHolder isn't GuiInventory?");
+        }
+        handler.onInit(this);
+    }
 
-	/*
-	 * Getter
-	 */
+    /*
+     * Update
+     */
 
-	public IProperties getProperties() {
-		return properties;
-	}
+    public void updateType(int size) {
+        this.type = InventoryType.CHEST;
+        this.size = size;
+        updateInventory(true);
+    }
 
-	public GuiHandler getHandler() {
-		return handler;
-	}
+    public void updateType(InventoryType type) {
+        this.type = type;
+        updateInventory(true);
+    }
 
-	@Override
-	public Inventory getInventory() {
-		return inventory;
-	}
+    public void updateName(ColorString name) {
+        updateName(name.asColoredString());
+    }
 
-	@Override
-	public int size() {
-		return size;
-	}
+    public void updateName(String name) {
+        this.name = name;
+        updateInventory(true);
+    }
 
-	/*
-	 * ItemStorage implementation
-	 */
+    private void updateInventory(boolean trigger) {
+        if (type == InventoryType.CHEST) {
+            inventory.replace(Bukkit.createInventory(this, size, name));
+        } else {
+            inventory.replace(Bukkit.createInventory(this, type, name));
+        }
+        size = inventory.get().getSize();
+        if (trigger) {
+            inventoryChanged = true;
+            update();
+            inventoryChanged = false;
+        }
+    }
 
-	@Override
-	public GuiInventory me() {
-		return this;
-	}
+    public void update() {
+        handler.onUpdate(this);
+    }
 
-	@Override
-	public ItemStack get(int id) {
-		return inventory.getItem(min(id, size));
-	}
+    /*
+     * Getter
+     */
+    
+    public boolean isInventoryChanged() {
+        return inventoryChanged;
+    }
 
-	@Override
-	public GuiInventory set(int id, ItemStack stack) {
-		inventory.setItem(min(id, size), stack);
-		return this;
-	}
+    public IProperties getProperties() {
+        return properties;
+    }
+
+    public GuiHandler getHandler() {
+        return handler;
+    }
+
+    @Override
+    public Inventory getInventory() {
+        return inventory.get();
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    /*
+     * ItemStorage implementation
+     */
+
+    @Override
+    public GuiInventory me() {
+        return this;
+    }
+
+    @Override
+    public ItemStack get(int id) {
+        return inventory.get().getItem(min(id, size));
+    }
+
+    @Override
+    public GuiInventory set(int id, ItemStack stack) {
+        inventory.get().setItem(min(id, size), stack);
+        return this;
+    }
 
 }

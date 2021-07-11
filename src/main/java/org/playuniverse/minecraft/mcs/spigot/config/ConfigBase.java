@@ -126,6 +126,7 @@ public abstract class ConfigBase<C extends BaseConfig, B extends BaseSection> {
         }
 
         onLoad();
+        loaded = file.lastModified();
 
         save();
         loaded = file.lastModified();

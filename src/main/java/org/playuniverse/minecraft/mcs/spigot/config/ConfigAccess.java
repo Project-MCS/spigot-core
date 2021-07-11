@@ -1,7 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.config;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
@@ -11,6 +10,7 @@ import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
+import org.playuniverse.minecraft.mcs.spigot.utils.java.InstanceCreator;
 
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.utils.java.Files;
@@ -37,7 +37,7 @@ public class ConfigAccess {
         ArrayList<ConfigBase<?, ?>> configs = new ArrayList<>();
         for (Class<? extends ConfigBase<?, ?>> clazz : list) {
             try {
-                configs.add(load0(configFolder, clazz));
+                configs.add(load0(clazz, configFolder, base.getLogger()));
             } catch (Exception e) {
                 logger.log(e);
             }
@@ -52,51 +52,11 @@ public class ConfigAccess {
      * Config loading
      */
 
-    @SuppressWarnings("deprecation")
-    private ConfigBase<?, ?> load0(File folder, Class<? extends ConfigBase<?, ?>> clazz) throws Exception {
-        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
-        if (constructors.length == 0) {
-            return null;
+    private ConfigBase<?, ?> load0(Class<? extends ConfigBase<?, ?>> clazz, Object... arguments) throws Exception {
+        ConfigBase<?, ?> config = InstanceCreator.create(clazz, arguments);
+        if (config == null) {
+            throw new NullPointerException("config is null!");
         }
-        Constructor<?> current;
-        Constructor<?> execute = null;
-        boolean paramFile = false;
-        for (int index = 0; index < constructors.length; index++) {
-            current = constructors[index];
-            switch (current.getParameterCount()) {
-            case 0:
-                if (execute == null) {
-                    execute = current;
-                }
-                continue;
-            case 1:
-                if (!ILogger.class.equals(current.getParameters()[0].getType())
-                    && !(paramFile = File.class.equals(current.getParameters()[0].getType()))) {
-                    continue;
-                }
-                execute = current;
-                continue;
-            case 2:
-                if (!File.class.equals(current.getParameters()[0].getType())
-                    || !ILogger.class.equals(current.getParameters()[1].getType())) {
-                    continue;
-                }
-                execute = current;
-                continue;
-            default:
-                continue;
-            }
-        }
-        if (execute == null) {
-            return null;
-        }
-        boolean access = execute.isAccessible();
-        if (!access) {
-            execute.setAccessible(true);
-        }
-        ConfigBase<?, ?> config = (ConfigBase<?, ?>) (execute.getParameterCount() == 0 ? execute.newInstance()
-            : (execute.getParameterCount() == 2 ? execute.newInstance(folder, logger) : execute.newInstance(paramFile ? folder : logger)));
-        execute.setAccessible(access);
         configs.put(clazz, config);
         return config;
     }
@@ -118,11 +78,11 @@ public class ConfigAccess {
         for (Class<? extends ConfigBase<?, ?>> clazz : classes) {
             ConfigBase<?, ?> config = null;
             try {
-                config = load0(plugin.getDataLocation(), clazz);
+                config = load0(clazz, plugin.getDataLocation(), plugin, plugin.getLogger());
             } catch (Exception e) {
                 logger.log(e);
             }
-            if (configList.stream().anyMatch(current -> current.getClass().getName().equals(clazz.getName()))) {
+            if (config == null || configList.stream().anyMatch(current -> current.getClass().getName().equals(clazz.getName()))) {
                 continue;
             }
             configList.add(config);

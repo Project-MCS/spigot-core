@@ -16,52 +16,56 @@ import org.bukkit.event.inventory.TradeSelectEvent;
 
 public interface GuiHandler {
 
-	public default void onInit(GuiInventory inventory) {}
+    default void onInit(GuiInventory inventory) {}
 
-	public default void onPreAnvil(GuiInventory inventory, PrepareAnvilEvent event) {}
+    default void onPreAnvil(GuiInventory inventory, PrepareAnvilEvent event) {}
 
-	public default void onPreCraft(GuiInventory inventory, PrepareItemCraftEvent event) {}
+    default void onPreCraft(GuiInventory inventory, PrepareItemCraftEvent event) {}
 
-	public default void onPreSmith(GuiInventory inventory, PrepareSmithingEvent event) {}
+    default void onPreSmith(GuiInventory inventory, PrepareSmithingEvent event) {}
 
-	public default boolean onClose(GuiInventory inventory, InventoryCloseEvent event) {
-		return false;
-	}
+    default boolean onClose(GuiInventory inventory, InventoryCloseEvent event) {
+        return false;
+    }
 
-	public default boolean onOpen(GuiInventory inventory, InventoryOpenEvent event) {
-		return false;
-	}
+    default boolean onOpen(GuiInventory inventory, InventoryOpenEvent event) {
+        return false;
+    }
 
-	public default boolean onPreEnchant(GuiInventory inventory, PrepareItemEnchantEvent event) {
-		return false;
-	}
+    default boolean onPreEnchant(GuiInventory inventory, PrepareItemEnchantEvent event) {
+        return false;
+    }
 
-	public default boolean onEnchant(GuiInventory inventory, EnchantItemEvent event) {
-		return false;
-	}
+    default boolean onEnchant(GuiInventory inventory, EnchantItemEvent event) {
+        return false;
+    }
 
-	public default boolean onClick(GuiInventory inventory, InventoryClickEvent event) {
-		return false;
-	}
+    default boolean onClick(GuiInventory inventory, InventoryClickEvent event) {
+        return false;
+    }
 
-	public default boolean onCraft(GuiInventory inventory, CraftItemEvent event) {
-		return false;
-	}
+    default boolean onCraft(GuiInventory inventory, CraftItemEvent event) {
+        return false;
+    }
 
-	public default boolean onCreative(GuiInventory inventory, InventoryCreativeEvent event) {
-		return false;
-	}
+    default boolean onCreative(GuiInventory inventory, InventoryCreativeEvent event) {
+        return false;
+    }
 
-	public default boolean onDrag(GuiInventory inventory, InventoryDragEvent event) {
-		return false;
-	}
+    default boolean onDrag(GuiInventory inventory, InventoryDragEvent event) {
+        return false;
+    }
 
-	public default boolean onTradeSelect(GuiInventory inventory, TradeSelectEvent event) {
-		return false;
-	}
+    default boolean onTradeSelect(GuiInventory inventory, TradeSelectEvent event) {
+        return false;
+    }
 
-	public default boolean onItemMove(GuiInventory inventory, InventoryMoveItemEvent event, MoveInventory state) {
-		return false;
-	}
+    default boolean onItemMove(GuiInventory inventory, InventoryMoveItemEvent event, MoveInventory state) {
+        return false;
+    }
+
+    default void onUpdate(GuiInventory inventory) {
+        
+    }
 
 }

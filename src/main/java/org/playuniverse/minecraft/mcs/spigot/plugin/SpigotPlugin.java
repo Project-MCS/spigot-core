@@ -84,6 +84,8 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     @Override
     public final void start() {
         logger.log("Starting...");
+        logger.log("Loading logic...");
+        onLoad();
         logger.log("Loading configs...");
         ConfigBase.ACCESS.load(wrapper);
         logger.log("Starting logic...");
@@ -100,6 +102,8 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         onStop();
         logger.log("Unloading configs...");
         ConfigBase.ACCESS.unload(wrapper);
+        logger.log("Unloading logic...");
+        onUnload();
         logger.log("Successfully stopped!");
     }
 
@@ -110,9 +114,13 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         logger.log("Successfully deleted!");
     }
 
+    protected void onLoad() {}
+    
     protected void onStart() {}
 
     protected void onStop() {}
+    
+    protected void onUnload() {}
 
     protected void onDelete() {}
 

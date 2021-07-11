@@ -68,7 +68,8 @@ public final class ConfigTimer extends Thread {
                         try {
                             config.reload();
                         } catch (Exception exp) {
-                            logger.log(LogTypeId.WARNING, "Failed to load config '" + config.getName() + "'!");
+                            logger.log(LogTypeId.WARNING, "Failed to load config '" + config.getName() + "'!", "================================");
+                            logger.log(LogTypeId.WARNING, exp);
                             continue;
                         }
                         logger.log(LogTypeId.INFO, "Config '" + config.getName() + "' was successfully loaded!");

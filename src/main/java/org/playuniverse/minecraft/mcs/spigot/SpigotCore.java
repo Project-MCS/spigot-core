@@ -4,6 +4,7 @@ import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.redirect.ManagerRedirect;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.CommandNode;
+import org.playuniverse.minecraft.mcs.spigot.helper.task.TaskHelper;
 
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 import com.syntaxphoenix.syntaxapi.utils.key.Namespace;
@@ -25,6 +26,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     @Override
     protected void onLoadup() {
         NAMESPACE.replace(Namespace.of("system")).lock();
+        TaskHelper.TASK.start();
     }
 
     @Override
@@ -53,6 +55,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     @Override
     protected void onShutdown() {
         getInjections().uninject(command);
+        TaskHelper.TASK.shutdown();
     }
 
 }
