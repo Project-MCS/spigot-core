@@ -18,12 +18,13 @@ public final class GuiInventory implements InventoryHolder, ItemStorage<GuiInven
 
     private final IProperties properties;
 
-    private final GuiHandler handler;
     private final Container<Inventory> inventory = Container.of();
 
     private int size;
     private String name;
     private InventoryType type;
+    
+    private GuiHandler handler;
     
     private boolean inventoryChanged = false;
 
@@ -46,6 +47,11 @@ public final class GuiInventory implements InventoryHolder, ItemStorage<GuiInven
     /*
      * Update
      */
+    
+    public void updateHandler(GuiHandler handler) {
+        this.handler = Objects.requireNonNull(handler);
+        handler.onInit(this);
+    }
 
     public void updateType(int size) {
         this.type = InventoryType.CHEST;
