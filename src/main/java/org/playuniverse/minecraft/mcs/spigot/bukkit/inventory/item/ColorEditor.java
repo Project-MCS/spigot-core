@@ -102,7 +102,7 @@ abstract class ColorEditor<E extends ColorEditor> {
 			return me();
 		int size = lines.size();
 		for (int index = 0; index < size; index++)
-			content.add(lines.get(size));
+			content.add(lines.get(index));
 		return me();
 	}
 

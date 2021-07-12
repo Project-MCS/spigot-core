@@ -1,15 +1,28 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider;
 
+import static org.playuniverse.minecraft.vcompat.utils.constants.MinecraftConstants.TEXTURE_SIGNATURE;
+
+import java.io.IOException;
+import java.util.Base64;
+
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_17_R1.CraftOfflinePlayer;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftSkull;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.playuniverse.minecraft.vcompat.reflection.TextureProvider;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
+import com.syntaxphoenix.syntaxapi.json.JsonObject;
+import com.syntaxphoenix.syntaxapi.json.io.JsonParser;
+import com.syntaxphoenix.syntaxapi.json.io.JsonWriter;
 import com.syntaxphoenix.syntaxapi.reflection.AbstractReflect;
 import com.syntaxphoenix.syntaxapi.reflection.Reflect;
 
@@ -24,6 +37,9 @@ public class TextureProviderImpl extends TextureProvider<VersionControlImpl> {
     private final AbstractReflect craftItemStackRef = new Reflect(CraftItemStack.class).searchField("handle", "handle");
     private final AbstractReflect craftMetaSkullRef = new Reflect("org.bukkit.craftbukkit.v1_17_R1.inventory.CraftMetaSkull")
         .searchField("serialized", "serializedProfile").searchField("profile", "profile");
+
+    private final JsonParser parser = new JsonParser();
+    private final JsonWriter writer = new JsonWriter().setPretty(false).setSpaces(true);
 
     protected TextureProviderImpl(VersionControlImpl versionControl) {
         super(versionControl);
@@ -97,6 +113,29 @@ public class TextureProviderImpl extends TextureProvider<VersionControlImpl> {
         SkullBlockEntity entitySkull = (SkullBlockEntity) craftEntityStateRef.getFieldValue("tileEntity", block);
         entitySkull.setOwner(profile);
         return true;
+    }
+
+    @Override
+    public GameProfile profileFromPlayer(OfflinePlayer player) {
+        GameProfile profile = player.isOnline() ? ((CraftPlayer) player.getPlayer()).getProfile()
+            : ((CraftOfflinePlayer) player).getProfile();
+        Property property = profile.getProperties().get("textures").iterator().next();
+        String string = new String(Base64.getDecoder().decode(property.getValue()));
+        GameProfile outputProfile = new GameProfile(player.getUniqueId(), player.getName());
+        PropertyMap map = outputProfile.getProperties();
+        try {
+            JsonObject object = (JsonObject) parser.fromString(string);
+            JsonObject textures = (JsonObject) object.get("textures");
+            JsonObject skin = (JsonObject) textures.get("SKIN");
+            skin.remove("metadata");
+            JsonObject output = new JsonObject();
+            output.set("textures", textures);
+            map.put("textures",
+                new Property(property.getName(), Base64.getEncoder().encodeToString(writer.toBytes(output)), TEXTURE_SIGNATURE));
+            return outputProfile;
+        } catch (IOException e) {
+        }
+        return outputProfile;
     }
 
 }

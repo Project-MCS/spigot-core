@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
@@ -45,6 +46,10 @@ public abstract class TextureProvider<V extends VersionControl> extends VersionH
     public String textureFromItem(ItemStack itemStack) {
         return textureFromProfile(profileFromItem(itemStack));
     }
+    
+    public String textureFromPlayer(OfflinePlayer player) {
+        return textureFromProfile(profileFromPlayer(player));
+    }
 
     public GameProfile getCacheProfile(String texture) {
         texture = texture.replace(TEXTURE_SIGNATURE, "");
@@ -58,6 +63,11 @@ public abstract class TextureProvider<V extends VersionControl> extends VersionH
 
     public GameProfile getCacheProfile(Block block) {
         GameProfile profile = profileFromBlock(block);
+        return textures.containsValue(profile) ? profile : getCacheProfile(textureFromProfile(profile));
+    }
+
+    public GameProfile getCacheProfile(OfflinePlayer player) {
+        GameProfile profile = profileFromPlayer(player);
         return textures.containsValue(profile) ? profile : getCacheProfile(textureFromProfile(profile));
     }
 
@@ -76,8 +86,18 @@ public abstract class TextureProvider<V extends VersionControl> extends VersionH
 
     public abstract GameProfile profileFromItem(ItemStack itemStack);
 
+    public abstract GameProfile profileFromPlayer(OfflinePlayer player);
+
     public GameProfile removeProfile(String texture) {
         return textures.remove(texture);
+    }
+
+    public ItemStack getItem(Block block) {
+        return getItem(textureFromBlock(block));
+    }
+
+    public ItemStack getItem(OfflinePlayer player) {
+        return getItem(textureFromPlayer(player));
     }
 
     public ItemStack getItem(String texture) {
