@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ColorList extends ArrayList<String> {
+import org.playuniverse.minecraft.vcompat.utils.bukkit.BukkitColor;
 
-	public static final char UNCOLOR_CHAR = '\u0026';
-	public static final char COLOR_CHAR = '\u00A7';
+public class ColorList extends ArrayList<String> {
 
 	private static final long serialVersionUID = 1310623158005774539L;
 
@@ -100,15 +99,15 @@ public class ColorList extends ArrayList<String> {
 	}
 
 	private String color(String msg) {
-		return msg.replace(UNCOLOR_CHAR, COLOR_CHAR);
+		return BukkitColor.apply(msg);
 	}
 	
 	private String uncolor(String msg) {
-	    return msg.replace(COLOR_CHAR, UNCOLOR_CHAR);
+	    return BukkitColor.unapply(msg);
 	}
 	
 	private String strip(String msg) {
-	    return msg.replace("" + UNCOLOR_CHAR, "");
+	    return BukkitColor.strip(msg);
 	}
 
 }
