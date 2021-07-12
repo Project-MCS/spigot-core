@@ -35,7 +35,7 @@ public interface IDataType<P extends Object, C extends Object> {
 
     public static final IDataType<IDataContainer, IDataContainer> CONTAINER = of(IDataContainer.class);
     public static final IDataType<IDataContainer[], IDataContainer[]> CONTAINER_ARRAY = of(IDataContainer[].class);
-    
+
     public static final IDataType<byte[], UUID> UUID = of(byte[].class, UUID.class, array -> {
         ByteBuffer buffer = ByteBuffer.wrap(array);
         long mostSignificant = buffer.getLong();
@@ -77,11 +77,17 @@ public interface IDataType<P extends Object, C extends Object> {
     }
 
     public default boolean isComplex(Object object) {
-        return getComplex().isInstance(object);
+        if (object == null) {
+            return false;
+        }
+        return Primitives.fromPrimitive(object.getClass()).isAssignableFrom(getComplex());
     }
 
     public default boolean isPrimitive(Object object) {
-        return getPrimitive().isInstance(object);
+        if (object == null) {
+            return false;
+        }
+        return Primitives.fromPrimitive(object.getClass()).isAssignableFrom(getPrimitive());
     }
 
     public Class<C> getComplex();

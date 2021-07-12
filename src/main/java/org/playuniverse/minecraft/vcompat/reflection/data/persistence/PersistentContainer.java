@@ -151,6 +151,7 @@ public class PersistentContainer<K> extends NbtContainer {
         lock.writeLock().lock();
         observer.save();
         super.getRoot().clear();
+        changed = false;
         observer.shutdown();
         lock.writeLock().unlock();
     }
