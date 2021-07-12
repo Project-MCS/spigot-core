@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapter;
 import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterRegistry;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
 
 import com.google.common.base.Objects;
 
@@ -18,6 +19,12 @@ public abstract class AbstractDataAdapterRegistry<B> implements IDataAdapterRegi
 
     public abstract <P, C extends B> IDataAdapter<P, C, B> create(Class<P> primitiveType, Class<C> complexType, Function<P, C> builder,
         Function<C, P> extractor);
+
+    public AbstractDataAdapterRegistry() {
+        for (IDataType<?, ?> type : IDataType.PRIMITIVES) {
+            adapters.add(build(type.getPrimitive()));
+        }
+    }
 
     @Override
     public B wrap(Object value) {
@@ -47,7 +54,7 @@ public abstract class AbstractDataAdapterRegistry<B> implements IDataAdapterRegi
     }
 
     private IDataAdapter<?, ? extends B, B> find(Class<?> clazz, Function<IDataAdapter<?, ? extends B, B>, Class<?>> mapper) {
-        return adapters.stream().filter(adapter -> clazz.isAssignableFrom(mapper.apply(adapter))).findAny().orElseGet(() -> build(clazz));
+        return adapters.stream().filter(adapter -> mapper.apply(adapter).isAssignableFrom(clazz)).findAny().orElseGet(() -> build(clazz));
     }
 
 }

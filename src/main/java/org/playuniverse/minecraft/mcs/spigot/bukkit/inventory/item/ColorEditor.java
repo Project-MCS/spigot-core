@@ -30,6 +30,10 @@ abstract class ColorEditor<E extends ColorEditor> {
 	public String plain(int index) {
 		return content.getPlain(index);
 	}
+	
+	public String stripped(int index) {
+	    return content.getStripped(index);
+	}
 
 	public String[] color(int start, int length) {
 		int size = content.size();
@@ -54,6 +58,18 @@ abstract class ColorEditor<E extends ColorEditor> {
 			output[index] = plain(index);
 		return output;
 	}
+
+    public String[] stripped(int start, int length) {
+        int size = content.size();
+        if (start >= size)
+            throw new IndexOutOfBoundsException("start can't be bigger than size (" + Math.abs(size - start) + ")");
+        if (length > size)
+            throw new IndexOutOfBoundsException("length can't be bigger than size (" + Math.abs(size - length) + ")");
+        String[] output = new String[length];
+        for (int index = start; index < length; index++)
+            output[index] = stripped(index);
+        return output;
+    }
 
 	public E set(int index, String line) {
 		content.set(index, line);

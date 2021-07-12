@@ -31,7 +31,7 @@ public abstract class AbstractDataContainer<B> implements IDataContainer {
 
     @Override
     public <E> E get(String key, IDataType<?, E> type) {
-        Object value = type.getPrimitive().isAssignableFrom(registry.getBase()) ? getRaw(key) : get(key);
+        Object value = registry.getBase().isAssignableFrom(type.getPrimitive()) ? getRaw(key) : get(key);
         if (value == null || !type.isPrimitive(value)) {
             return null;
         }
@@ -43,7 +43,7 @@ public abstract class AbstractDataContainer<B> implements IDataContainer {
         if (!has(key)) {
             return false;
         }
-        Object value = type.getPrimitive().isAssignableFrom(registry.getBase()) ? getRaw(key) : get(key);
+        Object value = registry.getBase().isAssignableFrom(type.getPrimitive()) ? getRaw(key) : get(key);
         return (value == null || !type.isPrimitive(value));
     }
 

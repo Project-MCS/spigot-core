@@ -150,9 +150,9 @@ public class PersistentContainer<K> extends NbtContainer {
     public void delete() {
         lock.writeLock().lock();
         observer.save();
+        observer.shutdown();
         super.getRoot().clear();
         changed = false;
-        observer.shutdown();
         lock.writeLock().unlock();
     }
 

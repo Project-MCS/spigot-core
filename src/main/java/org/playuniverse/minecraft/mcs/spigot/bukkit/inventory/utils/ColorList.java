@@ -45,6 +45,10 @@ public class ColorList extends ArrayList<String> {
 	public String getPlain(int index) {
 		return super.get(index);
 	}
+    
+    public String getStripped(int index) {
+        return strip(super.get(index));
+    }
 
 	@Override
 	public boolean addAll(Collection<? extends String> collection) {
@@ -64,21 +68,21 @@ public class ColorList extends ArrayList<String> {
 	public String set(int index, String element) {
 		if (element == null)
 			return element;
-		return super.set(index, element);
+		return super.set(index, uncolor(element));
 	}
 
 	@Override
 	public boolean add(String element) {
 		if (element == null)
 			return false;
-		return super.add(element);
+		return super.add(uncolor(element));
 	}
 
 	@Override
 	public void add(int index, String element) {
 		if (element == null)
 			return;
-		super.add(index, element);
+		super.add(index, uncolor(element));
 	}
 
 	@Override
@@ -97,6 +101,14 @@ public class ColorList extends ArrayList<String> {
 
 	private String color(String msg) {
 		return msg.replace(UNCOLOR_CHAR, COLOR_CHAR);
+	}
+	
+	private String uncolor(String msg) {
+	    return msg.replace(COLOR_CHAR, UNCOLOR_CHAR);
+	}
+	
+	private String strip(String msg) {
+	    return msg.replace("" + UNCOLOR_CHAR, "");
 	}
 
 }
