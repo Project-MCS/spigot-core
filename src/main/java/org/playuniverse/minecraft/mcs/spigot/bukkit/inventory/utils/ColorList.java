@@ -107,7 +107,7 @@ public class ColorList extends ArrayList<String> {
 	}
 	
 	private String strip(String msg) {
-	    return BukkitColor.strip(msg);
+	    return BukkitColor.stripPlain(msg);
 	}
 
 }
