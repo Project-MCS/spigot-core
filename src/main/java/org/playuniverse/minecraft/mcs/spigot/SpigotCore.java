@@ -1,5 +1,7 @@
 package org.playuniverse.minecraft.mcs.spigot;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.pf4j.PluginManager;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
@@ -51,6 +53,9 @@ public class SpigotCore extends PluginBase<SpigotCore> {
             manager.startPlugins();
             getPluginLogger().log("Reloading... (4 / 4)");
             getPluginLogger().log("Reload complete!");
+            for(Player player : Bukkit.getOnlinePlayers()) {
+                player.closeInventory();
+            }
         }));
     }
 
@@ -63,6 +68,9 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     protected void onShutdown() {
         getInjections().uninject(command);
         TaskHelper.TASK.shutdown();
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            player.closeInventory();
+        }
     }
 
 }

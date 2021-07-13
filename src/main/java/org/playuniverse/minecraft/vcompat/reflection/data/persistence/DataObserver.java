@@ -98,6 +98,14 @@ public class DataObserver implements Runnable {
     public void shutdown() {
         alive = false;
     }
+    
+    public void shutdownNow() {
+        if(!thread.isAlive()) {
+            return;
+        }
+        shutdown();
+        thread.interrupt();
+    }
 
     public boolean isAlive() {
         return alive;

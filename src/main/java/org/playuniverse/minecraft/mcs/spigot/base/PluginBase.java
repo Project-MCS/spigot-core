@@ -26,6 +26,7 @@ import org.playuniverse.minecraft.mcs.spigot.language.handler.EntityMessageHandl
 import org.playuniverse.minecraft.mcs.spigot.language.handler.PlayerMessageHandler;
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.ComponentMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.StringMessageBuilder;
+import org.playuniverse.minecraft.mcs.spigot.listener.ServerLoadListener;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
@@ -244,6 +245,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         //
 
         register(GuiListener.LISTENER);
+        register(new ServerLoadListener(this));
 
         //
         // Register Injections and apply reflections

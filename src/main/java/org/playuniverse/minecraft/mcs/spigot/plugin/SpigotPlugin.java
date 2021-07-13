@@ -106,6 +106,10 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         onUnload();
         logger.log("Successfully stopped!");
     }
+    
+    public final void ready() {
+        onServerReady();
+    }
 
     @Override
     public final void delete() {
@@ -117,6 +121,8 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     protected void onLoad() {}
     
     protected void onStart() {}
+    
+    protected void onServerReady() {}
 
     protected void onStop() {}
     
