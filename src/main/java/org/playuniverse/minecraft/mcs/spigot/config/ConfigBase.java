@@ -22,24 +22,30 @@ public abstract class ConfigBase<C extends BaseConfig, B extends BaseSection> {
     protected final int latestVersion;
     protected int version;
 
+    private boolean busy = false;
+
     public ConfigBase(File file, Class<? extends Migration> clazz, int latestVersion) {
         this.file = file;
         this.migrationRef = new Reflect(clazz);
         this.latestVersion = latestVersion;
         this.version = latestVersion;
     }
-    
+
     /*
      * Abstract Getter
      */
-    
+
     public abstract C getConfig();
-    
+
     public abstract B getStorage();
 
     /*
      * Getter
      */
+    
+    public final boolean isBusy() {
+        return busy;
+    }
 
     public final Reflect getMigrationRef() {
         return migrationRef;
@@ -99,47 +105,60 @@ public abstract class ConfigBase<C extends BaseConfig, B extends BaseSection> {
      */
 
     public final void reload() {
-        load();
+        busy = true;
+        try {
+            load();
 
-        if (loaded == -1) {
-            onSetup();
-        }
-        loaded = file.lastModified();
-
-        if (file.exists())
-            version = check("version", 1).intValue();
-
-        if (latestVersion > version) {
-            MigrationContext context = new MigrationContext(getStorage());
-            while (latestVersion > version) {
-                String method = "update" + version++;
-                migrationRef.searchMethod(method, method, MigrationContext.class).execute(method, context);
+            if (loaded == -1) {
+                onSetup();
             }
-            file.delete();
-            getStorage().clear();
-            context.remove("version");
-            getStorage().set("version", version);
-            for (Entry<String, Object> entry : context.getValues().entrySet())
-                getStorage().set(entry.getKey(), entry.getValue());
-        } else if (latestVersion < version) {
-            backupAndClear();
+            loaded = file.lastModified();
+
+            if (file.exists())
+                version = check("version", 1).intValue();
+
+            if (latestVersion > version) {
+                MigrationContext context = new MigrationContext(getStorage());
+                while (latestVersion > version) {
+                    String method = "update" + version++;
+                    migrationRef.searchMethod(method, method, MigrationContext.class).execute(method, context);
+                }
+                file.delete();
+                getStorage().clear();
+                context.remove("version");
+                getStorage().set("version", version);
+                for (Entry<String, Object> entry : context.getValues().entrySet())
+                    getStorage().set(entry.getKey(), entry.getValue());
+            } else if (latestVersion < version) {
+                backupAndClear();
+            }
+
+            onLoad();
+
+            save();
+            loaded = file.lastModified();
+            busy = false;
+        } catch (Throwable throwable) {
+            busy = false;
+            throw throwable;
         }
-
-        onLoad();
-        loaded = file.lastModified();
-
-        save();
-        loaded = file.lastModified();
     }
 
     public final void unload() {
-        onUnload();
-        save();
+        busy = true;
+        try {
+            onUnload();
+            save();
 
-        ConfigTimer.TIMER.unload(this);
+            ConfigTimer.TIMER.unload(this);
 
-        loaded = -1;
-        getStorage().clear();
+            loaded = -1;
+            getStorage().clear();
+            busy = false;
+        } catch (Throwable throwable) {
+            busy = false;
+            throw throwable;
+        }
     }
 
     private final void backupAndClear() {
@@ -198,7 +217,7 @@ public abstract class ConfigBase<C extends BaseConfig, B extends BaseSection> {
     protected void onSetup() {}
 
     protected void onLoad() {}
-    
+
     protected void onSave() {}
 
     protected void onUnload() {

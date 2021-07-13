@@ -18,6 +18,7 @@ import org.playuniverse.minecraft.mcs.spigot.bukkit.inventory.GuiListener;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
+import org.playuniverse.minecraft.mcs.spigot.config.ConfigTimer;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.language.handler.BlockMessageHandler;
@@ -298,6 +299,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
             return;
         }
         init = false;
+        
+        ConfigTimer.TIMER.shutdown();
 
         //
         // Shutdown addons
@@ -316,7 +319,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         // Shutdown base logic
         //
 
-        bukkitEventManager.getHook().unregister();
+        bukkitEventManager.getHook().unregister(); 
 
         //
         // Uninject everything

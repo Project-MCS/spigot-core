@@ -20,10 +20,16 @@ public final class ConfigTimer extends Thread {
     private final ReadLock read = lock.readLock();
     private final WriteLock write = lock.writeLock();
 
+    private boolean alive = true;
+    
     private ConfigTimer() {
         setName("Config");
         setDaemon(true);
         start();
+    }
+    
+    public void shutdown() {
+        alive = false;
     }
 
     public boolean load(ConfigBase<?, ?> config) {
@@ -58,12 +64,12 @@ public final class ConfigTimer extends Thread {
 
     @Override
     public void run() {
-        while (true) {
+        while (alive) {
             read.lock();
             try {
                 ILogger logger = SpigotCore.get().getPluginLogger();
                 for (ConfigBase<?, ?> config : reload) {
-                    if (config.loaded < config.file.lastModified()) {
+                    if (config.loaded < config.file.lastModified() && !config.isBusy()) {
                         logger.log(LogTypeId.INFO, "Loading config '" + config.getName() + "'...");
                         try {
                             config.reload();
