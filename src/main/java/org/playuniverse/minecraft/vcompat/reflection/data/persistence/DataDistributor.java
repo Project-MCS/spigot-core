@@ -54,7 +54,7 @@ public class DataDistributor<K> {
         if (!containers.containsKey(key)) {
             return false;
         }
-        PersistentContainer<K> container = containers.get(key);
+        PersistentContainer<K> container = containers.remove(key);
         File location = container.getLocation();
         container.delete();
         if (location.exists()) {
