@@ -36,6 +36,9 @@ public abstract class TextureProvider<V extends VersionControl> extends VersionH
     }
 
     public String textureFromProfile(GameProfile profile) {
+        if(profile.getProperties().get("textures").isEmpty()) {
+            return "";
+        }
         return profile.getProperties().get("textures").iterator().next().getValue();
     }
 
@@ -49,6 +52,10 @@ public abstract class TextureProvider<V extends VersionControl> extends VersionH
     
     public String textureFromPlayer(OfflinePlayer player) {
         return textureFromProfile(profileFromPlayer(player));
+    }
+    
+    public String textureFromUniqueId(UUID uniqueId) {
+        return textureFromProfile(profileFromUniqueId(uniqueId));
     }
 
     public GameProfile getCacheProfile(String texture) {
@@ -87,6 +94,8 @@ public abstract class TextureProvider<V extends VersionControl> extends VersionH
     public abstract GameProfile profileFromItem(ItemStack itemStack);
 
     public abstract GameProfile profileFromPlayer(OfflinePlayer player);
+    
+    public abstract GameProfile profileFromUniqueId(UUID uniqueId);
 
     public GameProfile removeProfile(String texture) {
         return textures.remove(texture);
@@ -102,6 +111,10 @@ public abstract class TextureProvider<V extends VersionControl> extends VersionH
 
     public ItemStack getItem(String texture) {
         return getItem(getCacheProfile(texture));
+    }
+    
+    public ItemStack getItem(UUID uniqueId) {
+        return getItem(textureFromUniqueId(uniqueId));
     }
 
     public abstract ItemStack getItem(GameProfile profile);

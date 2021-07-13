@@ -1,5 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot;
 
+import org.pf4j.PluginManager;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.redirect.ManagerRedirect;
@@ -34,14 +35,20 @@ public class SpigotCore extends PluginBase<SpigotCore> {
         getCommandManager().setGlobal("help");
         getInjections().inject(command = new MinecraftCommand(new ManagerRedirect(getCommandManager()), this, "system", "sys", "core"));
         getCommandManager().register(new CommandNode<>("reload", context -> {
+            PluginManager manager = getPluginManager();
             getPluginLogger().log("Reloading... (0 / 4)");
-            getPluginManager().stopPlugins();
+            manager.stopPlugins();
             getPluginLogger().log("Reloading... (1 / 4)");
-            get().unloadPlugins();
+            manager.unloadPlugins();
+            System.gc();
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+            }
             getPluginLogger().log("Reloading... (2 / 4)");
             get().loadPlugins();
             getPluginLogger().log("Reloading... (3 / 4)");
-            getPluginManager().startPlugins();
+            manager.startPlugins();
             getPluginLogger().log("Reloading... (4 / 4)");
             getPluginLogger().log("Reload complete!");
         }));

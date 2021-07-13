@@ -3,7 +3,6 @@ package org.playuniverse.minecraft.mcs.spigot.base;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -303,7 +302,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
         //
 
         pluginManager.stopPlugins();
-        unloadPlugins();
+        pluginManager.unloadPlugins();
 
         //
         // Shutdown the plugin logic
@@ -373,16 +372,6 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
     /*
      * 
      */
-
-    protected final void unloadPlugins() {
-        List<PluginWrapper> plugins = pluginManager.getPlugins();
-        if (plugins.isEmpty()) {
-            return;
-        }
-        for (PluginWrapper plugin : plugins) {
-            pluginManager.unloadPlugin(plugin.getPluginId());
-        }
-    }
 
     protected final void loadPlugins() {
         logger.log("Loading functionality addons...");

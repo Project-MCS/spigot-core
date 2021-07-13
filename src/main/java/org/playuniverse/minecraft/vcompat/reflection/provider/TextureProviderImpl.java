@@ -4,7 +4,9 @@ import static org.playuniverse.minecraft.vcompat.utils.constants.MinecraftConsta
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -16,6 +18,8 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.playuniverse.minecraft.vcompat.reflection.TextureProvider;
+import org.playuniverse.minecraft.vcompat.utils.minecraft.MojangProfileServer;
+import org.playuniverse.minecraft.vcompat.utils.minecraft.Skin;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -117,8 +121,18 @@ public class TextureProviderImpl extends TextureProvider<VersionControlImpl> {
 
     @Override
     public GameProfile profileFromPlayer(OfflinePlayer player) {
+        return profileFromPlayer(player, true);
+    }
+
+    private GameProfile profileFromPlayer(OfflinePlayer player, boolean checkUniqueId) {
         GameProfile profile = player.isOnline() ? ((CraftPlayer) player.getPlayer()).getProfile()
             : ((CraftOfflinePlayer) player).getProfile();
+        if (profile.getProperties().get("textures").isEmpty()) {
+            if (checkUniqueId) {
+                return profileFromUniqueId(player.getName(), player.getUniqueId());
+            }
+            return profile;
+        }
         Property property = profile.getProperties().get("textures").iterator().next();
         String string = new String(Base64.getDecoder().decode(property.getValue()));
         GameProfile outputProfile = new GameProfile(player.getUniqueId(), player.getName());
@@ -132,6 +146,35 @@ public class TextureProviderImpl extends TextureProvider<VersionControlImpl> {
             output.set("textures", textures);
             map.put("textures",
                 new Property(property.getName(), Base64.getEncoder().encodeToString(writer.toBytes(output)), TEXTURE_SIGNATURE));
+            return outputProfile;
+        } catch (IOException e) {
+        }
+        return outputProfile;
+    }
+
+    @Override
+    public GameProfile profileFromUniqueId(UUID uniqueId) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(uniqueId);
+        GameProfile profile = profileFromPlayer(player, false);
+        if (!profile.getProperties().get("textures").isEmpty()) {
+            return profile;
+        }
+        return profileFromUniqueId(player.getName(), uniqueId);
+    }
+
+    private GameProfile profileFromUniqueId(String name, UUID uniqueId) {
+        Skin skinObj = MojangProfileServer.getSkin(name, uniqueId);
+        GameProfile outputProfile = new GameProfile(uniqueId, name);
+        PropertyMap map = outputProfile.getProperties();
+        String string = new String(Base64.getDecoder().decode(skinObj.getValue()));
+        try {
+            JsonObject object = (JsonObject) parser.fromString(string);
+            JsonObject textures = (JsonObject) object.get("textures");
+            JsonObject skin = (JsonObject) textures.get("SKIN");
+            skin.remove("metadata");
+            JsonObject output = new JsonObject();
+            output.set("textures", textures);
+            map.put("textures", new Property("textures", Base64.getEncoder().encodeToString(writer.toBytes(output)), TEXTURE_SIGNATURE));
             return outputProfile;
         } catch (IOException e) {
         }
