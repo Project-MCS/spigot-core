@@ -10,8 +10,15 @@ public class TypedRegistry<T extends ITyped<?>> extends Registry<Class<?>, T> {
         if (clazz.isArray()) {
             clazz = clazz.getComponentType();
         }
-        for (Class<?> key : map.keySet()) {
-            if (!clazz.isAssignableFrom(key)) {
+        Class<?>[] array = map.keySet().toArray(Class<?>[]::new);
+        for (Class<?> key : array) {
+            if (!key.equals(clazz)) {
+                continue;
+            }
+            return get(key);
+        }
+        for (Class<?> key : array) {
+            if (!key.isAssignableFrom(clazz)) {
                 continue;
             }
             return get(key);
