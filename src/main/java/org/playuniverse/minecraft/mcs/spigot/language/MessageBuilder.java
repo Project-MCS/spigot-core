@@ -8,6 +8,7 @@ import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderPar
 import org.playuniverse.minecraft.mcs.spigot.registry.ITyped;
 
 import com.syntaxphoenix.syntaxapi.nbt.NbtCompound;
+import com.syntaxphoenix.syntaxapi.nbt.NbtType;
 
 public abstract class MessageBuilder<T> implements ITyped<T> {
 
@@ -35,8 +36,12 @@ public abstract class MessageBuilder<T> implements ITyped<T> {
 
     @SuppressWarnings("unchecked")
     public abstract IMessage<T> buildMessage(NbtCompound data, T... objects);
-    
+
     public abstract IMessage<T> emptyMessage();
+
+    public final NbtCompound getProperties(NbtCompound data) {
+        return data.hasKey("properties", NbtType.COMPOUND) ? data.getCompound("properties") : new NbtCompound();
+    }
 
     public final String apply(NbtCompound placeholderData, String content) {
         DefaultPlaceholderStore store = new DefaultPlaceholderStore();

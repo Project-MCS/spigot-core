@@ -14,7 +14,7 @@ public class StringMessageBuilder extends MessageBuilder<String> {
     private StringMessageBuilder() {
         super(String.class, String[]::new);
     }
-    
+
     @Override
     public IMessage<String> emptyMessage() {
         return new StringMessage();
@@ -32,7 +32,7 @@ public class StringMessageBuilder extends MessageBuilder<String> {
                 output[index] = apply(placeholders, output[index]);
             }
         }
-        return new StringMessage(data.getCompound("properties"), output);
+        return new StringMessage(getProperties(data), output);
     }
 
 }

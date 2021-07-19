@@ -38,7 +38,7 @@ public final class ComponentMessageBuilder extends MessageBuilder<BaseComponent>
                 applyPlaceholders(placeholders, component);
             }
         }
-        return new ComponentMessage(data.getCompound("properties"), output);
+        return new ComponentMessage(getProperties(data), output);
     }
 
     private BaseComponent[] copy(BaseComponent[] components) {
