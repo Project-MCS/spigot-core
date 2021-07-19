@@ -28,4 +28,9 @@ public class DefaultPlaceholderStore implements PlaceholderStore {
 		return placeholders.toArray(Placeholder[]::new);
 	}
 
+    @Override
+    public boolean isEmpty() {
+        return placeholders.isEmpty();
+    }
+
 }

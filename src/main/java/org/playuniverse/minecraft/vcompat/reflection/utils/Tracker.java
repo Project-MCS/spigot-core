@@ -8,7 +8,9 @@ import org.bukkit.plugin.Plugin;
 import com.syntaxphoenix.syntaxapi.reflection.ClassCache;
 import com.syntaxphoenix.syntaxapi.utils.java.Arrays;
 
-public abstract class Tracker {
+public final class Tracker {
+
+    private Tracker() {}
 
     public static Optional<Class<?>> getClassFromStack(int offset) {
         StackTraceElement element = Thread.currentThread().getStackTrace()[2 + offset];

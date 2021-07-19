@@ -1,8 +1,13 @@
 package org.playuniverse.minecraft.mcs.spigot.language;
 
+import java.util.Optional;
+
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.Placeholder;
+import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderStore;
+import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
 import org.playuniverse.minecraft.mcs.spigot.registry.Registry;
+import org.playuniverse.minecraft.mcs.spigot.utils.java.CoreTracker;
 
 import com.syntaxphoenix.syntaxapi.nbt.NbtCompound;
 import com.syntaxphoenix.syntaxapi.utils.key.NamespacedKey;
@@ -176,19 +181,36 @@ public final class MessageWrapper<T> {
         if (properties != null) {
             data.set("properties", properties);
         }
-        if (placeholders != null) {
-            NbtCompound compound = new NbtCompound();
-            for (Placeholder placeholder : placeholders) {
-                if (placeholder == null || placeholder.getKey() == null) {
-                    continue;
-                }
-                compound.set('$' + placeholder.getKey(), placeholder.getValue());
-            }
-            if (!compound.isEmpty()) {
-                data.set("placeholders", compound);
-            }
+        NbtCompound compound = new NbtCompound();
+        placeholdersToCompound(placeholders, compound);
+        Optional<SpigotPlugin<?>> option = CoreTracker.getCallerPlugin();
+        if (option.isPresent()) {
+            placeholdersToCompound(option.get().getDefaultPlaceholders(), compound);
+        }
+        placeholdersToCompound(Singleton.Registries.PLACEHOLDERS, compound);
+        if (!compound.isEmpty()) {
+            data.set("placeholders", compound);
         }
         return data;
+    }
+
+    private void placeholdersToCompound(PlaceholderStore store, NbtCompound compound) {
+        if (store.isEmpty()) {
+            return;
+        }
+        placeholdersToCompound(store.placeholderArray(), compound);
+    }
+
+    private void placeholdersToCompound(Placeholder[] placeholders, NbtCompound compound) {
+        if (placeholders == null || placeholders.length == 0) {
+            return;
+        }
+        for (Placeholder placeholder : placeholders) {
+            if (placeholder == null || placeholder.getKey() == null) {
+                continue;
+            }
+            compound.set('$' + placeholder.getKey(), placeholder.getValue());
+        }
     }
 
     /*

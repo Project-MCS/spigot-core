@@ -9,5 +9,7 @@ public interface PlaceableStore {
 	Placeable getPlaceable(String key, boolean flag);
 
 	Placeable[] placeableArray();
+	
+	boolean isEmpty();
 
 }

@@ -15,13 +15,15 @@ import org.playuniverse.minecraft.mcs.spigot.command.nodes.PluginNode;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.RootNode;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
+import org.playuniverse.minecraft.mcs.spigot.language.placeholder.DefaultPlaceholderStore;
+import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderStore;
 
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.utils.java.Files;
 
 public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin implements IPlugin {
-    
+
     @SuppressWarnings("unchecked")
     private static final Class<? extends ConfigBase<?, ?>>[] EMPTY_CONFIG = new Class[0];
 
@@ -51,6 +53,8 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     private final File dataLocation;
     private final ILogger logger;
 
+    private final DefaultPlaceholderStore placeholders = new DefaultPlaceholderStore();
+
     public SpigotPlugin(PluginWrapper wrapper, File dataLocation) {
         super(wrapper);
         this.dataLocation = dataLocation;
@@ -76,7 +80,7 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     public final File getDataLocation() {
         return dataLocation;
     }
-    
+
     public Class<? extends ConfigBase<?, ?>>[] getConfigurations() {
         return EMPTY_CONFIG;
     }
@@ -106,7 +110,7 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         onUnload();
         logger.log("Successfully stopped!");
     }
-    
+
     public final void ready() {
         onServerReady();
     }
@@ -119,13 +123,13 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     }
 
     protected void onLoad() {}
-    
+
     protected void onStart() {}
-    
+
     protected void onServerReady() {}
 
     protected void onStop() {}
-    
+
     protected void onUnload() {}
 
     protected void onDelete() {}
@@ -152,6 +156,10 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
 
     public final <T> boolean uninject(T object) {
         return getBase().getInjections().uninject(object);
+    }
+
+    public final PlaceholderStore getDefaultPlaceholders() {
+        return placeholders;
     }
 
 }
