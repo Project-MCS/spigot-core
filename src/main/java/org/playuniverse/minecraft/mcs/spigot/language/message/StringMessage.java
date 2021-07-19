@@ -4,6 +4,7 @@ import org.bukkit.util.Consumer;
 import org.playuniverse.minecraft.mcs.spigot.language.IMessage;
 import org.playuniverse.minecraft.mcs.spigot.language.MessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.StringMessageBuilder;
+import org.playuniverse.minecraft.vcompat.utils.bukkit.BukkitColor;
 
 import com.syntaxphoenix.syntaxapi.nbt.NbtCompound;
 import com.syntaxphoenix.syntaxapi.utils.java.Strings;
@@ -64,7 +65,7 @@ public final class StringMessage implements IMessage<String> {
     }
 
     private BaseComponent[] asComponents(String string) {
-        return TextComponent.fromLegacyText(string, defaultColor);
+        return TextComponent.fromLegacyText(BukkitColor.apply(string), defaultColor);
     }
 
     @Override
