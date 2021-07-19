@@ -3,9 +3,16 @@ package org.playuniverse.minecraft.mcs.spigot.command.listener;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
+import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.Node;
 
 public abstract class AbstractRedirect {
+    
+    protected final IPlugin plugin;
+    
+    public AbstractRedirect(IPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     protected abstract Node<MinecraftInfo> handleComplete(String command);
 
@@ -22,4 +29,9 @@ public abstract class AbstractRedirect {
     protected abstract boolean isValid();
     
     protected abstract int argBuildStart();
+    
+    public final IPlugin getPlugin() {
+        return plugin;
+    }
+    
 }

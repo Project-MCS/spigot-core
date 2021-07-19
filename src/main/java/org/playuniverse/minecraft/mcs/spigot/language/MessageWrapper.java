@@ -2,6 +2,7 @@ package org.playuniverse.minecraft.mcs.spigot.language;
 
 import java.util.Optional;
 
+import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.Placeholder;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderStore;
@@ -17,9 +18,12 @@ public final class MessageWrapper<T> {
     private final T receiver;
     private final IMessageHandler<T> handler;
 
-    public MessageWrapper(T receiver, IMessageHandler<T> handler) {
+    private final IPlugin plugin;
+
+    public MessageWrapper(T receiver, IMessageHandler<T> handler, IPlugin plugin) {
         this.receiver = receiver;
         this.handler = handler;
+        this.plugin = plugin;
     }
 
     /*
@@ -48,6 +52,10 @@ public final class MessageWrapper<T> {
 
     public IMessageHandler<T> getHandler() {
         return handler;
+    }
+
+    public IPlugin getPlugin() {
+        return plugin;
     }
 
     /*
@@ -185,6 +193,7 @@ public final class MessageWrapper<T> {
         placeholdersToCompound(placeholders, compound);
         Optional<SpigotPlugin<?>> option = CoreTracker.getCallerPlugin();
         if (option.isPresent()) {
+            System.out.println("is present!");
             placeholdersToCompound(option.get().getDefaultPlaceholders(), compound);
         }
         placeholdersToCompound(Singleton.Registries.PLACEHOLDERS, compound);
@@ -223,7 +232,16 @@ public final class MessageWrapper<T> {
         if (handler == null) {
             return null;
         }
-        return new MessageWrapper<>(receiver, (IMessageHandler<S>) handler);
+        return new MessageWrapper<>(receiver, (IMessageHandler<S>) handler, CoreTracker.getCallerCommandPlugin().orElse(null));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <S> MessageWrapper<S> of(S receiver, IPlugin plugin) {
+        IMessageHandler<?> handler = Singleton.Registries.MESSAGE_HANDLER.getFor(receiver);
+        if (handler == null) {
+            return null;
+        }
+        return new MessageWrapper<>(receiver, (IMessageHandler<S>) handler, plugin);
     }
 
 }

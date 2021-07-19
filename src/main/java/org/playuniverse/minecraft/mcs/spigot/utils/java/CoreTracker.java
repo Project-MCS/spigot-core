@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.pf4j.PluginManager;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
+import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
 
 import com.syntaxphoenix.syntaxapi.reflection.ClassCache;
@@ -25,6 +26,14 @@ public final class CoreTracker {
         return getClassFromStack(1);
     }
 
+    public static Optional<IPlugin> getCallerCommandPlugin() {
+        return getCallerPlugin().map(plugin -> (IPlugin) plugin);
+    }
+
+    public static Optional<IPlugin> getCommandPlugin(Optional<Class<?>> option) {
+        return getPlugin(option).map(plugin -> (IPlugin) plugin);
+    }
+
     public static Optional<SpigotPlugin<?>> getCallerPlugin() {
         StackTraceElement[] elements = Arrays.subArray(StackTraceElement[]::new, Thread.currentThread().getStackTrace(), 2);
         for (StackTraceElement element : elements) {
@@ -40,6 +49,7 @@ public final class CoreTracker {
         if (!option.isPresent()) {
             return Optional.empty();
         }
+        System.out.println(option.get().getName());
         return option.map(clazz -> getPluginManager().whichPlugin(clazz)).map(SpigotPlugin::getByWrapper);
     }
 

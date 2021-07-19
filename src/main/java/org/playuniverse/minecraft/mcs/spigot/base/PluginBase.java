@@ -16,6 +16,7 @@ import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injections;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inventory.GuiListener;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
+import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigTimer;
@@ -42,7 +43,7 @@ import com.syntaxphoenix.syntaxapi.service.ServiceManager;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 import com.syntaxphoenix.syntaxapi.random.Keys;
 
-public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
+public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin implements IPlugin {
 
     public static final Keys KEYS = new Keys(73453345478693428L);
 
@@ -146,6 +147,11 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
     /*
      * 
      */
+    
+    @Override
+    public final String getId() {
+        return getName();
+    }
 
     public final File getDirectory() {
         return directory;

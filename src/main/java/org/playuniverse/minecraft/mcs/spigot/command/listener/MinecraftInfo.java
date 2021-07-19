@@ -2,6 +2,7 @@ package org.playuniverse.minecraft.mcs.spigot.command.listener;
 
 import org.bukkit.command.CommandSender;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
+import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.language.MessageWrapper;
 
 public class MinecraftInfo {
@@ -10,10 +11,10 @@ public class MinecraftInfo {
     private final CommandSender sender;
     private final MessageWrapper<? extends CommandSender> receiver;
 
-    public MinecraftInfo(PluginBase<?> base, CommandSender sender) {
+    public MinecraftInfo(PluginBase<?> base, CommandSender sender, IPlugin plugin) {
         this.base = base;
         this.sender = sender;
-        this.receiver = MessageWrapper.of(sender.getClass().cast(sender));
+        this.receiver = MessageWrapper.of(sender.getClass().cast(sender), plugin);
     }
 
     public MessageWrapper<? extends CommandSender> getReceiver() {

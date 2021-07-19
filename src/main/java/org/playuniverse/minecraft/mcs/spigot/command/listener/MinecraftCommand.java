@@ -148,7 +148,7 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
         if (node == null) {
             return redirect.handleNullComplete(this, sender, args);
         }
-        MinecraftInfo info = new MinecraftInfo(owner, sender);
+        MinecraftInfo info = new MinecraftInfo(owner, sender, redirect.getPlugin());
         try {
             return node.complete(new CommandContext<>(info, buildArgs(args)));
         } catch (Throwable throwable) {
@@ -161,7 +161,7 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
 
     @Override
     public boolean onCommand(CommandSender sender, Command ignore, String label, String[] args) {
-        MinecraftInfo info = new MinecraftInfo(owner, sender);
+        MinecraftInfo info = new MinecraftInfo(owner, sender, redirect.getPlugin());
         Node<MinecraftInfo> node = args.length == 0 ? (redirect.hasGlobal() ? redirect.handleCommand(null) : null)
             : redirect.handleCommand(args[0]);
         if (node == null) {

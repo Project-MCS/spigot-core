@@ -35,7 +35,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     @Override
     protected void onStartup() {
         getCommandManager().setGlobal("help");
-        getInjections().inject(command = new MinecraftCommand(new ManagerRedirect(getCommandManager()), this, "system", "sys", "core"));
+        getInjections().inject(command = new MinecraftCommand(new ManagerRedirect(getCommandManager(), this), this, "system", "sys", "core"));
         getCommandManager().register(new CommandNode<>("reload", context -> {
             PluginManager manager = getPluginManager();
             getPluginLogger().log("Reloading... (0 / 4)");
