@@ -4,6 +4,7 @@ import org.playuniverse.minecraft.mcs.spigot.language.IMessageHandler;
 import org.playuniverse.minecraft.mcs.spigot.language.Language;
 import org.playuniverse.minecraft.mcs.spigot.language.MessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.DefaultPlaceholderStore;
+import org.playuniverse.minecraft.mcs.spigot.registry.OrderedTypedRegistry;
 import org.playuniverse.minecraft.mcs.spigot.registry.Registry;
 import org.playuniverse.minecraft.mcs.spigot.registry.TypedRegistry;
 import org.playuniverse.minecraft.mcs.spigot.registry.UniqueRegistry;
@@ -43,7 +44,7 @@ public final class Singleton {
          * 
          */
 
-        public static final TypedRegistry<IMessageHandler<?>> MESSAGE_HANDLER = new TypedRegistry<>();
+        public static final OrderedTypedRegistry<IMessageHandler<?>> MESSAGE_HANDLER = new OrderedTypedRegistry<>();
         public static final TypedRegistry<MessageBuilder<?>> MESSAGE_BUILDER = new TypedRegistry<>();
 
         public static final Registry<Language, Registry<NamespacedKey, Object>> TRANSLATIONS = new Registry<>();

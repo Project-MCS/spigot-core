@@ -22,6 +22,11 @@ public final class ComponentMessageBuilder extends MessageBuilder<BaseComponent>
     }
 
     @Override
+    public IMessage<BaseComponent> emptyMessage() {
+        return new ComponentMessage();
+    }
+
+    @Override
     public IMessage<BaseComponent> buildMessage(NbtCompound data, BaseComponent... components) {
         if (components.length == 0) {
             return null;

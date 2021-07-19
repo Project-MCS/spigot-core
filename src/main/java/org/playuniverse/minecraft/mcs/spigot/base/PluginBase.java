@@ -25,6 +25,8 @@ import org.playuniverse.minecraft.mcs.spigot.language.handler.BlockMessageHandle
 import org.playuniverse.minecraft.mcs.spigot.language.handler.ConsoleMessageHandler;
 import org.playuniverse.minecraft.mcs.spigot.language.handler.EntityMessageHandler;
 import org.playuniverse.minecraft.mcs.spigot.language.handler.PlayerMessageHandler;
+import org.playuniverse.minecraft.mcs.spigot.language.handler.ProxiedMessageHandler;
+import org.playuniverse.minecraft.mcs.spigot.language.handler.RemoteConsoleMessageHandler;
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.ComponentMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.StringMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.listener.ServerLoadListener;
@@ -261,11 +263,13 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin {
 
         Singleton.Registries.MESSAGE_BUILDER.register(ComponentMessageBuilder.INSTANCE);
         Singleton.Registries.MESSAGE_BUILDER.register(StringMessageBuilder.INSTANCE);
-        
-        Singleton.Registries.MESSAGE_HANDLER.register(BlockMessageHandler.INSTANCE);
+
+        Singleton.Registries.MESSAGE_HANDLER.register(RemoteConsoleMessageHandler.INSTANCE);
         Singleton.Registries.MESSAGE_HANDLER.register(ConsoleMessageHandler.INSTANCE);
-        Singleton.Registries.MESSAGE_HANDLER.register(EntityMessageHandler.INSTANCE);
+        Singleton.Registries.MESSAGE_HANDLER.register(ProxiedMessageHandler.INSTANCE);
         Singleton.Registries.MESSAGE_HANDLER.register(PlayerMessageHandler.INSTANCE);
+        Singleton.Registries.MESSAGE_HANDLER.register(EntityMessageHandler.INSTANCE);
+        Singleton.Registries.MESSAGE_HANDLER.register(BlockMessageHandler.INSTANCE);
 
         //
         // Running the startup of the actual bot logic

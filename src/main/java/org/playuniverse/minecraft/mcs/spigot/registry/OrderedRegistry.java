@@ -1,11 +1,13 @@
 package org.playuniverse.minecraft.mcs.spigot.registry;
 
 import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class Registry<K, V> implements IRegistry<K, V> {
+public class OrderedRegistry<K, V> implements IRegistry<K, V> {
 
-    protected final ConcurrentHashMap<K, V> map = new ConcurrentHashMap<>();
+    protected final Map<K, V> map = Collections.synchronizedMap(new LinkedHashMap<>());
 
     @Override
     public V get(K key) {

@@ -14,6 +14,11 @@ public class StringMessageBuilder extends MessageBuilder<String> {
     private StringMessageBuilder() {
         super(String.class, String[]::new);
     }
+    
+    @Override
+    public IMessage<String> emptyMessage() {
+        return new StringMessage();
+    }
 
     @Override
     public IMessage<String> buildMessage(NbtCompound data, String... strings) {

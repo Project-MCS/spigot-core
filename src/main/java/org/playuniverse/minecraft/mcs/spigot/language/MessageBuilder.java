@@ -25,8 +25,8 @@ public abstract class MessageBuilder<T> implements ITyped<T> {
     }
 
     public IMessage<T> buildMessageOfObjects(NbtCompound data, Object... objects) {
-        if (objects.length == 0 || getType().isInstance(objects[0])) {
-            return null;
+        if (objects.length == 0 || !getType().isInstance(objects[0])) {
+            return emptyMessage();
         }
         T[] array = arrayBuilder.apply(objects.length);
         System.arraycopy(objects, 0, array, 0, objects.length);
@@ -35,6 +35,8 @@ public abstract class MessageBuilder<T> implements ITyped<T> {
 
     @SuppressWarnings("unchecked")
     public abstract IMessage<T> buildMessage(NbtCompound data, T... objects);
+    
+    public abstract IMessage<T> emptyMessage();
 
     public final String apply(NbtCompound placeholderData, String content) {
         DefaultPlaceholderStore store = new DefaultPlaceholderStore();
