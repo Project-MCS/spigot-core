@@ -37,4 +37,9 @@ public class NodeRedirect extends AbstractRedirect {
         return node.getName();
     }
 
+    @Override
+    protected int argBuildStart() {
+        return 0;
+    }
+
 }

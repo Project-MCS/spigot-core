@@ -20,4 +20,6 @@ public abstract class AbstractRedirect {
     protected abstract String getGlobal();
     
     protected abstract boolean isValid();
+    
+    protected abstract int argBuildStart();
 }

@@ -189,11 +189,11 @@ public final class MinecraftCommand implements CommandExecutor, TabCompleter, IU
      */
 
     public String buildArgs(String[] args) {
-        if (args.length <= 1) {
+        if (args.length <= redirect.argBuildStart()) {
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        for (int index = 1; index < args.length; index++) {
+        for (int index = redirect.argBuildStart(); index < args.length; index++) {
             builder.append(args[index]).append(" ");
         }
         return builder.substring(0, builder.length() - 1);

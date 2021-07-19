@@ -66,7 +66,7 @@ public class ManagerRedirect extends AbstractRedirect {
 
     @Override
     protected String getGlobal() {
-        return manager.getGlobal().getName();
+        return manager.hasGlobal() ? manager.getGlobal().getName() : null;
     }
 
     private List<String> collectCommands() {
@@ -76,6 +76,11 @@ public class ManagerRedirect extends AbstractRedirect {
         ArrayList<String> commands = new ArrayList<>();
         manager.getCommands().values().forEach(array -> Collections.addAll(commands, array));
         return commands;
+    }
+
+    @Override
+    protected int argBuildStart() {
+        return 1;
     }
 
 }
