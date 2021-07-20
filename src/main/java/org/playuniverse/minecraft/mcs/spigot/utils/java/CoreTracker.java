@@ -49,7 +49,6 @@ public final class CoreTracker {
         if (!option.isPresent()) {
             return Optional.empty();
         }
-        System.out.println(option.get().getName());
         return option.map(clazz -> getPluginManager().whichPlugin(clazz)).map(SpigotPlugin::getByWrapper);
     }
 

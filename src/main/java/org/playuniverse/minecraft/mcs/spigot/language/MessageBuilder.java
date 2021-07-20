@@ -45,12 +45,12 @@ public abstract class MessageBuilder<T> implements ITyped<T> {
 
     public final String apply(NbtCompound placeholderData, String content) {
         DefaultPlaceholderStore store = new DefaultPlaceholderStore();
-        PlaceholderParser.parse(store, content);
+        PlaceholderParser.parseMessage(store, content);
         for (Placeholder placeholder : store.placeholderArray()) {
-            if (!placeholderData.hasKey(placeholder.getKey())) {
+            if (!placeholderData.hasKey(placeholder.getKey(), NbtType.STRING)) {
                 continue;
             }
-            placeholder.setValue(placeholderData.get(placeholder.getKey()).getValue().toString());
+            placeholder.setValue(placeholderData.getString(placeholder.getKey()));
         }
         return PlaceholderParser.apply(store, content);
     }

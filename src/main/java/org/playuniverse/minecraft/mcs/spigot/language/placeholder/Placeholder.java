@@ -46,5 +46,10 @@ public final class Placeholder implements Placeable {
     public static Placeholder[] array(Placeholder... placeholders) {
         return placeholders;
     }
+    
+    @Override
+    public String toString() {
+        return '[' + getKey() + ", " + getValue() + ']';
+    }
 
 }

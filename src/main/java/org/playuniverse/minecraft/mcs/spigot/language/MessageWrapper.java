@@ -1,7 +1,5 @@
 package org.playuniverse.minecraft.mcs.spigot.language;
 
-import java.util.Optional;
-
 import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.Placeholder;
@@ -18,9 +16,13 @@ public final class MessageWrapper<T> {
     private final T receiver;
     private final IMessageHandler<T> handler;
 
-    private final IPlugin plugin;
+    private final SpigotPlugin<?> plugin;
 
     public MessageWrapper(T receiver, IMessageHandler<T> handler, IPlugin plugin) {
+        this(receiver, handler, SpigotPlugin.get(plugin.getId()));
+    }
+
+    public MessageWrapper(T receiver, IMessageHandler<T> handler, SpigotPlugin<?> plugin) {
         this.receiver = receiver;
         this.handler = handler;
         this.plugin = plugin;
@@ -54,7 +56,7 @@ public final class MessageWrapper<T> {
         return handler;
     }
 
-    public IPlugin getPlugin() {
+    public SpigotPlugin<?> getPlugin() {
         return plugin;
     }
 
@@ -190,13 +192,11 @@ public final class MessageWrapper<T> {
             data.set("properties", properties);
         }
         NbtCompound compound = new NbtCompound();
-        placeholdersToCompound(placeholders, compound);
-        Optional<SpigotPlugin<?>> option = CoreTracker.getCallerPlugin();
-        if (option.isPresent()) {
-            System.out.println("is present!");
-            placeholdersToCompound(option.get().getDefaultPlaceholders(), compound);
-        }
         placeholdersToCompound(Singleton.Registries.PLACEHOLDERS, compound);
+        if (plugin != null) {
+            placeholdersToCompound(plugin.getDefaultPlaceholders(), compound);
+        }
+        placeholdersToCompound(placeholders, compound);
         if (!compound.isEmpty()) {
             data.set("placeholders", compound);
         }
