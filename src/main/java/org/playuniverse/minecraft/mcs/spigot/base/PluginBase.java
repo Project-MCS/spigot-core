@@ -136,6 +136,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
     @Override
     public final void onEnable() {
+        
         initialize();
     }
 

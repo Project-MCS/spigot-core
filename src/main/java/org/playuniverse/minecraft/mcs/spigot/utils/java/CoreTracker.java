@@ -18,7 +18,7 @@ public final class CoreTracker {
     private CoreTracker() {}
 
     public static Optional<Class<?>> getClassFromStack(int offset) {
-        StackTraceElement element = Thread.currentThread().getStackTrace()[2 + offset];
+        StackTraceElement element = getStack()[3 + offset];
         return element == null ? Optional.empty() : ClassCache.getOptionalClass(element.getClassName());
     }
 
@@ -35,7 +35,7 @@ public final class CoreTracker {
     }
 
     public static Optional<SpigotPlugin<?>> getCallerPlugin() {
-        StackTraceElement[] elements = Arrays.subArray(StackTraceElement[]::new, Thread.currentThread().getStackTrace(), 2);
+        StackTraceElement[] elements = Arrays.subArray(StackTraceElement[]::new, getStack(), 3);
         for (StackTraceElement element : elements) {
             Optional<SpigotPlugin<?>> plugin = getPlugin(ClassCache.getOptionalClass(element.getClassName()));
             if (plugin.isPresent()) {
@@ -46,10 +46,11 @@ public final class CoreTracker {
     }
 
     public static Optional<SpigotPlugin<?>> getPlugin(Optional<Class<?>> option) {
-        if (!option.isPresent()) {
-            return Optional.empty();
-        }
         return option.map(clazz -> getPluginManager().whichPlugin(clazz)).map(SpigotPlugin::getByWrapper);
+    }
+    
+    private static StackTraceElement[] getStack() {
+        return new Throwable().getStackTrace();
     }
 
     private static PluginManager getPluginManager() {

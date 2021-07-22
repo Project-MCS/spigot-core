@@ -4,12 +4,12 @@ public class ClassLookupCache extends AbstractClassLookupCache<ClassLookup> {
 
     @Override
     protected ClassLookup create(Class<?> clazz) {
-        return new ClassLookup(clazz);
+        return ClassLookup.of(clazz);
     }
 
     @Override
     protected ClassLookup create(String path) {
-        return new ClassLookup(path);
+        return ClassLookup.of(path);
     }
 
 }

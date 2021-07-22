@@ -80,14 +80,14 @@ public interface IDataType<P extends Object, C extends Object> {
         if (object == null) {
             return false;
         }
-        return Primitives.fromPrimitive(object.getClass()).isAssignableFrom(getComplex());
+        return getComplex().isAssignableFrom(Primitives.fromPrimitive(object.getClass()));
     }
 
     public default boolean isPrimitive(Object object) {
         if (object == null) {
             return false;
         }
-        return Primitives.fromPrimitive(object.getClass()).isAssignableFrom(getPrimitive());
+        return getPrimitive().isAssignableFrom(Primitives.fromPrimitive(object.getClass()));
     }
 
     public Class<C> getComplex();

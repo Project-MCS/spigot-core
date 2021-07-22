@@ -40,6 +40,8 @@ public abstract class VersionControl {
     public Properties getServerProperties() {
         return properties;
     }
+    
+    public abstract void rehook();
 
     public abstract ToolProvider<?> getToolProvider();
 

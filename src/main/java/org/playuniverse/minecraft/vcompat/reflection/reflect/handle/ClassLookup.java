@@ -5,8 +5,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
@@ -22,17 +22,19 @@ public class ClassLookup {
     public static final Lookup LOOKUP = MethodHandles.lookup();
 
     private Class<?> owner;
+    private Lookup privateLookup;
 
     private final HashMap<String, MethodHandle> constructors = new HashMap<>();
     private final HashMap<String, MethodHandle> methods = new HashMap<>();
     private final HashMap<String, VarHandle> fields = new HashMap<>();
 
-    public ClassLookup(String classPath) {
-        this.owner = ClassCache.getClass(classPath);
+    protected ClassLookup(String classPath) throws IllegalAccessException {
+        this(ClassCache.getClass(classPath));
     }
 
-    public ClassLookup(Class<?> owner) {
+    protected ClassLookup(Class<?> owner) throws IllegalAccessException {
         this.owner = owner;
+        this.privateLookup = owner != null ? MethodHandles.privateLookupIn(owner, LOOKUP) : null;
     }
 
     /*
@@ -41,6 +43,10 @@ public class ClassLookup {
 
     public Class<?> getOwner() {
         return owner;
+    }
+
+    public Lookup getPrivateLockup() {
+        return privateLookup;
     }
 
     /*
@@ -52,6 +58,7 @@ public class ClassLookup {
         methods.clear();
         fields.clear();
         owner = null;
+        privateLookup = null;
     }
 
     public boolean isValid() {
@@ -234,14 +241,7 @@ public class ClassLookup {
         }
         if (constructor != null) {
             try {
-                boolean access = constructor.canAccess(null);
-                if (!access) {
-                    constructor.setAccessible(true);
-                }
-                constructors.put(name, LOOKUP.unreflectConstructor(constructor));
-                if (!access) {
-                    constructor.setAccessible(false);
-                }
+                constructors.put(name, unreflect(constructor));
             } catch (IllegalAccessException e) {
             }
         }
@@ -262,14 +262,7 @@ public class ClassLookup {
             }
             try {
                 if (ReflectionTools.hasSameArguments(arguments, args)) {
-                    boolean access = constructor.canAccess(null);
-                    if (!access) {
-                        constructor.setAccessible(true);
-                    }
-                    this.constructors.put(base + current, LOOKUP.unreflectConstructor(constructor));
-                    if (!access) {
-                        constructor.setAccessible(false);
-                    }
+                    this.constructors.put(base + current, unreflect(constructor));
                     current++;
                 }
             } catch (IllegalAccessException e) {
@@ -303,8 +296,8 @@ public class ClassLookup {
         }
         if (method != null) {
             try {
-                methods.put(name, LOOKUP.unreflect(method));
-            } catch (IllegalAccessException e) {
+                methods.put(name, unreflect(method));
+            } catch (IllegalAccessException | SecurityException e) {
             }
         }
         return this;
@@ -324,10 +317,10 @@ public class ClassLookup {
             }
             try {
                 if (ReflectionTools.hasSameArguments(arguments, args)) {
-                    this.methods.put(base + current, LOOKUP.unreflect(method));
+                    this.methods.put(base + current, unreflect(method));
                     current++;
                 }
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException | SecurityException e) {
             }
         }
         return this;
@@ -337,85 +330,65 @@ public class ClassLookup {
      * 
      */
 
-    public ClassLookup searchField(Predicate<ClassLookup> predicate, String name, String fieldName) {
-        return predicate.test(this) ? searchField(name, fieldName) : this;
+    public ClassLookup searchField(Predicate<ClassLookup> predicate, String name, String fieldName, Class<?> type) {
+        return predicate.test(this) ? searchField(name, fieldName, type) : this;
     }
 
-    public ClassLookup searchField(String name, String fieldName) {
+    public ClassLookup searchField(String name, String fieldName, Class<?> type) {
         if (hasField(name)) {
             return this;
         }
-        Field field = null;
+        VarHandle handle = null;
         try {
-            field = owner.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException | SecurityException e) {
+            handle = privateLookup.findVarHandle(owner, fieldName, type);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
         }
-        if (field == null) {
+        if (handle == null) {
             try {
-                field = owner.getField(fieldName);
-            } catch (NoSuchFieldException | SecurityException e) {
+                handle = privateLookup.findStaticVarHandle(owner, fieldName, type);
+            } catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
             }
         }
-        if (field != null) {
-            try {
-                fields.put(name, LOOKUP.unreflectVarHandle(field));
-            } catch (IllegalAccessException e) {
-            }
+        if (handle != null) {
+            fields.put(name, handle);
         }
         return this;
     }
 
-    public ClassLookup searchFields(String base, String fieldName) {
-        if (!isValid()) {
-            return this;
-        }
-        Field[] searching = owner.getFields();
-        int current = 0;
-        for (Field field : searching) {
-            try {
-                if (field.getName().startsWith(fieldName)) {
-                    fields.put(base + current, LOOKUP.unreflectVarHandle(field));
-                    current++;
-                }
-            } catch (IllegalAccessException e) {
+    /*
+     * 
+     */
+
+    private MethodHandle unreflect(Method method) throws IllegalAccessException, SecurityException {
+        if (Modifier.isStatic(method.getModifiers())) {
+            boolean access = method.canAccess(null);
+            if (!access) {
+                method.setAccessible(true);
             }
+            MethodHandle out = LOOKUP.unreflect(method);
+            if (!access) {
+                method.setAccessible(false);
+            }
+            return out;
         }
-        return this;
+        if (method.trySetAccessible()) {
+            MethodHandle out = LOOKUP.unreflect(method);
+            method.setAccessible(false);
+            return out;
+        }
+        return LOOKUP.unreflect(method);
     }
 
-    public ClassLookup searchField(String name, Class<?> type) {
-        if (hasField(name)) {
-            return this;
+    private MethodHandle unreflect(Constructor<?> constructor) throws IllegalAccessException {
+        boolean access = constructor.canAccess(null);
+        if (!access) {
+            constructor.setAccessible(true);
         }
-        Field[] searching = owner.getFields();
-        for (Field field : searching) {
-            if (field.getType() == type) {
-                try {
-                    fields.put(name, LOOKUP.unreflectVarHandle(field));
-                } catch (IllegalAccessException e) {
-                }
-                return this;
-            }
+        MethodHandle out = LOOKUP.unreflectConstructor(constructor);
+        if (!access) {
+            constructor.setAccessible(false);
         }
-        return this;
-    }
-
-    public ClassLookup searchFields(String base, Class<?> type) {
-        if (!isValid()) {
-            return this;
-        }
-        Field[] searching = owner.getFields();
-        int current = 0;
-        for (Field field : searching) {
-            try {
-                if (field.getType() == type) {
-                    fields.put(base + current, LOOKUP.unreflectVarHandle(field));
-                    current++;
-                }
-            } catch (IllegalAccessException e) {
-            }
-        }
-        return this;
+        return out;
     }
 
     /*
@@ -440,6 +413,26 @@ public class ClassLookup {
         System.arraycopy(array2, 0, output, 0, array2.length);
         System.arraycopy(array1, 0, output, array2.length, array1.length);
         return output;
+    }
+
+    /*
+     * 
+     */
+
+    public static final ClassLookup of(Class<?> clazz) {
+        try {
+            return new ClassLookup(clazz);
+        } catch (IllegalAccessException e) {
+            return null;
+        }
+    }
+
+    public static final ClassLookup of(String path) {
+        try {
+            return new ClassLookup(path);
+        } catch (IllegalAccessException e) {
+            return null;
+        }
     }
 
 }

@@ -232,7 +232,7 @@ public final class MessageWrapper<T> {
         if (handler == null) {
             return null;
         }
-        return new MessageWrapper<>(receiver, (IMessageHandler<S>) handler, CoreTracker.getCallerCommandPlugin().orElse(null));
+        return new MessageWrapper<>(receiver, (IMessageHandler<S>) handler, CoreTracker.getCallerPlugin().orElse(null));
     }
 
     @SuppressWarnings("unchecked")

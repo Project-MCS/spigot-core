@@ -60,6 +60,7 @@ public final class Ticker {
         thread.setDaemon(true);
         this.delay = delay;
         setLength(length);
+        thread.start();
     }
 
     public boolean add(ITickReceiver receiver) {
@@ -136,6 +137,10 @@ public final class Ticker {
             counter = counter - NANO_TIME;
         }
         ticks++;
+    }
+
+    public void stop() {
+        thread.interrupt();
     }
 
 }

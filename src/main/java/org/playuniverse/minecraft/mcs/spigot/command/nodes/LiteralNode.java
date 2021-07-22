@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.playuniverse.minecraft.mcs.spigot.command.CommandContext;
+import org.playuniverse.minecraft.mcs.spigot.command.StringReader;
 
 public class LiteralNode<S> extends RootNode<S> {
 
@@ -37,17 +38,22 @@ public class LiteralNode<S> extends RootNode<S> {
 
     @Override
     public int execute(CommandContext<S> context) {
-        String name = context.getReader().skipWhitespace().readUnquoted();
-        if (!hasChild(name) && !hasChild(name = execution)) {
-            return 0;
+        StringReader reader = context.getReader();
+        int cursor = reader.getCursor();
+        String name = reader.skipWhitespace().readUnquoted();
+        if (!hasChild(name)) {
+            if (!(name.isEmpty() && hasChild(name = execution))) {
+                return 0;
+            }
+            reader.setCursor(cursor);
         }
         return getChild(name).execute(context);
     }
-    
+
     @Override
     public List<String> complete(CommandContext<S> context) {
         String name = context.getReader().skipWhitespace().readUnquoted();
-        if (!hasChild(name) && !hasChild(name = execution)) {
+        if (!hasChild(name)) {
             return new ArrayList<>(children.keySet());
         }
         return getChild(name).complete(context);

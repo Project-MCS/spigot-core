@@ -18,6 +18,12 @@ public class VersionControlImpl extends VersionControl {
     private final BukkitConversionImpl bukkitConversion = new BukkitConversionImpl(this);
 
     public VersionControlImpl() {
+        rehook();
+    }
+
+    @Override
+    public void rehook() {
+        BukkitContainerAdapterHookImpl.unhookAll();
         BukkitContainerAdapterHookImpl.hookEntity();
     }
 

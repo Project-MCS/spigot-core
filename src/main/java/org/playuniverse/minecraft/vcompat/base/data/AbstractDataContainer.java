@@ -44,6 +44,10 @@ public abstract class AbstractDataContainer<B> implements IDataContainer {
             return false;
         }
         Object value = registry.getBase().isAssignableFrom(type.getPrimitive()) ? getRaw(key) : get(key);
+        System.out.println(key);
+        System.out.println(type.getPrimitive());
+        System.out.println(value == null ? "null" : value.getClass());
+        System.out.println(value);
         return (value == null || !type.isPrimitive(value));
     }
 

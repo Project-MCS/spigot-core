@@ -4,10 +4,18 @@ import org.playuniverse.minecraft.vcompat.reflection.reflect.handle.ClassLookup;
 
 public class FakeLookup extends ClassLookup {
 
-    public static final FakeLookup FAKE = new FakeLookup();
+    public static final FakeLookup FAKE = build();
 
-    private FakeLookup() {
+    private FakeLookup() throws IllegalAccessException {
         super((Class<?>) null);
+    }
+
+    private static final FakeLookup build() {
+        try {
+            return new FakeLookup();
+        } catch (IllegalAccessException e) {
+            return null;
+        }
     }
 
 }

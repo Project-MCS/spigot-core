@@ -25,7 +25,7 @@ public final class SyntaxContextImpl extends WrappedContext<PersistentDataAdapte
 
     @Override
     public IDataContainer newContainer() {
-        return newContainer();
+        return newWrapContainer();
     }
 
     @Override

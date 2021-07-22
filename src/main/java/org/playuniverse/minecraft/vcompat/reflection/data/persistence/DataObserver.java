@@ -7,6 +7,7 @@ import com.syntaxphoenix.syntaxapi.nbt.NbtNamedTag;
 import com.syntaxphoenix.syntaxapi.nbt.NbtType;
 import com.syntaxphoenix.syntaxapi.nbt.tools.NbtDeserializer;
 import com.syntaxphoenix.syntaxapi.nbt.tools.NbtSerializer;
+import com.syntaxphoenix.syntaxapi.utils.java.Exceptions;
 import com.syntaxphoenix.syntaxapi.utils.java.Files;
 
 public class DataObserver implements Runnable {
@@ -18,6 +19,7 @@ public class DataObserver implements Runnable {
 
     private long lastModified = 0L;
     private boolean saving = false;
+    private boolean loading = false;
     private Thread thread;
 
     private long wait = 700L;
@@ -51,22 +53,24 @@ public class DataObserver implements Runnable {
     }
 
     private void handle() {
-        if (saving) {
+        if (saving || loading) {
             return;
         }
         if (!alive) {
             stopIndicator = true;
         }
-        if (alive && container.location.lastModified() != lastModified) {
+        if (alive && container.location.lastModified() > lastModified) {
+            System.out.println(lastModified + " / " + container.location.lastModified());
             load();
         }
-        if (container.changed) {
+        if (alive && container.changed) {
             save();
             container.changed = false;
         }
     }
 
     public void load() {
+        loading = true;
         container.lock.writeLock().lock();
         if (container.location.exists()) {
             NbtNamedTag tag = null;
@@ -80,8 +84,14 @@ public class DataObserver implements Runnable {
         }
         container.lock.writeLock().unlock();
         if (container.consumer != null) {
-            container.consumer.accept(container);
+            try {
+                container.consumer.accept(container);
+            } catch (Exception note) {
+                System.out.println(Exceptions.stackTraceToString(note));
+            }
         }
+        lastModified = container.location.lastModified();
+        loading = false;
     }
 
     public void save() {
@@ -89,18 +99,18 @@ public class DataObserver implements Runnable {
         try {
             Files.createFile(container.location);
             NbtSerializer.COMPRESSED.toFile(new NbtNamedTag("root", container.asNbt()), container.location);
-            lastModified = container.location.lastModified();
         } catch (IOException ignore) {
         }
+        lastModified = container.location.lastModified();
         saving = false;
     }
 
     public void shutdown() {
         alive = false;
     }
-    
+
     public void shutdownNow() {
-        if(!thread.isAlive()) {
+        if (!thread.isAlive()) {
             return;
         }
         shutdown();
