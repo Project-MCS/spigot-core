@@ -59,14 +59,17 @@ public class DataObserver implements Runnable {
         if (!alive) {
             stopIndicator = true;
         }
-        if (alive && container.location.lastModified() > lastModified) {
-            System.out.println(lastModified + " / " + container.location.lastModified());
+        if (alive && checkMod()) {
             load();
         }
         if (alive && container.changed) {
             save();
             container.changed = false;
         }
+    }
+    
+    private boolean checkMod() {
+        return (container.location.lastModified() - lastModified) > wait;
     }
 
     public void load() {
