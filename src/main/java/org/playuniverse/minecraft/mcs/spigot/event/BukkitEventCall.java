@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 
-import com.syntaxphoenix.syntaxapi.event.Cancelable;
 import com.syntaxphoenix.syntaxapi.event.EventPriority;
 import com.syntaxphoenix.syntaxapi.utils.general.Status;
 import com.syntaxphoenix.syntaxapi.utils.java.Exceptions;
@@ -54,7 +54,7 @@ public final class BukkitEventCall {
 			listeners.put(priority, methods);
 		}
 		Status result = new Status(count);
-		return event instanceof Cancelable ? callCancelable(result, listeners) : call(result, listeners);
+		return event instanceof Cancellable ? callCancelable(result, listeners) : call(result, listeners);
 	}
 
 	public Status executeAsync(ExecutorService service) {
@@ -74,7 +74,7 @@ public final class BukkitEventCall {
 
 		Status result = new Status(count);
 		service.submit(() -> {
-			if (event instanceof Cancelable) {
+			if (event instanceof Cancellable) {
 				callCancelable(result, listeners);
 			} else {
 				call(result, listeners);
@@ -84,7 +84,7 @@ public final class BukkitEventCall {
 	}
 
 	private Status callCancelable(Status result, LinkedHashMap<EventPriority, ArrayList<BukkitEventMethod>> listeners) {
-		Cancelable cancel = (Cancelable) event;
+	    Cancellable cancel = (Cancellable) event;
 		for (EventPriority priority : EventPriority.ORDERED_VALUES) {
 			ArrayList<BukkitEventMethod> methods = listeners.get(priority);
 			if (methods.isEmpty()) {

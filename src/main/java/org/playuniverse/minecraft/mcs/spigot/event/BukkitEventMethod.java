@@ -3,62 +3,67 @@ package org.playuniverse.minecraft.mcs.spigot.event;
 import java.lang.reflect.Method;
 
 import org.bukkit.event.Event;
+import org.playuniverse.minecraft.mcs.spigot.event.base.BukkitPriority;
+import org.playuniverse.minecraft.mcs.spigot.event.base.holder.HandlerHolder;
 
-import com.syntaxphoenix.syntaxapi.event.EventHandler;
 import com.syntaxphoenix.syntaxapi.event.EventListener;
+import com.syntaxphoenix.syntaxapi.event.EventPriority;
 import com.syntaxphoenix.syntaxapi.reflection.ReflectionTools;
 
 public class BukkitEventMethod {
 
-	private final EventListener listener;
-	private final boolean ignoreCancel;
-	private final Method method;
+    private final EventListener listener;
+    private final Method method;
 
-	public BukkitEventMethod(EventListener listener, Method method) {
-		this.listener = listener;
-		this.method = method;
-		this.ignoreCancel = hasEventHandler() ? getHandler().ignoreCancel() : false;
-	}
+    private final HandlerHolder<?> handler;
 
-	public BukkitEventMethod(EventListener listener, Method method, boolean ignoreCancel) {
-		this.listener = listener;
-		this.method = method;
-		this.ignoreCancel = ignoreCancel;
-	}
+    public BukkitEventMethod(EventListener listener, Method method, HandlerHolder<?> handler) {
+        this.listener = listener;
+        this.method = method;
+        this.handler = handler;
+    }
 
-	public boolean isValid() {
-		return ReflectionTools.hasSameArguments(new Class<?>[] {
-				Event.class
-		}, method.getParameterTypes());
-	}
+    public boolean isValid() {
+        return ReflectionTools.hasSameArguments(new Class<?>[] {
+            Event.class
+        }, method.getParameterTypes());
+    }
 
-	public final boolean hasEventHandler() {
-		return getHandler() != null;
-	}
+    public final boolean hasEventHandler() {
+        return getHandler() != null;
+    }
 
-	@SuppressWarnings("unchecked")
-	public final Class<? extends Event> getEvent() {
-		return (Class<? extends Event>) method.getParameterTypes()[0];
-	}
+    @SuppressWarnings("unchecked")
+    public final Class<? extends Event> getEvent() {
+        return (Class<? extends Event>) method.getParameterTypes()[0];
+    }
 
-	public final EventHandler getHandler() {
-		return method.getAnnotation(EventHandler.class);
-	}
+    public final HandlerHolder<?> getHandler() {
+        return handler;
+    }
 
-	public final boolean ignoresCancel() {
-		return ignoreCancel;
-	}
+    public final boolean ignoresCancel() {
+        return handler != null ? handler.ignoreCancel() : false;
+    }
 
-	public final Method getMethod() {
-		return method;
-	}
+    public final EventPriority priortiy() {
+        return handler != null ? handler.priority() : EventPriority.NORMAL;
+    }
 
-	public final EventListener getListener() {
-		return listener;
-	}
+    public final BukkitPriority bukkitPriority() {
+        return handler != null ? handler.bukkitPriority() : BukkitPriority.NORMAL;
+    }
 
-	public void execute(Event event) {
-		ReflectionTools.execute(listener, method, event);
-	}
+    public final Method getMethod() {
+        return method;
+    }
+
+    public final EventListener getListener() {
+        return listener;
+    }
+
+    public void execute(Event event) {
+        ReflectionTools.execute(listener, method, event);
+    }
 
 }

@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.List;
 
 import org.bukkit.event.Event;
+import org.playuniverse.minecraft.mcs.spigot.event.base.BukkitPriority;
 
 import com.syntaxphoenix.syntaxapi.event.EventListener;
 import com.syntaxphoenix.syntaxapi.event.EventPriority;
@@ -16,16 +17,22 @@ public final class BukkitEventExecutor implements Comparable<BukkitEventExecutor
 	private final Class<? extends Event> event;
 	private final EventListener listener;
 	private final BukkitEventManager manager;
+	private final BukkitPriority priority;
 
-	public BukkitEventExecutor(BukkitEventManager manager, EventListener listener, Class<? extends Event> event) {
+	public BukkitEventExecutor(BukkitEventManager manager, EventListener listener, BukkitPriority priority, Class<? extends Event> event) {
 		this.listener = listener;
 		this.manager = manager;
 		this.event = event;
+		this.priority = priority;
 	}
 
 	/*
 	 * 
 	 */
+	
+	public final BukkitPriority getPriority() {
+        return priority;
+    }
 
 	public final BukkitEventManager getManager() {
 		return manager;
