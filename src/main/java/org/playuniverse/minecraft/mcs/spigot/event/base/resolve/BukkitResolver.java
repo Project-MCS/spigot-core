@@ -3,10 +3,11 @@ package org.playuniverse.minecraft.mcs.spigot.event.base.resolve;
 import java.lang.reflect.Method;
 
 import org.playuniverse.minecraft.mcs.spigot.event.base.BukkitEventHandler;
+import org.playuniverse.minecraft.mcs.spigot.event.base.holder.BukkitHolder;
 import org.playuniverse.minecraft.mcs.spigot.event.base.holder.HandlerHolder;
 
 public final class BukkitResolver extends MethodResolver<BukkitEventHandler> {
-    
+
     BukkitResolver() {}
 
     @Override
@@ -16,8 +17,16 @@ public final class BukkitResolver extends MethodResolver<BukkitEventHandler> {
 
     @Override
     public HandlerHolder<BukkitEventHandler> resolve(Method method) {
-        // TODO Auto-generated method stub
-        return null;
+        BukkitEventHandler handler;
+        try {
+            handler = method.getAnnotation(BukkitEventHandler.class);
+        } catch (NullPointerException e) {
+            return null;
+        }
+        if (handler == null) {
+            return null;
+        }
+        return new BukkitHolder(handler);
     }
 
 }

@@ -142,6 +142,7 @@ public class BukkitEventManager {
                 list = new ArrayList<>();
                 list.add(executor);
                 map.put(executor.getPriority(), list);
+                hook.registerEvent(event, executor.getPriority());
                 return this;
             }
             if (!list.contains(executor)) {
