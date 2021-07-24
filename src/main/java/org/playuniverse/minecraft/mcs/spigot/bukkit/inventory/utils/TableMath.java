@@ -46,7 +46,7 @@ public final class TableMath {
 	}
 
 	private static int[] fromId0(int id, int rowSize) {
-		int[] output = new int[2];
+		int[] output = new int[3];
 		output[2] = rowSize;
 		output[1] = id % rowSize;
 		output[0] = (id - output[1]) / rowSize;

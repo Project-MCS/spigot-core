@@ -35,7 +35,8 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     @Override
     protected void onStartup() {
         getCommandManager().setGlobal("help");
-        getInjections().inject(command = new MinecraftCommand(new ManagerRedirect(getCommandManager(), this), this, "system", "sys", "core"));
+        getInjections()
+            .inject(command = new MinecraftCommand(new ManagerRedirect(getCommandManager(), this), this, "system", "sys", "core"));
         getCommandManager().register(new CommandNode<>("reload", context -> {
             PluginManager manager = getPluginManager();
             getPluginLogger().log("Reloading... (0 / 4)");
@@ -53,9 +54,10 @@ public class SpigotCore extends PluginBase<SpigotCore> {
             manager.startPlugins();
             getPluginLogger().log("Reloading... (4 / 4)");
             getPluginLogger().log("Reload complete!");
-            for(Player player : Bukkit.getOnlinePlayers()) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
                 player.closeInventory();
             }
+            get().readyPlugins();
         }));
     }
 
@@ -68,7 +70,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     protected void onShutdown() {
         getInjections().uninject(command);
         TaskHelper.TASK.shutdown();
-        for(Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
         }
     }

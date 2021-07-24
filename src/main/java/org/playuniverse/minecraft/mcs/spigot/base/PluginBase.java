@@ -3,6 +3,7 @@ package org.playuniverse.minecraft.mcs.spigot.base;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -32,6 +33,7 @@ import org.playuniverse.minecraft.mcs.spigot.language.message.builder.ComponentM
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.StringMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.listener.ServerLoadListener;
 import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
+import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
@@ -136,7 +138,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
     @Override
     public final void onEnable() {
-        
+
         initialize();
     }
 
@@ -148,7 +150,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     /*
      * 
      */
-    
+
     @Override
     public final String getId() {
         return getName();
@@ -263,7 +265,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
         register(new Commands());
         injections.setup();
-        
+
         //
         // Register default handler for registries
         //
@@ -310,7 +312,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
             return;
         }
         init = false;
-        
+
         ConfigTimer.TIMER.shutdown();
 
         //
@@ -330,7 +332,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         // Shutdown base logic
         //
 
-        bukkitEventManager.getHook().unregister(); 
+        bukkitEventManager.getHook().unregister();
 
         //
         // Uninject everything
@@ -389,7 +391,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
      * 
      */
 
-    protected final void loadPlugins() {
+    public final void loadPlugins() {
         logger.log("Loading functionality addons...");
         try {
             pluginManager.loadPlugins();
@@ -450,6 +452,44 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
                 logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
             }
         }
+    }
+
+    public final void readyPlugins() {
+        HashMap<PluginWrapper, Throwable> map = new HashMap<>();
+        for (PluginWrapper wrapper : getPluginManager().getStartedPlugins()) {
+            SpigotPlugin<?> plugin = SpigotPlugin.getByWrapper(wrapper);
+            if (plugin == null) {
+                continue;
+            }
+            try {
+                plugin.ready();
+            } catch (Throwable throwable) {
+                map.put(wrapper, throwable);
+            }
+        }
+        if (map.isEmpty()) {
+            return;
+        }
+        ILogger logger = getPluginLogger();
+        logger.log(LogTypeId.ERROR, "Some plugins failed to ready up...");
+        logger.log(LogTypeId.ERROR, "");
+        PluginWrapper[] wrappers = map.keySet().toArray(PluginWrapper[]::new);
+        for (int index = 0; index < wrappers.length; index++) {
+            PluginWrapper wrapper = wrappers[index];
+            logger.log(LogTypeId.ERROR, "===============================================");
+            logger.log(LogTypeId.ERROR, "");
+            logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getPluginId() + "' by " + wrapper.getDescriptor().getProvider());
+            logger.log(LogTypeId.ERROR, "");
+            logger.log(LogTypeId.ERROR, "-----------------------------------------------");
+            logger.log(LogTypeId.ERROR, map.get(wrapper));
+            logger.log(LogTypeId.ERROR, "===============================================");
+            if (index + 1 != wrappers.length) {
+                logger.log(LogTypeId.ERROR, "");
+                logger.log(LogTypeId.ERROR, "");
+            }
+        }
+        logger.log(LogTypeId.ERROR, "");
+        logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
     }
 
     /*
