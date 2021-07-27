@@ -33,9 +33,16 @@ public abstract class AbstractDataContainer<B> implements IDataContainer {
     public <E> E get(String key, IDataType<?, E> type) {
         Object value = registry.getBase().isAssignableFrom(type.getPrimitive()) ? getRaw(key) : get(key);
         if (value == null || !type.isPrimitive(value)) {
+            if (Number.class.isAssignableFrom(type.getComplex())) {
+                return type.getComplex().cast(0);
+            }
             return null;
         }
-        return type.fromPrimitiveObj(getContext(), value);
+        E output = type.fromPrimitiveObj(getContext(), value);
+        if (output == null && Number.class.isAssignableFrom(type.getComplex())) {
+            return type.getComplex().cast(0);
+        }
+        return output;
     }
 
     @Override
@@ -90,17 +97,17 @@ public abstract class AbstractDataContainer<B> implements IDataContainer {
     public IKey[] getKeys() {
         return getKeyspaces().stream().map(NamespacedKey::fromString).toArray(IKey[]::new);
     }
-    
+
     /*
      * Abstract
      */
-    
+
     public abstract B getRaw(String key);
 
     public B getRaw(IKey key) {
         return getRaw(key.asString());
     }
-    
+
     public abstract void set(String key, B value);
 
     public void set(IKey key, B value) {
