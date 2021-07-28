@@ -35,15 +35,15 @@ public final class PlayerMessageHandler implements ICommandMessageHandler<Player
         case TITLE:
             message.send(original -> {
                 NbtCompound properties = message.getProperties();
-                boolean subtitleOnly = Optional.of(properties.get("subOnly")).filter(tag -> tag.getType() == NbtType.BYTE)
+                boolean subtitleOnly = Optional.ofNullable(properties.get("subOnly")).filter(tag -> tag.getType() == NbtType.BYTE)
                     .map(tag -> ((NbtByte) tag).getValue() == 1).orElse(false);
-                int subtitleOffset = Optional.of(properties.get("subOffset")).filter(tag -> tag.getType() == NbtType.INT)
+                int subtitleOffset = Optional.ofNullable(properties.get("subOffset")).filter(tag -> tag.getType() == NbtType.INT)
                     .map(tag -> ((NbtInt) tag).getValue()).orElse(-1);
-                int fadeIn = Optional.of(properties.get("fadeIn")).filter(tag -> tag.getType() == NbtType.INT)
+                int fadeIn = Optional.ofNullable(properties.get("fadeIn")).filter(tag -> tag.getType() == NbtType.INT)
                     .map(tag -> ((NbtInt) tag).getValue()).orElse(10);
-                int stay = Optional.of(properties.get("stay")).filter(tag -> tag.getType() == NbtType.INT)
+                int stay = Optional.ofNullable(properties.get("stay")).filter(tag -> tag.getType() == NbtType.INT)
                     .map(tag -> ((NbtInt) tag).getValue()).orElse(80);
-                int fadeOut = Optional.of(properties.get("fadeOut")).filter(tag -> tag.getType() == NbtType.INT)
+                int fadeOut = Optional.ofNullable(properties.get("fadeOut")).filter(tag -> tag.getType() == NbtType.INT)
                     .map(tag -> ((NbtInt) tag).getValue()).orElse(10);
                 if (subtitleOffset < 0 && !subtitleOnly) {
                     receiver.sendTitle(TextComponent.toLegacyText(original), null, fadeIn, stay, fadeOut);
