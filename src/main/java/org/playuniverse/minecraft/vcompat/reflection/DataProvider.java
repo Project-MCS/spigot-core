@@ -12,7 +12,7 @@ import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.persistence.DataDistributor;
 import org.playuniverse.minecraft.vcompat.reflection.data.wrap.SimpleSyntaxContainer;
 
-public class DataProvider extends VersionHandler<VersionControl> {
+public abstract class DataProvider<E extends VersionControl> extends VersionHandler<E> {
 
     public static final Function<UUID, String> DEFAULT_NAMING = UUID::toString;
     public static final Supplier<UUID> DEFAULT_RANDOM = UUID::randomUUID;
@@ -20,7 +20,7 @@ public class DataProvider extends VersionHandler<VersionControl> {
     protected final NbtAdapterRegistry registry = new NbtAdapterRegistry();
     protected final DataDistributor<UUID> defaultDistributor;
 
-    protected DataProvider(VersionControl versionControl) {
+    protected DataProvider(E versionControl) {
         super(versionControl);
         defaultDistributor = createDistributor(new File(Bukkit.getServer().getWorldContainer(),
             versionControl.getServerProperties().getProperty("level-name", "world") + "/pluginData"));
@@ -37,6 +37,8 @@ public class DataProvider extends VersionHandler<VersionControl> {
     public WrappedContainer createPersistentContainer() {
         return new SimpleSyntaxContainer<>(defaultDistributor.create());
     }
+
+    public abstract WrappedContainer wrap(Object container);
 
     public DataDistributor<UUID> getDefaultDistributor() {
         return defaultDistributor;

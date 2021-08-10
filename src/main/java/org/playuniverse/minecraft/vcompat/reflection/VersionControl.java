@@ -31,17 +31,13 @@ public abstract class VersionControl {
         }
     }
 
-    protected final DataProvider dataProvider = new DataProvider(this);
-
-    public DataProvider getDataProvider() {
-        return dataProvider;
-    }
-    
     public Properties getServerProperties() {
         return properties;
     }
-    
+
     public abstract void rehook();
+
+    public abstract DataProvider<?> getDataProvider();
 
     public abstract ToolProvider<?> getToolProvider();
 

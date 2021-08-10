@@ -13,17 +13,17 @@ public class DataDistributor<K> {
 
     protected final Map<K, PersistentContainer<K>> containers = Collections.synchronizedMap(new HashMap<>());
 
-    protected final DataProvider dataProvider;
+    protected final DataProvider<?> dataProvider;
 
     protected final File parent;
     protected final Function<K, String> namingFunction;
     protected final Supplier<K> randomFunction;
 
-    public DataDistributor(DataProvider dataProvider, File parent, Supplier<K> randomFunction) {
+    public DataDistributor(DataProvider<?> dataProvider, File parent, Supplier<K> randomFunction) {
         this(dataProvider, parent, Object::toString, randomFunction);
     }
 
-    public DataDistributor(DataProvider dataProvider, File parent, Function<K, String> namingFunction, Supplier<K> randomFunction) {
+    public DataDistributor(DataProvider<?> dataProvider, File parent, Function<K, String> namingFunction, Supplier<K> randomFunction) {
         this.dataProvider = dataProvider;
         this.parent = parent;
         this.namingFunction = namingFunction;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 public final class Ticker {
 
@@ -72,6 +73,10 @@ public final class Ticker {
 
     public boolean remove(ITickReceiver receiver) {
         return receivers.remove(receiver);
+    }
+    
+    public ITickReceiver find(Predicate<ITickReceiver> predicate) {
+        return receivers.stream().filter(predicate).findAny().orElse(null);
     }
 
     public long getLength() {

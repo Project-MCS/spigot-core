@@ -16,6 +16,7 @@ public class VersionControlImpl extends VersionControl {
     private final EntityProviderImpl entityProvider = new EntityProviderImpl(this);
     private final PlayerProviderImpl playerProvider = new PlayerProviderImpl(this);
     private final BukkitConversionImpl bukkitConversion = new BukkitConversionImpl(this);
+    private final DataProviderImpl dataProvider = new DataProviderImpl(this);
 
     public VersionControlImpl() {
         rehook();
@@ -25,6 +26,11 @@ public class VersionControlImpl extends VersionControl {
     public void rehook() {
         BukkitContainerAdapterHookImpl.unhookAll();
         BukkitContainerAdapterHookImpl.hookEntity();
+    }
+    
+    @Override
+    public DataProviderImpl getDataProvider() {
+        return dataProvider;
     }
 
     @Override
