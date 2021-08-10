@@ -91,7 +91,7 @@ public final class BukkitEventCall {
 				continue;
 			}
 			for (BukkitEventMethod method : methods) {
-				if (cancel.isCancelled() && !method.ignoresCancel()) {
+				if (cancel.isCancelled() && method.ignoresCancel()) {
 					result.cancel();
 					continue;
 				}

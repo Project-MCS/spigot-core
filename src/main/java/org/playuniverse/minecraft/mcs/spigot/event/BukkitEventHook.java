@@ -24,7 +24,7 @@ public class BukkitEventHook implements Listener {
 
     public void registerEvent(Class<? extends Event> event, BukkitPriority priority) {
         Bukkit.getPluginManager().registerEvent(event, this, priority.asBukkit(), methods.computeIfAbsent(priority, this::buildMethod),
-            SpigotCore.get());
+            SpigotCore.get(), false);
     }
 
     public void unregister() {
