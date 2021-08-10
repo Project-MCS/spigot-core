@@ -27,7 +27,7 @@ import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
@@ -194,7 +194,7 @@ public class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements NmsPla
             handle);
         ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, handle);
 
-        ClientboundRemoveEntityPacket destroyPacket = new ClientboundRemoveEntityPacket(handle.getId());
+        ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(handle.getId());
         ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(handle);
         ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(handle,
             (byte) Mth.floor(handle.getYHeadRot() * 256F / 360F));

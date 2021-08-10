@@ -16,7 +16,7 @@ import org.playuniverse.minecraft.vcompat.reflection.entity.NmsEntity;
 import org.playuniverse.minecraft.vcompat.reflection.utils.NmsBoundingBox;
 
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
@@ -158,7 +158,7 @@ public abstract class EntityImpl<E extends Entity> implements NmsEntity {
         if (players.length == 0) {
             return;
         }
-        ClientboundRemoveEntityPacket packet = new ClientboundRemoveEntityPacket(handle.getId());
+        ClientboundRemoveEntitiesPacket packet = new ClientboundRemoveEntitiesPacket(handle.getId());
         for (Player player : players) {
             if (!isShown(player)) {
                 continue;
