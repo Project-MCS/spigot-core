@@ -78,6 +78,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
         <configuration>
           <source>16</source>
           <target>16</target>
@@ -98,9 +99,9 @@
               <goal>remap</goal>
             </goals>
             <configuration>
-              <srgIn>org.spigotmc:minecraft-server:1.17-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
+              <srgIn>org.spigotmc:minecraft-server:1.17.1-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
               <reverse>true</reverse>
-              <remappedDependencies>org.spigotmc:spigot:1.17-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>
+              <remappedDependencies>org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>
               <remappedArtifactAttached>true</remappedArtifactAttached>
               <remappedClassifierName>remapped-obf</remappedClassifierName>
             </configuration>
@@ -154,7 +155,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
-      <version>1.17-R0.1-SNAPSHOT</version>
+      <version>1.17.1-R0.1-SNAPSHOT</version>
       <classifier>remapped-mojang</classifier>
       <scope>provided</scope>
     </dependency>
