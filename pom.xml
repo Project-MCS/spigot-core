@@ -241,7 +241,7 @@
 							<target>
 								<copy
 									file="${project.build.directory}/${project.build.finalName}.jar"
-									tofile="${basedir}/../../../TestServers/1.17/plugins/${project.artifactId}.jar" />
+									tofile="${basedir}/../../../TestServers/1.17/plugins/${project.artifactId}-core.jar" />
 							</target>
 						</configuration>
 					</execution>
