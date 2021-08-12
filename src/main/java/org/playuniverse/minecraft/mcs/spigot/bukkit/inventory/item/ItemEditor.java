@@ -231,6 +231,13 @@ public class ItemEditor {
         return getContainer().has(key, type);
     }
 
+    public ItemEditor apply() {
+        if (hasItemMeta()) {
+            itemStack.setItemMeta(itemMeta);
+        }
+        return this;
+    }
+
     public ItemStack asItemStack() {
         if (hasItemMeta()) {
             itemStack.setItemMeta(itemMeta);
