@@ -23,6 +23,17 @@ public final class ColorHelper {
         return builder.toStringClear();
     }
 
+    public static Color fromHexColor(String color) {
+        if (color.startsWith("#")) {
+            color = color.replace("#", "");
+        }
+        if (color.length() < 6) {
+            return Color.BLACK;
+        }
+        return new Color(Integer.parseInt(color.substring(0, 2), 16), Integer.parseInt(color.substring(2, 4), 16),
+            Integer.parseInt(color.substring(4, 6), 16));
+    }
+
     public static String toHexColor(float[] color) {
         StringBuilder builder = new StringBuilder("#");
         builder.append(String.format(HEX_FORMAT, Math.min(255, Math.abs(Math.round(color[0] * 255.0f)))));
@@ -46,7 +57,7 @@ public final class ColorHelper {
         return builder.toStringClear();
     }
 
-    public static float[] fromHexColor(String color) {
+    public static float[] hexToFloatColor(String color) {
         float[] output = new float[3];
         if (color.startsWith("#")) {
             color = color.replace("#", "");
@@ -65,11 +76,11 @@ public final class ColorHelper {
     }
 
     public static ColorIterator linearGradient(String hexColor0, String hexColor1, int steps) {
-        return new LinearGradient(fromHexColor(hexColor0), fromHexColor(hexColor1), steps);
+        return new LinearGradient(hexToFloatColor(hexColor0), hexToFloatColor(hexColor1), steps);
     }
 
     public static ColorIterator linearGradient(String hexColor, int steps) {
-        return new LinearGradient(fromHexColor(hexColor), fromHexColor(hexColor), steps);
+        return new LinearGradient(hexToFloatColor(hexColor), hexToFloatColor(hexColor), steps);
     }
 
 }

@@ -126,8 +126,8 @@
             </goals>
             <configuration>
               <inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>
-              <srgIn>org.spigotmc:minecraft-server:1.17-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
-              <remappedDependencies>org.spigotmc:spigot:1.17-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>
+              <srgIn>org.spigotmc:minecraft-server:1.17.1-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
+              <remappedDependencies>org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>
             </configuration>
           </execution>
         </executions>
