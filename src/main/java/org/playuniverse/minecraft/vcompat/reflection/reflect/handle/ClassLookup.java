@@ -21,6 +21,8 @@ import com.syntaxphoenix.syntaxapi.utils.java.Arrays;
 public class ClassLookup {
 
     public static final Lookup LOOKUP = MethodHandles.lookup();
+    
+    private static final ClassLookup FIELD = ClassLookup.of(Field.class).searchField("mod", "modifiers");
 
     private Class<?> owner;
     private Lookup privateLookup;
@@ -390,31 +392,11 @@ public class ClassLookup {
      * 
      */
 
-    private Field getFinalField() {
-        Field out = null;
-        try {
-            out = Field.class.getDeclaredField("modifier");
-        } catch (Exception ignore1) {
-            try {
-                out = Field.class.getField("modifier");
-            } catch (Exception ignore2) {
-            }
-        }
-        return out;
-    }
-
     private void unfinal(Field field) {
         if (!Modifier.isFinal(field.getModifiers())) {
             return;
         }
-        Field modifiers = getFinalField();
-        try {
-            modifiers.setAccessible(true);
-            modifiers.set(field, field.getModifiers() & ~Modifier.FINAL);
-            modifiers.setAccessible(false);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            // Failed :c
-        }
+        FIELD.setFieldValue(field, "mod", field.getModifiers() & ~Modifier.FINAL);
     }
 
     private VarHandle unreflect(Field field) throws IllegalAccessException, SecurityException {
