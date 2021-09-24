@@ -14,6 +14,11 @@ import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
+import org.playuniverse.minecraft.vcompat.reflection.reflect.handle.field.IFieldHandle;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.handle.field.SafeFieldHandle;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.handle.field.UnsafeDeclaredFieldHandle;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.handle.field.UnsafeStaticFieldHandle;
+
 import com.syntaxphoenix.syntaxapi.reflection.ClassCache;
 import com.syntaxphoenix.syntaxapi.reflection.ReflectionTools;
 import com.syntaxphoenix.syntaxapi.utils.java.Arrays;
@@ -21,15 +26,13 @@ import com.syntaxphoenix.syntaxapi.utils.java.Arrays;
 public class ClassLookup {
 
     public static final Lookup LOOKUP = MethodHandles.lookup();
-    
-    private static final ClassLookup FIELD = ClassLookup.of(Field.class).searchField("mod", "modifiers");
 
     private Class<?> owner;
     private Lookup privateLookup;
 
     private final HashMap<String, MethodHandle> constructors = new HashMap<>();
     private final HashMap<String, MethodHandle> methods = new HashMap<>();
-    private final HashMap<String, VarHandle> fields = new HashMap<>();
+    private final HashMap<String, IFieldHandle<?>> fields = new HashMap<>();
 
     protected ClassLookup(String classPath) throws IllegalAccessException {
         this(ClassCache.getClass(classPath));
@@ -80,7 +83,7 @@ public class ClassLookup {
         return methods.values();
     }
 
-    public Collection<VarHandle> getFields() {
+    public Collection<IFieldHandle<?>> getFields() {
         return fields.values();
     }
 
@@ -96,7 +99,7 @@ public class ClassLookup {
         return isValid() ? methods.get(name) : null;
     }
 
-    public VarHandle getField(String name) {
+    public IFieldHandle<?> getField(String name) {
         return isValid() ? fields.get(name) : null;
     }
 
@@ -198,25 +201,25 @@ public class ClassLookup {
      */
 
     public Object getFieldValue(String name) {
-        return isValid() && fields.containsKey(name) ? fields.get(name).get() : null;
+        return isValid() && fields.containsKey(name) ? fields.get(name).getValue() : null;
     }
 
     public Object getFieldValue(Object source, String name) {
-        return isValid() && fields.containsKey(name) ? fields.get(name).get(source) : null;
+        return isValid() && fields.containsKey(name) ? fields.get(name).getValue(source) : null;
     }
 
     public void setFieldValue(String name, Object value) {
         if (!isValid() || !fields.containsKey(name)) {
             return;
         }
-        fields.get(name).set(value);
+        fields.get(name).setValue(value);
     }
 
     public void setFieldValue(Object source, String name, Object value) {
         if (!isValid() || !fields.containsKey(name)) {
             return;
         }
-        fields.get(name).set(source, value);
+        fields.get(name).setValue(source, value);
     }
 
     /*
@@ -353,37 +356,28 @@ public class ClassLookup {
             }
         }
         if (field != null) {
-            try {
-                fields.put(name, unreflect(field));
-            } catch (IllegalAccessException | SecurityException e) {
-            }
+            storeField(name, field);
         }
         return this;
     }
 
     public ClassLookup searchField(String name, String fieldName, Class<?> type) {
-        if (hasMethod(name)) {
+        if (hasField(name)) {
             return this;
         }
-        Field field = null;
+        VarHandle handle = null;
         try {
-            field = owner.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException | SecurityException e) {
+            handle = privateLookup.findVarHandle(owner, fieldName, type);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
         }
-        if (field == null) {
+        if (handle == null) {
             try {
-                field = owner.getField(fieldName);
-            } catch (NoSuchFieldException | SecurityException e) {
+                handle = privateLookup.findStaticVarHandle(owner, fieldName, type);
+            } catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
             }
         }
-        if (field != null) {
-            if (!field.getType().equals(type)) {
-                return this;
-            }
-            try {
-                fields.put(name, unreflect(field));
-            } catch (IllegalAccessException | SecurityException e) {
-            }
+        if (handle != null) {
+            fields.put(name, new SafeFieldHandle(handle));
         }
         return this;
     }
@@ -392,11 +386,19 @@ public class ClassLookup {
      * 
      */
 
-    private void unfinal(Field field) {
+    private void storeField(String name, Field field) {
         if (!Modifier.isFinal(field.getModifiers())) {
+            try {
+                fields.put(name, new SafeFieldHandle(unreflect(field)));
+                return;
+            } catch (IllegalAccessException | SecurityException e) {
+            }
+        }
+        if (!Modifier.isStatic(field.getModifiers())) {
+            fields.put(name, new UnsafeDeclaredFieldHandle(field));
             return;
         }
-        FIELD.setFieldValue(field, "mod", field.getModifiers() & ~Modifier.FINAL);
+        fields.put(name, new UnsafeStaticFieldHandle(field));
     }
 
     private VarHandle unreflect(Field field) throws IllegalAccessException, SecurityException {
@@ -405,7 +407,6 @@ public class ClassLookup {
             if (!access) {
                 field.setAccessible(true);
             }
-            unfinal(field);
             VarHandle out = LOOKUP.unreflectVarHandle(field);
             if (!access) {
                 field.setAccessible(false);
@@ -413,12 +414,10 @@ public class ClassLookup {
             return out;
         }
         if (field.trySetAccessible()) {
-            unfinal(field);
             VarHandle out = LOOKUP.unreflectVarHandle(field);
             field.setAccessible(false);
             return out;
         }
-        unfinal(field);
         return LOOKUP.unreflectVarHandle(field);
     }
 
