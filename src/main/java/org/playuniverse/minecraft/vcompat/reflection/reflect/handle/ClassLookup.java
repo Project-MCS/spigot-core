@@ -5,6 +5,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.invoke.VarHandle;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -334,23 +335,53 @@ public class ClassLookup {
         return predicate.test(this) ? searchField(name, fieldName, type) : this;
     }
 
-    public ClassLookup searchField(String name, String fieldName, Class<?> type) {
-        if (hasField(name)) {
+    public ClassLookup searchField(String name, String fieldName) {
+        if (hasMethod(name)) {
             return this;
         }
-        VarHandle handle = null;
+        Field field = null;
         try {
-            handle = privateLookup.findVarHandle(owner, fieldName, type);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            field = owner.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException | SecurityException e) {
         }
-        if (handle == null) {
+        if (field == null) {
             try {
-                handle = privateLookup.findStaticVarHandle(owner, fieldName, type);
-            } catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
+                field = owner.getField(fieldName);
+            } catch (NoSuchFieldException | SecurityException e) {
             }
         }
-        if (handle != null) {
-            fields.put(name, handle);
+        if (field != null) {
+            try {
+                fields.put(name, unreflect(field));
+            } catch (IllegalAccessException | SecurityException e) {
+            }
+        }
+        return this;
+    }
+
+    public ClassLookup searchField(String name, String fieldName, Class<?> type) {
+        if (hasMethod(name)) {
+            return this;
+        }
+        Field field = null;
+        try {
+            field = owner.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException | SecurityException e) {
+        }
+        if (field == null) {
+            try {
+                field = owner.getField(fieldName);
+            } catch (NoSuchFieldException | SecurityException e) {
+            }
+        }
+        if (field != null) {
+            if (!field.getType().equals(type)) {
+                return this;
+            }
+            try {
+                fields.put(name, unreflect(field));
+            } catch (IllegalAccessException | SecurityException e) {
+            }
         }
         return this;
     }
@@ -358,6 +389,56 @@ public class ClassLookup {
     /*
      * 
      */
+
+    private Field getFinalField() {
+        Field out = null;
+        try {
+            out = Field.class.getDeclaredField("modifiers");
+        } catch (Exception ignore1) {
+            try {
+                out = Field.class.getField("modifiers");
+            } catch (Exception ignore2) {
+            }
+        }
+        return out;
+    }
+
+    private void unfinal(Field field) {
+        if (!Modifier.isFinal(field.getModifiers())) {
+            return;
+        }
+        Field modifiers = getFinalField();
+        try {
+            modifiers.setAccessible(true);
+            modifiers.set(field, field.getModifiers() & ~Modifier.FINAL);
+            modifiers.setAccessible(false);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            // Failed :c
+        }
+    }
+
+    private VarHandle unreflect(Field field) throws IllegalAccessException, SecurityException {
+        if (Modifier.isStatic(field.getModifiers())) {
+            boolean access = field.canAccess(null);
+            if (!access) {
+                field.setAccessible(true);
+            }
+            unfinal(field);
+            VarHandle out = LOOKUP.unreflectVarHandle(field);
+            if (!access) {
+                field.setAccessible(false);
+            }
+            return out;
+        }
+        if (field.trySetAccessible()) {
+            unfinal(field);
+            VarHandle out = LOOKUP.unreflectVarHandle(field);
+            field.setAccessible(false);
+            return out;
+        }
+        unfinal(field);
+        return LOOKUP.unreflectVarHandle(field);
+    }
 
     private MethodHandle unreflect(Method method) throws IllegalAccessException, SecurityException {
         if (Modifier.isStatic(method.getModifiers())) {

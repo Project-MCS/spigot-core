@@ -27,7 +27,7 @@ public class GeneralReflections extends ClassLookups {
         //
         // Mojang
 
-        provider.createLookup("mjGameProfile", GameProfile.class).searchField("name", "name", String.class);
+        provider.createLookup("mjGameProfile", GameProfile.class).searchField("name", "name");
 
     }
 
