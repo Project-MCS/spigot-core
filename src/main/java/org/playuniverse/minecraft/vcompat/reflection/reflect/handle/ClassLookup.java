@@ -393,10 +393,10 @@ public class ClassLookup {
     private Field getFinalField() {
         Field out = null;
         try {
-            out = Field.class.getDeclaredField("modifiers");
+            out = Field.class.getDeclaredField("modifier");
         } catch (Exception ignore1) {
             try {
-                out = Field.class.getField("modifiers");
+                out = Field.class.getField("modifier");
             } catch (Exception ignore2) {
             }
         }
