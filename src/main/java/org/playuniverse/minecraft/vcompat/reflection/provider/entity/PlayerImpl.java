@@ -31,6 +31,7 @@ import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
@@ -38,7 +39,6 @@ import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.network.protocol.game.ClientboundTabListPacket;
 import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
-import net.minecraft.network.protocol.game.ServerboundPickItemPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -227,7 +227,7 @@ public class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements NmsPla
             handle.gameMode.getPreviousGameModeForPlayer(), world.isDebug(), world.isFlat(), true);
         ClientboundPlayerPositionPacket positionPacket = new ClientboundPlayerPositionPacket(handle.getX(), handle.getY(), handle.getZ(),
             handle.xRotO, handle.yRotO, Collections.emptySet(), 0, false);
-        ServerboundPickItemPacket itemPacket = new ServerboundPickItemPacket(handle.getInventory().selected);
+        ClientboundSetCarriedItemPacket itemPacket = new ClientboundSetCarriedItemPacket(handle.getInventory().selected);
         ClientboundEntityEventPacket statusPacket = new ClientboundEntityEventPacket(handle, (byte) 28);
         ClientboundSetEntityDataPacket metadataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
 
