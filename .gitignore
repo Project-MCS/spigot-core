@@ -195,3 +195,4 @@ local.properties
 .sts4-cache/
 
 # Based on gitignore.io work
+/.apt_generated_tests/
