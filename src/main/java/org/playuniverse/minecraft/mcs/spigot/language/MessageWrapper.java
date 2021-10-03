@@ -4,7 +4,7 @@ import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.Placeholder;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderStore;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
+import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotModule;
 import org.playuniverse.minecraft.mcs.spigot.registry.Registry;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.CoreTracker;
 
@@ -16,13 +16,13 @@ public final class MessageWrapper<T> {
     private final T receiver;
     private final IMessageHandler<T> handler;
 
-    private final SpigotPlugin<?> plugin;
+    private final SpigotModule<?> plugin;
 
     public MessageWrapper(T receiver, IMessageHandler<T> handler, IPlugin plugin) {
-        this(receiver, handler, SpigotPlugin.get(plugin.getId()));
+        this(receiver, handler, SpigotModule.get(plugin.getId()));
     }
 
-    public MessageWrapper(T receiver, IMessageHandler<T> handler, SpigotPlugin<?> plugin) {
+    public MessageWrapper(T receiver, IMessageHandler<T> handler, SpigotModule<?> plugin) {
         this.receiver = receiver;
         this.handler = handler;
         this.plugin = plugin;
@@ -56,7 +56,7 @@ public final class MessageWrapper<T> {
         return handler;
     }
 
-    public SpigotPlugin<?> getPlugin() {
+    public SpigotModule<?> getPlugin() {
         return plugin;
     }
 

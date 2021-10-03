@@ -1,7 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.base;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,9 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.pf4j.PluginManager;
-import org.pf4j.PluginState;
-import org.pf4j.PluginWrapper;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Commands;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injections;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
@@ -32,17 +28,23 @@ import org.playuniverse.minecraft.mcs.spigot.language.handler.RemoteConsoleMessa
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.ComponentMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.StringMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.listener.ServerLoadListener;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
+import org.playuniverse.minecraft.mcs.spigot.plugin.DefaultModuleListener;
+import org.playuniverse.minecraft.mcs.spigot.plugin.SafeModuleListener;
+import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotModule;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
+import org.playuniverse.minecraft.mcs.spigot.utils.version.MinecraftVersion;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
+import com.syntaxphoenix.avinity.module.ModuleManager;
+import com.syntaxphoenix.avinity.module.ModuleState;
+import com.syntaxphoenix.avinity.module.ModuleWrapper;
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.logging.LogTypeId;
 import com.syntaxphoenix.syntaxapi.service.ServiceManager;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
+import com.syntaxphoenix.syntaxapi.version.Version;
 import com.syntaxphoenix.syntaxapi.random.Keys;
 
 public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin implements IPlugin {
@@ -62,7 +64,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     private org.bukkit.plugin.PluginManager bukkitManager;
 
     private ServiceManager serviceManager;
-    private PluginManager pluginManager;
+    private ModuleManager<?> moduleManager;
 
     private BukkitEventManager bukkitEventManager;
     private EventManager eventManager;
@@ -78,18 +80,25 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     protected final File pluginDirectory;
     protected final File compatDirectory;
 
+    private final Class<? extends SpigotModule<P>> moduleClass;
+    private final Version version;
+
     /*
      * 
      */
 
-    public PluginBase() {
+    public PluginBase(Class<? extends SpigotModule<P>> moduleClass) {
 
         //
         // Initializing variables
         //
+
+        this.moduleClass = moduleClass;
         this.directory = getDataFolder();
         this.pluginDirectory = new File(directory, "addons");
         this.compatDirectory = new File(directory, "compatability");
+
+        this.version = MinecraftVersion.fromString(getDescription().getVersion());
 
         //
         // Creating bot directory
@@ -138,7 +147,6 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
     @Override
     public final void onEnable() {
-
         initialize();
     }
 
@@ -154,6 +162,10 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     @Override
     public final String getId() {
         return getName();
+    }
+
+    public final Version getVersion() {
+        return version;
     }
 
     public final File getDirectory() {
@@ -196,8 +208,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         return lookupProvider.get();
     }
 
-    public final PluginManager getPluginManager() {
-        return pluginManager;
+    public final ModuleManager<?> getModuleManager() {
+        return moduleManager;
     }
 
     public final Injections getInjections() {
@@ -248,23 +260,25 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
         bukkitManager = Bukkit.getPluginManager();
         injections = new Injections(lookupProvider.get());
-        
+
+        //
+        // Create ModuleListener for disabling modules
+        //
+
+        createModuleListener(logger, lookupProvider, commandManager, eventManager, bukkitEventManager, serviceManager);
+
         //
         // Loading configs before creation of PluginManager
         //
 
         ConfigBase.ACCESS.getClass();
         ConfigTimer.TIMER.waitForNextCycle();
-        ConfigTimer.TIMER.waitForNextCycle(); // Wait two cycles so the configs are definitly loaded
-        
+
         //
-        // Creating plugin manager
+        // Creating module manager
         //
 
-        pluginManager = createPluginManager(pluginDirectory.toPath(), logger, lookupProvider, commandManager, eventManager,
-            bukkitEventManager, serviceManager);
-        
-        logger.log("Starting core in " + pluginManager.getRuntimeMode() + " mode!");
+        moduleManager = createModuleManager(moduleClass, eventManager, version);
 
         //
         // Registering Events
@@ -341,8 +355,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         // Shutdown addons
         //
 
-        pluginManager.stopPlugins();
-        pluginManager.unloadPlugins();
+        moduleManager.disableModules();
+        moduleManager.unloadModules();
 
         //
         // Shutdown the plugin logic
@@ -413,31 +427,32 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
      * 
      */
 
+    @SuppressWarnings("unchecked")
     public final void loadPlugins() {
+        final ModuleManager<SpigotModule<?>> moduleManager = (ModuleManager<SpigotModule<?>>) this.moduleManager;
         logger.log("Loading functionality addons...");
         try {
-            pluginManager.loadPlugins();
+            moduleManager.loadModules(pluginDirectory);
         } catch (Throwable throwable) {
             logger.log(throwable);
         }
-        int size = pluginManager.getResolvedPlugins().size();
+        int size = moduleManager.getModules(ModuleState.RESOLVED).size();
         logger.log("Loaded " + size + " addons to add functionality!");
         if (size != 0) {
-            PluginWrapper[] wrappers = pluginManager.getPlugins().stream()
-                .filter(wrapper -> wrapper.getPluginState() == PluginState.DISABLED).toArray(PluginWrapper[]::new);
-            if (wrappers.length != 0) {
+            ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.DISABLED);
+            if (wrappers.size() != 0) {
                 logger.log(LogTypeId.ERROR, "Some plugins failed to load...");
                 logger.log(LogTypeId.ERROR, "");
-                for (int index = 0; index < wrappers.length; index++) {
-                    PluginWrapper wrapper = wrappers[index];
+                for (int index = 0; index < wrappers.size(); index++) {
+                    ModuleWrapper<?> wrapper = wrappers.get(index);
                     logger.log(LogTypeId.ERROR, "===============================================");
                     logger.log(LogTypeId.ERROR, "");
-                    logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getPluginId() + "' by " + wrapper.getDescriptor().getProvider());
+                    logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
                     logger.log(LogTypeId.ERROR, "");
                     logger.log(LogTypeId.ERROR, "-----------------------------------------------");
-                    logger.log(LogTypeId.ERROR, wrapper.getFailedException());
+//                  logger.log(LogTypeId.ERROR, wrapper.getFailedException());  // TODO: Check this out
                     logger.log(LogTypeId.ERROR, "===============================================");
-                    if (index + 1 != wrappers.length) {
+                    if (index + 1 != wrappers.size()) {
                         logger.log(LogTypeId.ERROR, "");
                         logger.log(LogTypeId.ERROR, "");
                     }
@@ -448,24 +463,23 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         }
         if (size != 0) {
             logger.log("Enabling functionality addons...");
-            pluginManager.startPlugins();
-            size = pluginManager.getStartedPlugins().size();
+            moduleManager.enableModules();
+            size = moduleManager.getModules(ModuleState.ENABLED).size();
             logger.log("Enabled " + size + " addons to add functionality!");
-            PluginWrapper[] wrappers = pluginManager.getPlugins().stream().filter(wrapper -> wrapper.getPluginState() == PluginState.FAILED)
-                .toArray(PluginWrapper[]::new);
-            if (wrappers.length != 0) {
+            ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.FAILED);
+            if (wrappers.size() != 0) {
                 logger.log(LogTypeId.ERROR, "Some plugins failed to start...");
                 logger.log(LogTypeId.ERROR, "");
-                for (int index = 0; index < wrappers.length; index++) {
-                    PluginWrapper wrapper = wrappers[index];
+                for (int index = 0; index < wrappers.size(); index++) {
+                    ModuleWrapper<?> wrapper = wrappers.get(index);
                     logger.log(LogTypeId.ERROR, "===============================================");
                     logger.log(LogTypeId.ERROR, "");
-                    logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getPluginId() + "' by " + wrapper.getDescriptor().getProvider());
+                    logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
                     logger.log(LogTypeId.ERROR, "");
                     logger.log(LogTypeId.ERROR, "-----------------------------------------------");
-                    logger.log(LogTypeId.ERROR, wrapper.getFailedException());
+//                    logger.log(LogTypeId.ERROR, wrapper.getFailedException());  // TODO: Check this out
                     logger.log(LogTypeId.ERROR, "===============================================");
-                    if (index + 1 != wrappers.length) {
+                    if (index + 1 != wrappers.size()) {
                         logger.log(LogTypeId.ERROR, "");
                         logger.log(LogTypeId.ERROR, "");
                     }
@@ -478,12 +492,12 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
     public final void readyPlugins() {
         ILogger logger = getPluginLogger();
-        HashMap<PluginWrapper, Throwable> map = new HashMap<>();
+        HashMap<ModuleWrapper<?>, Throwable> map = new HashMap<>();
         logger.log("Readying up plugins...");
         int amount = 0;
-        PluginManager pluginManager = getPluginManager();
-        for (PluginWrapper wrapper : pluginManager.getStartedPlugins()) {
-            SpigotPlugin<?> plugin = SpigotPlugin.getByWrapper(wrapper);
+        ModuleManager<?> moduleManager = getModuleManager();
+        for (ModuleWrapper<?> wrapper : moduleManager.getModules(ModuleState.ENABLED)) {
+            SpigotModule<?> plugin = SpigotModule.getByWrapper(wrapper);
             if (plugin == null) {
                 continue;
             }
@@ -500,12 +514,12 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         }
         logger.log(LogTypeId.ERROR, "Some plugins failed to ready up and will be unloaded...");
         logger.log(LogTypeId.ERROR, "");
-        PluginWrapper[] wrappers = map.keySet().toArray(PluginWrapper[]::new);
+        ModuleWrapper<?>[] wrappers = map.keySet().toArray(ModuleWrapper<?>[]::new);
         for (int index = 0; index < wrappers.length; index++) {
-            PluginWrapper wrapper = wrappers[index];
+            ModuleWrapper<?> wrapper = wrappers[index];
             logger.log(LogTypeId.ERROR, "===============================================");
             logger.log(LogTypeId.ERROR, "");
-            logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getPluginId() + "' by " + wrapper.getDescriptor().getProvider());
+            logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
             logger.log(LogTypeId.ERROR, "");
             logger.log(LogTypeId.ERROR, "-----------------------------------------------");
             logger.log(LogTypeId.ERROR, map.get(wrapper));
@@ -515,13 +529,13 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
                 logger.log(LogTypeId.ERROR, "");
             }
             try {
-                pluginManager.unloadPlugin(wrapper.getPluginId());
+                moduleManager.unloadModule(wrapper.getId());
             } catch (Throwable throwable) {
-                if(!logger.getState().extendedInfo()) {
+                if (!logger.getState().extendedInfo()) {
                     continue;
                 }
                 logger.log(LogTypeId.ERROR, "");
-                logger.log(LogTypeId.ERROR, "Failed to unload Addon '" + wrapper.getPluginId() + "' by " + wrapper.getDescriptor().getProvider());
+                logger.log(LogTypeId.ERROR, "Failed to unload Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
                 logger.log(LogTypeId.ERROR, "");
                 logger.log(LogTypeId.ERROR, "-----------------------------------------------");
                 logger.log(LogTypeId.ERROR, throwable);
@@ -558,10 +572,14 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         return new CommandManager<>();
     }
 
-    protected PluginManager createPluginManager(Path path, ILogger logger, Container<ClassLookupProvider> provider,
+    protected ModuleManager<?> createModuleManager(Class<? extends SpigotModule<P>> clazz, EventManager eventManager, Version version) {
+        return new ModuleManager<>(clazz, eventManager, version);
+    }
+
+    protected SafeModuleListener createModuleListener(ILogger logger, Container<ClassLookupProvider> provider,
         CommandManager<MinecraftInfo> commandManager, EventManager eventManager, BukkitEventManager discordEventManager,
         ServiceManager serviceManager) {
-        return new SafePluginManager(path, logger, provider, commandManager, eventManager, discordEventManager, serviceManager);
+        return new DefaultModuleListener(logger, provider, commandManager, eventManager, discordEventManager, serviceManager);
     }
 
     /*

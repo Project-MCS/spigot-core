@@ -3,8 +3,6 @@ package org.playuniverse.minecraft.mcs.spigot.plugin;
 import java.io.File;
 import java.util.Optional;
 
-import org.pf4j.Plugin;
-import org.pf4j.PluginWrapper;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
@@ -20,53 +18,47 @@ import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderSto
 import org.playuniverse.minecraft.mcs.spigot.plugin.extension.ICommandExtension;
 import org.playuniverse.minecraft.mcs.spigot.plugin.extension.ISystemCommandExtension;
 
+import com.syntaxphoenix.avinity.module.Module;
+import com.syntaxphoenix.avinity.module.ModuleWrapper;
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.utils.java.Files;
 
-public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin implements IPlugin {
+public abstract class SpigotModule<P extends PluginBase<P>> extends Module implements IPlugin {
 
     @SuppressWarnings("unchecked")
     private static final Class<? extends ConfigBase<?, ?>>[] EMPTY_CONFIG = new Class[0];
 
-    public static Optional<SpigotPlugin<?>> getAsOptional(String name) {
+    public static Optional<SpigotModule<?>> getAsOptional(String name) {
         return Optional.ofNullable(get(name));
     }
 
-    public static SpigotPlugin<?> get(String name) {
-        return getByWrapper(SpigotCore.get().getPluginManager().getPlugin(name));
+    public static SpigotModule<?> get(String name) {
+        return SpigotCore.get().getModuleManager().getModule(name).map(SpigotModule::getByWrapper).orElse(null);
     }
 
-    public static Optional<SpigotPlugin<?>> getByWrapperAsOptional(PluginWrapper wrapper) {
+    public static Optional<SpigotModule<?>> getByWrapperAsOptional(ModuleWrapper<?> wrapper) {
         return Optional.ofNullable(getByWrapper(wrapper));
     }
 
-    public static SpigotPlugin<?> getByWrapper(PluginWrapper wrapper) {
+    public static SpigotModule<?> getByWrapper(ModuleWrapper<?> wrapper) {
         if (wrapper == null) {
             return null;
         }
-        Plugin plugin = wrapper.getPlugin();
-        if (plugin instanceof SpigotPlugin) {
-            return (SpigotPlugin<?>) plugin;
+        Module plugin = wrapper.getModule();
+        if (plugin instanceof SpigotModule) {
+            return (SpigotModule<?>) plugin;
         }
         return null;
     }
 
-    private final File dataLocation;
     private final ILogger logger;
 
     private final DefaultPlaceholderStore placeholders = new DefaultPlaceholderStore();
 
-    public SpigotPlugin(PluginWrapper wrapper, File dataLocation) {
-        super(wrapper);
-        this.dataLocation = dataLocation;
+    public SpigotModule(File dataLocation) {
         Files.createFolder(dataLocation);
         this.logger = new PluginLogger(getBase().getPluginLogger(), this);
-    }
-
-    @Override
-    public final String getId() {
-        return wrapper.getPluginId();
     }
 
     public String getPrefix() {
@@ -79,21 +71,17 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         return logger;
     }
 
-    public final File getDataLocation() {
-        return dataLocation;
-    }
-
     public Class<? extends ConfigBase<?, ?>>[] getConfigurations() {
         return EMPTY_CONFIG;
     }
 
     @Override
-    public final void start() {
+    public final void enable() {
         logger.log("Starting...");
         logger.log("Loading logic...");
         onLoad();
         logger.log("Loading configs...");
-        ConfigBase.ACCESS.load(wrapper);
+        ConfigBase.ACCESS.load(getWrapper());
         logger.log("Starting logic...");
         onStart();
         logger.log("Setting up injections...");
@@ -104,24 +92,24 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         registerSystemCommands();
         logger.log("Successfully started!");
     }
-    
+
     private final void registerPluginCommands() {
         int[] info = ICommandExtension.register(this);
         logger.log("Registered Plugin commands (" + info[0] + " of " + info[1] + ")!");
     }
-    
+
     private final void registerSystemCommands() {
         int[] info = ISystemCommandExtension.register(this);
         logger.log("Registered System commands (" + info[0] + " of " + info[1] + ")!");
     }
 
     @Override
-    public final void stop() {
+    public final void disable() {
         logger.log("Stopping...");
         logger.log("Stopping logic...");
         onStop();
         logger.log("Unloading configs...");
-        ConfigBase.ACCESS.unload(wrapper);
+        ConfigBase.ACCESS.unload(getWrapper());
         logger.log("Unloading logic...");
         onUnload();
         logger.log("Successfully stopped!");
@@ -133,13 +121,6 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         logger.log("Successfully readied!");
     }
 
-    @Override
-    public final void delete() {
-        logger.log("Deleting...");
-        onDelete();
-        logger.log("Successfully deleted!");
-    }
-
     protected void onLoad() {}
 
     protected void onStart() {}
@@ -149,8 +130,6 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     protected void onStop() {}
 
     protected void onUnload() {}
-
-    protected void onDelete() {}
 
     public final BukkitEventManager getBukkitManager() {
         return getBase().getBukkitEventManager();

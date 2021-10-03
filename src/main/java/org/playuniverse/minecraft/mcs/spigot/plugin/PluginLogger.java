@@ -12,9 +12,9 @@ import com.syntaxphoenix.syntaxapi.utils.java.Exceptions;
 class PluginLogger implements ILogger {
 
     private final ILogger logger;
-    private final SpigotPlugin<?> plugin;
+    private final SpigotModule<?> plugin;
 
-    public PluginLogger(ILogger logger, SpigotPlugin<?> plugin) {
+    public PluginLogger(ILogger logger, SpigotModule<?> plugin) {
         this.logger = logger;
         this.plugin = plugin;
     }

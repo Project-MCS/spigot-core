@@ -1,34 +1,22 @@
 package org.playuniverse.minecraft.mcs.spigot.plugin;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.pf4j.DefaultPluginManager;
-import org.pf4j.JarPluginLoader;
-import org.pf4j.JarPluginRepository;
-import org.pf4j.Plugin;
-import org.pf4j.PluginDescriptorFinder;
-import org.pf4j.PluginFactory;
-import org.pf4j.PluginLoader;
-import org.pf4j.PluginRepository;
-import org.pf4j.PluginState;
-import org.pf4j.PluginStateEvent;
-import org.pf4j.PluginStateListener;
-import org.pf4j.PluginWrapper;
-import org.pf4j.RuntimeMode;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
 import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
-import org.playuniverse.minecraft.mcs.spigot.config.config.DebugConfig;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventExecutor;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
-import org.playuniverse.minecraft.mcs.spigot.utils.wait.Awaiter;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
+import com.syntaxphoenix.avinity.module.Module;
+import com.syntaxphoenix.avinity.module.ModuleWrapper;
+import com.syntaxphoenix.avinity.module.event.ModuleDisableEvent;
 import com.syntaxphoenix.syntaxapi.event.Event;
 import com.syntaxphoenix.syntaxapi.event.EventExecutor;
+import com.syntaxphoenix.syntaxapi.event.EventHandler;
 import com.syntaxphoenix.syntaxapi.event.EventListener;
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
@@ -36,138 +24,38 @@ import com.syntaxphoenix.syntaxapi.service.ServiceManager;
 import com.syntaxphoenix.syntaxapi.utils.java.Collect;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 
-public class SafePluginManager extends DefaultPluginManager implements PluginStateListener {
+public abstract class SafeModuleListener implements EventListener {
 
-    private final Container<ClassLookupProvider> provider;
+    protected final Container<ClassLookupProvider> provider;
 
-    private final ServiceManager service;
+    protected final ServiceManager service;
 
-    private final CommandManager<MinecraftInfo> command;
+    protected final CommandManager<MinecraftInfo> command;
 
-    private final BukkitEventManager bukkitEvent;
-    private final EventManager event;
+    protected final BukkitEventManager bukkitEvent;
+    protected final EventManager event;
 
-    private final ILogger logger;
+    protected final ILogger logger;
 
-    private RuntimeMode mode;
-
-    public SafePluginManager(ILogger logger, Container<ClassLookupProvider> provider, CommandManager<MinecraftInfo> command,
+    public SafeModuleListener(ILogger logger, Container<ClassLookupProvider> provider, CommandManager<MinecraftInfo> command,
         EventManager event, BukkitEventManager bukkitEvent, ServiceManager service) {
-        super();
-        this.provider = provider;
         this.event = event;
         this.logger = logger;
-        this.service = service;
         this.command = command;
-        this.bukkitEvent = bukkitEvent;
-        super.addPluginStateListener(this);
-    }
-
-    public SafePluginManager(Path pluginsRoot, ILogger logger, Container<ClassLookupProvider> provider,
-        CommandManager<MinecraftInfo> command, EventManager event, BukkitEventManager bukkitEvent, ServiceManager service) {
-        super(pluginsRoot);
+        this.service = service;
         this.provider = provider;
-        this.event = event;
-        this.logger = logger;
-        this.service = service;
-        this.command = command;
         this.bukkitEvent = bukkitEvent;
-        super.addPluginStateListener(this);
+        event.registerEvents(this);
     }
 
-    @Override
-    public RuntimeMode getRuntimeMode() {
-        if (mode == null) {
-            return mode = DebugConfig.ACCESS.get(DebugConfig.class).getMode();
-        }
-        return mode;
-    }
-
-    @Override
-    protected PluginFactory createPluginFactory() {
-        return new SafePluginFactory(logger);
-    }
-
-    @Override
-    protected PluginDescriptorFinder createPluginDescriptorFinder() {
-        return new YamlPluginDescriptorFinder();
-    }
-
-    @Override
-    protected PluginLoader createPluginLoader() {
-        return new JarPluginLoader(this);
-    }
-
-    @Override
-    protected PluginRepository createPluginRepository() {
-        return new JarPluginRepository(getPluginsRoots());
-    }
-
-    /*
-     * Getter
-     */
-
-    public ClassLookupProvider getProvider() {
-        return provider.get();
-    }
-
-    public ServiceManager getServiceManager() {
-        return service;
-    }
-
-    public BukkitEventManager getDiscordEventManager() {
-        return bukkitEvent;
-    }
-
-    public EventManager getEventManager() {
-        return event;
-    }
-
-    public ILogger getLogger() {
-        return logger;
-    }
-
-    /*
-     * Plugin Listener
-     */
-
-    @Override
-    public synchronized void addPluginStateListener(PluginStateListener listener) {
-        return;
-    }
-
-    @Override
-    public synchronized void removePluginStateListener(PluginStateListener listener) {
-        return;
-    }
-
-    @Override
-    public void pluginStateChanged(PluginStateEvent event) {
-
-        if (event.getPluginState() == PluginState.STARTED) {
-            Awaiter.of(this.event.call(new PluginEnableEvent(this, event.getPlugin()))).await();
-            return;
-        }
-
-        if (event.getOldState() != PluginState.STARTED) {
-            return;
-        }
-        switch (event.getPluginState()) {
-        case STOPPED:
-        case DISABLED:
-            break;
-        default:
-            return;
-        }
-
-        PluginWrapper wrapper = event.getPlugin();
-
-        Awaiter.of(this.event.call(new PluginDisableEvent(this, wrapper))).await();
+    @EventHandler
+    public void onModuleDisable(ModuleDisableEvent event) {
+        ModuleWrapper<?> wrapper = event.getWrapper();
 
         List<Class<? extends EventListener>> owners = this.event.getOwnerClasses();
         int size = owners.size();
         for (int index = 0; index < size; index++) {
-            if (wrapper.equals(whichPlugin(owners.get(index)))) {
+            if (wrapper.isFromModule(owners.get(index))) {
                 continue;
             }
             owners.remove(index);
@@ -184,7 +72,7 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
         owners = this.bukkitEvent.getOwnerClasses();
         size = owners.size();
         for (int index = 0; index < size; index++) {
-            if (wrapper.equals(whichPlugin(owners.get(index)))) {
+            if (wrapper.isFromModule(owners.get(index))) {
                 continue;
             }
             owners.remove(index);
@@ -203,14 +91,14 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
         service.getServices().stream().filter(service -> isFromPlugin(wrapper, service.getOwner()))
             .forEach(service -> this.service.unregister(service));
 
-        Plugin plugin = wrapper.getPlugin();
+        Module plugin = wrapper.getModule();
         if (plugin instanceof IPlugin) {
             for (String alias : command.getAliases((IPlugin) plugin)) {
                 command.unregisterCommand(alias);
             }
         }
 
-        ClassLoader loader = wrapper.getPluginClassLoader();
+        ClassLoader loader = wrapper.getLoader();
         Package[] packages = loader.getDefinedPackages();
         ClassLookupProvider current = provider.get();
         for (int index = 0; index < packages.length; index++) {
@@ -241,8 +129,8 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
         }));
     }
 
-    public boolean isFromPlugin(PluginWrapper wrapper, Object object) {
-        return wrapper.equals(whichPlugin(!(object instanceof Class) ? object.getClass() : (Class<?>) object));
+    public boolean isFromPlugin(ModuleWrapper<?> wrapper, Object object) {
+        return wrapper.isFromModule(!(object instanceof Class) ? object.getClass() : (Class<?>) object);
     }
 
 }
