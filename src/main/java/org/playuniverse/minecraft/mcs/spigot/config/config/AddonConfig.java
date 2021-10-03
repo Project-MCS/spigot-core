@@ -21,7 +21,7 @@ public final class AddonConfig extends YamlConfigBase {
 
     private boolean skip = true;
 
-    protected AddonConfig(File folder) {
+    public AddonConfig(File folder) {
         super(new File(folder, "compat.yml"), AddonMigration.class, 1);
     }
 
