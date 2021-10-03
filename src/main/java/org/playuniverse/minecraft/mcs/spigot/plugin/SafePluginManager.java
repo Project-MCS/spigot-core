@@ -13,9 +13,11 @@ import org.pf4j.PluginState;
 import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginStateListener;
 import org.pf4j.PluginWrapper;
+import org.pf4j.RuntimeMode;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
 import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
+import org.playuniverse.minecraft.mcs.spigot.config.config.DebugConfig;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventExecutor;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.utils.wait.Awaiter;
@@ -43,6 +45,8 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
 
     private final ILogger logger;
 
+    private final RuntimeMode mode = DebugConfig.ACCESS.get(DebugConfig.class).getMode();
+
     public SafePluginManager(ILogger logger, Container<ClassLookupProvider> provider, CommandManager<MinecraftInfo> command,
         EventManager event, BukkitEventManager bukkitEvent, ServiceManager service) {
         super();
@@ -66,7 +70,12 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
         this.bukkitEvent = bukkitEvent;
         super.addPluginStateListener(this);
     }
-    
+
+    @Override
+    public RuntimeMode getRuntimeMode() {
+        return mode;
+    }
+
     @Override
     protected PluginFactory createPluginFactory() {
         return new SafePluginFactory(logger);

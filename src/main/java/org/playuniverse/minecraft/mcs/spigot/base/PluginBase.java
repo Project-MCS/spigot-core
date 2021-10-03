@@ -246,11 +246,21 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
         serviceManager = createServiceManager(logger);
 
-        pluginManager = createPluginManager(pluginDirectory.toPath(), logger, lookupProvider, commandManager, eventManager,
-            bukkitEventManager, serviceManager);
-
         bukkitManager = Bukkit.getPluginManager();
         injections = new Injections(lookupProvider.get());
+        
+        //
+        // Loading configs before creation of PluginManager
+        //
+
+        ConfigBase.ACCESS.getClass();
+        
+        //
+        // Creating plugin manager
+        //
+
+        pluginManager = createPluginManager(pluginDirectory.toPath(), logger, lookupProvider, commandManager, eventManager,
+            bukkitEventManager, serviceManager);
 
         //
         // Registering Events

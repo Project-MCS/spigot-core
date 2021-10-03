@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.pf4j.Extension;
 import org.pf4j.ExtensionPoint;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
@@ -17,7 +16,6 @@ import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
 import org.playuniverse.minecraft.mcs.spigot.plugin.extension.helper.ExtensionHelper;
 import org.playuniverse.minecraft.mcs.spigot.plugin.extension.info.CommandInfo;
 
-@Extension(points = {ICommandExtension.class})
 public interface ICommandExtension extends ExtensionPoint {
 
     static final Predicate<String> COMMAND_NAME = Pattern.compile("[\\da-z_]+").asMatchPredicate();
