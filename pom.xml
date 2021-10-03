@@ -22,7 +22,6 @@
 	</repositories>
 
 	<dependencies>
-
 		<!-- SyntaxApi -->
 		<dependency>
 			<groupId>com.syntaxphoenix.syntaxapi</groupId>
@@ -203,6 +202,7 @@
 				<configuration>
 					<archive>
 						<manifest>
+							<addClasspath>true</addClasspath>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>

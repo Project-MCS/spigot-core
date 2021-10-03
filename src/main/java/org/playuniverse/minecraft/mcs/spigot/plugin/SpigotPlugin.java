@@ -17,6 +17,8 @@ import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.DefaultPlaceholderStore;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderStore;
+import org.playuniverse.minecraft.mcs.spigot.plugin.extension.ICommandExtension;
+import org.playuniverse.minecraft.mcs.spigot.plugin.extension.ISystemCommandExtension;
 
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
@@ -96,7 +98,21 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
         onStart();
         logger.log("Setting up injections...");
         getBase().getInjections().setup();
+        logger.log("Registering commands... (Plugin commands) [0 / 2]");
+        registerPluginCommands();
+        logger.log("Registering commands... (System commands) [1 / 2]");
+        registerSystemCommands();
         logger.log("Successfully started!");
+    }
+    
+    private final void registerPluginCommands() {
+        int[] info = ICommandExtension.register(this);
+        logger.log("Registered Plugin commands (" + info[0] + " of " + info[1] + ")!");
+    }
+    
+    private final void registerSystemCommands() {
+        int[] info = ISystemCommandExtension.register(this);
+        logger.log("Registered System commands (" + info[0] + " of " + info[1] + ")!");
     }
 
     @Override
