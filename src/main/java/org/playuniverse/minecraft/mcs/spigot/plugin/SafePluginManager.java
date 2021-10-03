@@ -45,7 +45,7 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
 
     private final ILogger logger;
 
-    private final RuntimeMode mode = DebugConfig.ACCESS.get(DebugConfig.class).getMode();
+    private RuntimeMode mode;
 
     public SafePluginManager(ILogger logger, Container<ClassLookupProvider> provider, CommandManager<MinecraftInfo> command,
         EventManager event, BukkitEventManager bukkitEvent, ServiceManager service) {
@@ -73,6 +73,9 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
 
     @Override
     public RuntimeMode getRuntimeMode() {
+        if (mode == null) {
+            return mode = DebugConfig.ACCESS.get(DebugConfig.class).getMode();
+        }
         return mode;
     }
 

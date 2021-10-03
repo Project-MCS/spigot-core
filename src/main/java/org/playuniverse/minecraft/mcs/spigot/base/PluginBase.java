@@ -254,6 +254,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         //
 
         ConfigBase.ACCESS.getClass();
+        ConfigTimer.TIMER.waitForNextCycle();
+        ConfigTimer.TIMER.waitForNextCycle(); // Wait two cycles so the configs are definitly loaded
         
         //
         // Creating plugin manager
@@ -261,6 +263,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
         pluginManager = createPluginManager(pluginDirectory.toPath(), logger, lookupProvider, commandManager, eventManager,
             bukkitEventManager, serviceManager);
+        
+        logger.log("Starting core in " + pluginManager.getRuntimeMode() + " mode!");
 
         //
         // Registering Events

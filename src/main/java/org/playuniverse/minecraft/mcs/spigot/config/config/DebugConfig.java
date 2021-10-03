@@ -4,13 +4,14 @@ import java.io.File;
 
 import org.pf4j.RuntimeMode;
 import org.playuniverse.minecraft.mcs.spigot.config.base.json.JsonConfigBase;
+import org.playuniverse.minecraft.mcs.spigot.config.migration.DebugMigration;
 
 public final class DebugConfig extends JsonConfigBase {
 
     private RuntimeMode mode = RuntimeMode.DEPLOYMENT;
 
     public DebugConfig(File folder) {
-        super(new File(folder, "debug.json"), null, 1);
+        super(new File(folder, "debug.json"), DebugMigration.class, 1);
     }
 
     @Override

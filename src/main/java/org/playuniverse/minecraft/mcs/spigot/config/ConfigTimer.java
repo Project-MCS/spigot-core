@@ -22,6 +22,8 @@ public final class ConfigTimer extends Thread {
 
     private boolean alive = true;
     
+    private short cycle = 0;
+    
     private ConfigTimer() {
         setName("Config");
         setDaemon(true);
@@ -81,6 +83,7 @@ public final class ConfigTimer extends Thread {
                         logger.log(LogTypeId.INFO, "Config '" + config.getName() + "' was successfully loaded!");
                     }
                 }
+                cycle++;
             } finally {
                 read.unlock();
             }
@@ -88,6 +91,21 @@ public final class ConfigTimer extends Thread {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+    
+    public short getCycle() {
+        return cycle;
+    }
+
+    public void waitForNextCycle() {
+        int current = cycle;
+        while(current == cycle) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                break;
             }
         }
     }
