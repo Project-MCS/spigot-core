@@ -19,10 +19,6 @@
 			<id>central</id>
 			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
-		<repository>
-			<id>github</id>
-			<url>https://maven.pkg.github.com/*/*</url>
-		</repository>
 	</repositories>
 
 	<dependencies>
@@ -104,7 +100,7 @@
 		<dependency>
 			<groupId>com.syntaxphoenix.avinity</groupId>
 			<artifactId>module</artifactId>
-			<version>1.1.0-c1e57072403dd8f74266244700e8785595dab66e-SNAPSHOT</version>
+			<version>1.1.0-f795d9dfc6f24aefa8c90b578ab1b43e09acff05-SNAPSHOT</version>
 		</dependency>
 
 		<!-- System -->
