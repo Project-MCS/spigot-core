@@ -196,5 +196,6 @@ local.properties
 
 # Based on gitignore.io work
 /.apt_generated_tests/
+/target/
 .classpath
 .project
