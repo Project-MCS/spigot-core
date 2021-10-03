@@ -482,7 +482,6 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         }
         logger.log("Readied up " + amount + " plugins!");
         if (map.isEmpty()) {
-            logger.log("Everything is ready now!");
             return;
         }
         logger.log(LogTypeId.ERROR, "Some plugins failed to ready up and will be unloaded...");
