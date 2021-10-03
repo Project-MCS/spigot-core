@@ -112,7 +112,9 @@ public abstract class SpigotPlugin<P extends PluginBase<P>> extends Plugin imple
     }
 
     public final void ready() {
+        logger.log("Readying...");
         onServerReady();
+        logger.log("Successfully readied!");
     }
 
     @Override

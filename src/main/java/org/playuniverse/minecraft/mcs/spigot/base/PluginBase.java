@@ -455,7 +455,10 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     }
 
     public final void readyPlugins() {
+        ILogger logger = getPluginLogger();
         HashMap<PluginWrapper, Throwable> map = new HashMap<>();
+        logger.log("Readying up plugins...");
+        int amount = 0;
         for (PluginWrapper wrapper : getPluginManager().getStartedPlugins()) {
             SpigotPlugin<?> plugin = SpigotPlugin.getByWrapper(wrapper);
             if (plugin == null) {
@@ -463,14 +466,16 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
             }
             try {
                 plugin.ready();
+                amount++;
             } catch (Throwable throwable) {
                 map.put(wrapper, throwable);
             }
         }
+        logger.log("Readied up " + amount + " plugins!");
         if (map.isEmpty()) {
+            logger.log("Everything is ready now!");
             return;
         }
-        ILogger logger = getPluginLogger();
         logger.log(LogTypeId.ERROR, "Some plugins failed to ready up...");
         logger.log(LogTypeId.ERROR, "");
         PluginWrapper[] wrappers = map.keySet().toArray(PluginWrapper[]::new);
