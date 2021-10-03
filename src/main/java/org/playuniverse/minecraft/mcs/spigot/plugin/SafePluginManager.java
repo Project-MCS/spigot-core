@@ -6,9 +6,13 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.pf4j.DefaultPluginManager;
+import org.pf4j.JarPluginLoader;
+import org.pf4j.JarPluginRepository;
 import org.pf4j.Plugin;
 import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.PluginFactory;
+import org.pf4j.PluginLoader;
+import org.pf4j.PluginRepository;
 import org.pf4j.PluginState;
 import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginStateListener;
@@ -87,6 +91,16 @@ public class SafePluginManager extends DefaultPluginManager implements PluginSta
     @Override
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
         return new YamlPluginDescriptorFinder();
+    }
+
+    @Override
+    protected PluginLoader createPluginLoader() {
+        return new JarPluginLoader(this);
+    }
+
+    @Override
+    protected PluginRepository createPluginRepository() {
+        return new JarPluginRepository(getPluginsRoots());
     }
 
     /*
