@@ -1,5 +1,7 @@
 package org.playuniverse.minecraft.mcs.spigot;
 
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.pf4j.PluginManager;
@@ -7,6 +9,9 @@ import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.redirect.ManagerRedirect;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.CommandNode;
+import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
+import org.playuniverse.minecraft.mcs.spigot.config.config.AddonConfig;
+import org.playuniverse.minecraft.mcs.spigot.config.config.DebugConfig;
 import org.playuniverse.minecraft.mcs.spigot.helper.task.TaskHelper;
 
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
@@ -74,6 +79,12 @@ public class SpigotCore extends PluginBase<SpigotCore> {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
         }
+    }
+    
+    @Override
+    public void createConfigs(ArrayList<Class<? extends ConfigBase<?, ?>>> list) {
+        list.add(AddonConfig.class);
+        list.add(DebugConfig.class);
     }
 
 }
