@@ -300,6 +300,14 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
         logger.log("Post startup executed successfully!");
 
+        if (Bukkit.getWorlds().size() != 0) {
+            logger.log("Server is already started!");
+
+            readyPlugins();
+
+            logger.log("Everything is ready and setup now!");
+        }
+
     }
 
     /*
@@ -459,7 +467,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         HashMap<PluginWrapper, Throwable> map = new HashMap<>();
         logger.log("Readying up plugins...");
         int amount = 0;
-        for (PluginWrapper wrapper : getPluginManager().getStartedPlugins()) {
+        PluginManager pluginManager = getPluginManager();
+        for (PluginWrapper wrapper : pluginManager.getStartedPlugins()) {
             SpigotPlugin<?> plugin = SpigotPlugin.getByWrapper(wrapper);
             if (plugin == null) {
                 continue;
@@ -476,7 +485,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
             logger.log("Everything is ready now!");
             return;
         }
-        logger.log(LogTypeId.ERROR, "Some plugins failed to ready up...");
+        logger.log(LogTypeId.ERROR, "Some plugins failed to ready up and will be unloaded...");
         logger.log(LogTypeId.ERROR, "");
         PluginWrapper[] wrappers = map.keySet().toArray(PluginWrapper[]::new);
         for (int index = 0; index < wrappers.length; index++) {
@@ -491,6 +500,19 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
             if (index + 1 != wrappers.length) {
                 logger.log(LogTypeId.ERROR, "");
                 logger.log(LogTypeId.ERROR, "");
+            }
+            try {
+                pluginManager.unloadPlugin(wrapper.getPluginId());
+            } catch (Throwable throwable) {
+                if(!logger.getState().extendedInfo()) {
+                    continue;
+                }
+                logger.log(LogTypeId.ERROR, "");
+                logger.log(LogTypeId.ERROR, "Failed to unload Addon '" + wrapper.getPluginId() + "' by " + wrapper.getDescriptor().getProvider());
+                logger.log(LogTypeId.ERROR, "");
+                logger.log(LogTypeId.ERROR, "-----------------------------------------------");
+                logger.log(LogTypeId.ERROR, throwable);
+                logger.log(LogTypeId.ERROR, "===============================================");
             }
         }
         logger.log(LogTypeId.ERROR, "");

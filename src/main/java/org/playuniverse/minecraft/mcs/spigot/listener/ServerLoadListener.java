@@ -18,7 +18,7 @@ public class ServerLoadListener implements Listener {
     @EventHandler
     public void onLoad(ServerLoadEvent event) {
         ILogger logger = core.getPluginLogger();
-        logger.log("Server is fully started...");
+        logger.log("Server is fully started!");
         core.readyPlugins();
         logger.log("Everything is ready and setup now!");
     }

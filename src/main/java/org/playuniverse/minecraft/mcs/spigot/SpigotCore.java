@@ -39,25 +39,26 @@ public class SpigotCore extends PluginBase<SpigotCore> {
             .inject(command = new MinecraftCommand(new ManagerRedirect(getCommandManager(), this), this, "system", "sys", "core"));
         getCommandManager().register(new CommandNode<>("reload", context -> {
             PluginManager manager = getPluginManager();
-            getPluginLogger().log("Reloading... (0 / 4)");
+            getPluginLogger().log("Reloading... (0 / 5)");
             manager.stopPlugins();
-            getPluginLogger().log("Reloading... (1 / 4)");
+            getPluginLogger().log("Reloading... (1 / 5)");
             manager.unloadPlugins();
             System.gc();
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
             }
-            getPluginLogger().log("Reloading... (2 / 4)");
+            getPluginLogger().log("Reloading... (2 / 5)");
             get().loadPlugins();
-            getPluginLogger().log("Reloading... (3 / 4)");
+            getPluginLogger().log("Reloading... (3 / 5)");
             manager.startPlugins();
-            getPluginLogger().log("Reloading... (4 / 4)");
-            getPluginLogger().log("Reload complete!");
+            getPluginLogger().log("Reloading... (4 / 5)");
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.closeInventory();
             }
             get().readyPlugins();
+            getPluginLogger().log("Reloading... (5 / 5)");
+            getPluginLogger().log("Reload complete!");
         }));
     }
 
