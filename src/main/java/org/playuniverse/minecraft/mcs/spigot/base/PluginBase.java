@@ -339,6 +339,12 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         onStarted();
 
         logger.log("Post startup executed successfully!");
+        
+        //
+        // Setup Injections again because plugins possibly added more injectors
+        //
+        
+        injections.setup();
 
         if (Bukkit.getWorlds().size() != 0) {
             logger.log("Server is already started!");
