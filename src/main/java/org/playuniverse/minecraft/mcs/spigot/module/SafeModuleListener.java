@@ -1,11 +1,11 @@
-package org.playuniverse.minecraft.mcs.spigot.plugin;
+package org.playuniverse.minecraft.mcs.spigot.module;
 
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
-import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
+import org.playuniverse.minecraft.mcs.spigot.command.IModule;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventExecutor;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
@@ -92,8 +92,8 @@ public abstract class SafeModuleListener implements EventListener {
             .forEach(service -> this.service.unregister(service));
 
         Module plugin = wrapper.getModule();
-        if (plugin instanceof IPlugin) {
-            for (String alias : command.getAliases((IPlugin) plugin)) {
+        if (plugin instanceof IModule) {
+            for (String alias : command.getAliases((IModule) plugin)) {
                 command.unregisterCommand(alias);
             }
         }

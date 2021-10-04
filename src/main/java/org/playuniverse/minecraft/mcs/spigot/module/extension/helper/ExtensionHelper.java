@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.spigot.plugin.extension.helper;
+package org.playuniverse.minecraft.mcs.spigot.module.extension.helper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;

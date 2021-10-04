@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.spigot.plugin;
+package org.playuniverse.minecraft.mcs.spigot.module;
 
 import java.util.function.BiConsumer;
 
@@ -9,12 +9,12 @@ import com.syntaxphoenix.syntaxapi.logging.color.LogType;
 import com.syntaxphoenix.syntaxapi.logging.color.LogTypeMap;
 import com.syntaxphoenix.syntaxapi.utils.java.Exceptions;
 
-class PluginLogger implements ILogger {
+class ModuleLogger implements ILogger {
 
     private final ILogger logger;
     private final SpigotModule<?> plugin;
 
-    public PluginLogger(ILogger logger, SpigotModule<?> plugin) {
+    public ModuleLogger(ILogger logger, SpigotModule<?> plugin) {
         this.logger = logger;
         this.plugin = plugin;
     }

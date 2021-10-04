@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import org.bukkit.command.CommandSender;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
-import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
+import org.playuniverse.minecraft.mcs.spigot.command.IModule;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.AbstractRedirect;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
@@ -19,7 +19,7 @@ public class ManagerRedirect extends AbstractRedirect {
 
     private Function<String, Boolean> condition;
 
-    public ManagerRedirect(CommandManager<MinecraftInfo> manager, IPlugin plugin) {
+    public ManagerRedirect(CommandManager<MinecraftInfo> manager, IModule plugin) {
         super(plugin);
         this.manager = manager;
     }

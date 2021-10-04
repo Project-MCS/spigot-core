@@ -3,14 +3,14 @@ package org.playuniverse.minecraft.mcs.spigot.command.listener;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
-import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
+import org.playuniverse.minecraft.mcs.spigot.command.IModule;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.Node;
 
 public abstract class AbstractRedirect {
     
-    protected final IPlugin plugin;
+    protected final IModule plugin;
     
-    public AbstractRedirect(IPlugin plugin) {
+    public AbstractRedirect(IModule plugin) {
         this.plugin = plugin;
     }
 
@@ -30,7 +30,7 @@ public abstract class AbstractRedirect {
     
     protected abstract int argBuildStart();
     
-    public final IPlugin getPlugin() {
+    public final IModule getPlugin() {
         return plugin;
     }
     

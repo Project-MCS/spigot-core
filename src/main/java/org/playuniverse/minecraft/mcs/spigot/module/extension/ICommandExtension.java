@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.spigot.plugin.extension;
+package org.playuniverse.minecraft.mcs.spigot.module.extension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,56 +7,64 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
-import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
-import org.playuniverse.minecraft.mcs.spigot.command.CommandState;
+import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
+import org.playuniverse.minecraft.mcs.spigot.command.listener.redirect.NodeRedirect;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.RootNode;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotModule;
-import org.playuniverse.minecraft.mcs.spigot.plugin.extension.helper.ExtensionHelper;
-import org.playuniverse.minecraft.mcs.spigot.plugin.extension.info.CommandInfo;
+import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
+import org.playuniverse.minecraft.mcs.spigot.module.extension.helper.ExtensionHelper;
+import org.playuniverse.minecraft.mcs.spigot.module.extension.info.CommandInfo;
 
 import com.syntaxphoenix.avinity.module.extension.ExtensionPoint;
 import com.syntaxphoenix.avinity.module.extension.IExtension;
 
 @ExtensionPoint
-public interface ISystemCommandExtension extends IExtension {
+public interface ICommandExtension extends IExtension {
 
     static final Predicate<String> COMMAND_NAME = Pattern.compile("[\\da-z_]+").asMatchPredicate();
 
     RootNode<MinecraftInfo> buildRoot(String name);
 
+    default void configure(MinecraftCommand command) {}
+
     public static int[] register(SpigotModule<?> plugin) {
-        List<ISystemCommandExtension> extensions = new ArrayList<>(); // TODO: Add Extensions
+        List<ICommandExtension> extensions = new ArrayList<>(); // TODO: Add Extensions
         int[] output = new int[2];
         output[1] = extensions.size();
         if (extensions.isEmpty()) {
             output[0] = 0;
             return output;
         }
+        String prefix = plugin.getId();
         PluginBase<?> base = plugin.getBase();
-        CommandManager<MinecraftInfo> commandManager = base.getCommandManager();
         int registered = 0;
         ArrayList<String> aliases = new ArrayList<>();
-        for (ISystemCommandExtension extension : extensions) {
+        for (ICommandExtension extension : extensions) {
             Optional<CommandInfo> infoOption = ExtensionHelper.getAnnotationOfMethod(CommandInfo.class, extension.getClass(), "buildRoot",
                 String.class);
             if (infoOption.isEmpty()) {
+                System.out.println("No info");
                 continue; // Invalid command
             }
             CommandInfo info = infoOption.get();
             if (!COMMAND_NAME.test(info.name())) {
+                System.out.println("Invalid name");
                 continue; // Invalid command name
             }
             RootNode<MinecraftInfo> node = extension.buildRoot(info.name());
+            String fallbackPrefix = info.prefix().isBlank() ? prefix : info.prefix();
             for (String alias : info.aliases()) {
                 if (!COMMAND_NAME.test(alias)) {
                     continue;
                 }
                 aliases.add(alias);
             }
-            CommandState state = commandManager.register(node, aliases.toArray(String[]::new));
+            MinecraftCommand command = new MinecraftCommand(new NodeRedirect(node, plugin), fallbackPrefix, base, info.name(),
+                aliases.toArray(String[]::new));
             aliases.clear();
-            if (state == CommandState.FAILED) {
+            extension.configure(command);
+            if (!plugin.inject(command)) {
+                System.out.println("Failed to inject");
                 continue; // Unable to inject command
             }
             registered++;

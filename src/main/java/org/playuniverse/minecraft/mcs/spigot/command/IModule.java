@@ -1,6 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.command;
 
-public interface IPlugin {
+public interface IModule {
 
     String getId();
 

@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotModule;
+import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.InstanceCreator;
 
 import com.syntaxphoenix.avinity.module.ModuleWrapper;

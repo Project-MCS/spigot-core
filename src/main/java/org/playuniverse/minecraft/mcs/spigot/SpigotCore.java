@@ -12,7 +12,7 @@ import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.config.config.AddonConfig;
 import org.playuniverse.minecraft.mcs.spigot.config.config.DebugConfig;
 import org.playuniverse.minecraft.mcs.spigot.helper.task.TaskHelper;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotCoreModule;
+import org.playuniverse.minecraft.mcs.spigot.module.SpigotCoreModule;
 
 import com.syntaxphoenix.avinity.module.ModuleManager;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;

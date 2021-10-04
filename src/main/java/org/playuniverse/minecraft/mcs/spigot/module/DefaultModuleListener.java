@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.spigot.plugin;
+package org.playuniverse.minecraft.mcs.spigot.module;
 
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;

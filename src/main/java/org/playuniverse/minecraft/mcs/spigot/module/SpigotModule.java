@@ -1,13 +1,12 @@
-package org.playuniverse.minecraft.mcs.spigot.plugin;
+package org.playuniverse.minecraft.mcs.spigot.module;
 
-import java.io.File;
 import java.util.Optional;
 
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandState;
-import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
+import org.playuniverse.minecraft.mcs.spigot.command.IModule;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.PluginNode;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.RootNode;
@@ -15,8 +14,8 @@ import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.DefaultPlaceholderStore;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderStore;
-import org.playuniverse.minecraft.mcs.spigot.plugin.extension.ICommandExtension;
-import org.playuniverse.minecraft.mcs.spigot.plugin.extension.ISystemCommandExtension;
+import org.playuniverse.minecraft.mcs.spigot.module.extension.ICommandExtension;
+import org.playuniverse.minecraft.mcs.spigot.module.extension.ISystemCommandExtension;
 
 import com.syntaxphoenix.avinity.module.Module;
 import com.syntaxphoenix.avinity.module.ModuleWrapper;
@@ -24,7 +23,7 @@ import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.utils.java.Files;
 
-public abstract class SpigotModule<P extends PluginBase<P>> extends Module implements IPlugin {
+public abstract class SpigotModule<P extends PluginBase<P>> extends Module implements IModule {
 
     @SuppressWarnings("unchecked")
     private static final Class<? extends ConfigBase<?, ?>>[] EMPTY_CONFIG = new Class[0];
@@ -56,9 +55,8 @@ public abstract class SpigotModule<P extends PluginBase<P>> extends Module imple
 
     private final DefaultPlaceholderStore placeholders = new DefaultPlaceholderStore();
 
-    public SpigotModule(File dataLocation) {
-        Files.createFolder(dataLocation);
-        this.logger = new PluginLogger(getBase().getPluginLogger(), this);
+    public SpigotModule() {
+        this.logger = new ModuleLogger(getBase().getPluginLogger(), this);
     }
 
     public String getPrefix() {
@@ -78,6 +76,7 @@ public abstract class SpigotModule<P extends PluginBase<P>> extends Module imple
     @Override
     public final void enable() {
         logger.log("Starting...");
+        Files.createFolder(getDataLocation());
         logger.log("Loading logic...");
         onLoad();
         logger.log("Loading configs...");

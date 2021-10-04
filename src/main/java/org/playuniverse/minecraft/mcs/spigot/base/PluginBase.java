@@ -13,7 +13,7 @@ import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injections;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inventory.GuiListener;
 import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
-import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
+import org.playuniverse.minecraft.mcs.spigot.command.IModule;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigTimer;
@@ -28,9 +28,9 @@ import org.playuniverse.minecraft.mcs.spigot.language.handler.RemoteConsoleMessa
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.ComponentMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.StringMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.listener.ServerLoadListener;
-import org.playuniverse.minecraft.mcs.spigot.plugin.DefaultModuleListener;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SafeModuleListener;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotModule;
+import org.playuniverse.minecraft.mcs.spigot.module.DefaultModuleListener;
+import org.playuniverse.minecraft.mcs.spigot.module.SafeModuleListener;
+import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.version.MinecraftVersion;
@@ -47,7 +47,7 @@ import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 import com.syntaxphoenix.syntaxapi.version.Version;
 import com.syntaxphoenix.syntaxapi.random.Keys;
 
-public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin implements IPlugin {
+public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin implements IModule {
 
     public static final Keys KEYS = new Keys(73453345478693428L);
 
