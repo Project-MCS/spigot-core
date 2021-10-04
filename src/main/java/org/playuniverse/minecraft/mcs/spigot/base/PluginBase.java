@@ -3,6 +3,7 @@ package org.playuniverse.minecraft.mcs.spigot.base;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -31,14 +32,16 @@ import org.playuniverse.minecraft.mcs.spigot.listener.ServerLoadListener;
 import org.playuniverse.minecraft.mcs.spigot.module.DefaultModuleListener;
 import org.playuniverse.minecraft.mcs.spigot.module.SafeModuleListener;
 import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
+import org.playuniverse.minecraft.mcs.spigot.utils.java.JavaHelper;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
-import org.playuniverse.minecraft.mcs.spigot.utils.version.MinecraftVersion;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
 import com.syntaxphoenix.avinity.module.ModuleManager;
 import com.syntaxphoenix.avinity.module.ModuleState;
 import com.syntaxphoenix.avinity.module.ModuleWrapper;
+import com.syntaxphoenix.avinity.module.util.DependencyVersion;
+import com.syntaxphoenix.avinity.module.util.DependencyVersionParser;
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.logging.LogTypeId;
@@ -81,7 +84,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     protected final File compatDirectory;
 
     private final Class<? extends SpigotModule<P>> moduleClass;
-    private final Version version;
+    private final DependencyVersion version;
 
     /*
      * 
@@ -98,7 +101,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         this.pluginDirectory = new File(directory, "addons");
         this.compatDirectory = new File(directory, "compatability");
 
-        this.version = MinecraftVersion.fromString(getDescription().getVersion());
+        this.version = DependencyVersionParser.INSTANCE.analyze(getDescription().getVersion());
 
         //
         // Creating bot directory
@@ -281,6 +284,15 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         moduleManager = createModuleManager(moduleClass, eventManager, version);
 
         //
+        // Load system extensions
+        //
+
+        Optional<String> extensionData = JavaHelper.getResourceStringFromJar(getFile(), "extensions.json");
+        if (extensionData.isPresent()) {
+            moduleManager.getExtensionManager().loadSystemExtensions(extensionData.get());
+        }
+
+        //
         // Registering Events
         //
 
@@ -450,7 +462,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
                     logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
                     logger.log(LogTypeId.ERROR, "");
                     logger.log(LogTypeId.ERROR, "-----------------------------------------------");
-//                  logger.log(LogTypeId.ERROR, wrapper.getFailedException());  // TODO: Check this out
+                    // logger.log(LogTypeId.ERROR, wrapper.getFailedException()); // TODO: Check
+                    // this out
                     logger.log(LogTypeId.ERROR, "===============================================");
                     if (index + 1 != wrappers.size()) {
                         logger.log(LogTypeId.ERROR, "");
@@ -477,7 +490,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
                     logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
                     logger.log(LogTypeId.ERROR, "");
                     logger.log(LogTypeId.ERROR, "-----------------------------------------------");
-//                    logger.log(LogTypeId.ERROR, wrapper.getFailedException());  // TODO: Check this out
+                    // logger.log(LogTypeId.ERROR, wrapper.getFailedException()); // TODO: Check
+                    // this out
                     logger.log(LogTypeId.ERROR, "===============================================");
                     if (index + 1 != wrappers.size()) {
                         logger.log(LogTypeId.ERROR, "");
@@ -572,7 +586,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         return new CommandManager<>();
     }
 
-    protected ModuleManager<?> createModuleManager(Class<? extends SpigotModule<P>> clazz, EventManager eventManager, Version version) {
+    protected ModuleManager<?> createModuleManager(Class<? extends SpigotModule<P>> clazz, EventManager eventManager,
+        DependencyVersion version) {
         return new ModuleManager<>(clazz, eventManager, version);
     }
 
