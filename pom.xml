@@ -19,6 +19,10 @@
 			<id>central</id>
 			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/SyntaxPhoenix/*</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -100,7 +104,7 @@
 		<dependency>
 			<groupId>com.syntaxphoenix.avinity</groupId>
 			<artifactId>module</artifactId>
-			<version>1.1.0-8974acd0ccc371c9703d376279e98e38938e27ea-SNAPSHOT</version>
+			<version>1.1.0-ae65b24a854bd36c4eca4839a24c7cd51ce2e157-SNAPSHOT</version>
 		</dependency>
 
 		<!-- System -->

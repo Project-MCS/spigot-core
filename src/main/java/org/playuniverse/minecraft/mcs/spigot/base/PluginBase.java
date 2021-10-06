@@ -339,11 +339,11 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         onStarted();
 
         logger.log("Post startup executed successfully!");
-        
+
         //
         // Setup Injections again because plugins possibly added more injectors
         //
-        
+
         injections.setup();
 
         if (Bukkit.getWorlds().size() != 0) {
@@ -454,10 +454,10 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         } catch (Throwable throwable) {
             logger.log(throwable);
         }
-        int size = moduleManager.getModules(ModuleState.RESOLVED).size();
+        int size = moduleManager.getModules(ModuleState.CREATED).size();
         logger.log("Loaded " + size + " addons to add functionality!");
         if (size != 0) {
-            ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.DISABLED);
+            ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.FAILED_LOAD);
             if (wrappers.size() != 0) {
                 logger.log(LogTypeId.ERROR, "Some plugins failed to load...");
                 logger.log(LogTypeId.ERROR, "");
@@ -468,8 +468,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
                     logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
                     logger.log(LogTypeId.ERROR, "");
                     logger.log(LogTypeId.ERROR, "-----------------------------------------------");
-                    // logger.log(LogTypeId.ERROR, wrapper.getFailedException()); // TODO: Check
-                    // this out
+                    logger.log(LogTypeId.ERROR, wrapper.getFailedException());
                     logger.log(LogTypeId.ERROR, "===============================================");
                     if (index + 1 != wrappers.size()) {
                         logger.log(LogTypeId.ERROR, "");
@@ -481,31 +480,63 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
             }
         }
         if (size != 0) {
-            logger.log("Enabling functionality addons...");
-            moduleManager.enableModules();
-            size = moduleManager.getModules(ModuleState.ENABLED).size();
-            logger.log("Enabled " + size + " addons to add functionality!");
-            ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.FAILED);
-            if (wrappers.size() != 0) {
-                logger.log(LogTypeId.ERROR, "Some plugins failed to start...");
-                logger.log(LogTypeId.ERROR, "");
-                for (int index = 0; index < wrappers.size(); index++) {
-                    ModuleWrapper<?> wrapper = wrappers.get(index);
-                    logger.log(LogTypeId.ERROR, "===============================================");
+            logger.log("Resolving loaded functionality addons...");
+            try {
+                moduleManager.resolveModules();
+            } catch (Throwable throwable) {
+                logger.log(throwable);
+            }
+            size = moduleManager.getModules(ModuleState.RESOLVED).size();
+            logger.log("Loaded " + size + " addons to add functionality!");
+            if (size != 0) {
+                ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.FAILED_LOAD);
+                if (wrappers.size() != 0) {
+                    logger.log(LogTypeId.ERROR, "Some plugins failed to load...");
                     logger.log(LogTypeId.ERROR, "");
-                    logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
-                    logger.log(LogTypeId.ERROR, "");
-                    logger.log(LogTypeId.ERROR, "-----------------------------------------------");
-                    // logger.log(LogTypeId.ERROR, wrapper.getFailedException()); // TODO: Check
-                    // this out
-                    logger.log(LogTypeId.ERROR, "===============================================");
-                    if (index + 1 != wrappers.size()) {
+                    for (int index = 0; index < wrappers.size(); index++) {
+                        ModuleWrapper<?> wrapper = wrappers.get(index);
+                        logger.log(LogTypeId.ERROR, "===============================================");
                         logger.log(LogTypeId.ERROR, "");
+                        logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
                         logger.log(LogTypeId.ERROR, "");
+                        logger.log(LogTypeId.ERROR, "-----------------------------------------------");
+                        logger.log(LogTypeId.ERROR, wrapper.getFailedException());
+                        logger.log(LogTypeId.ERROR, "===============================================");
+                        if (index + 1 != wrappers.size()) {
+                            logger.log(LogTypeId.ERROR, "");
+                            logger.log(LogTypeId.ERROR, "");
+                        }
                     }
+                    logger.log(LogTypeId.ERROR, "");
+                    logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
                 }
-                logger.log(LogTypeId.ERROR, "");
-                logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
+            }
+            if (size != 0) {
+                logger.log("Enabling functionality addons...");
+                moduleManager.enableModules();
+                size = moduleManager.getModules(ModuleState.ENABLED).size();
+                logger.log("Enabled " + size + " addons to add functionality!");
+                ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.FAILED_START);
+                if (wrappers.size() != 0) {
+                    logger.log(LogTypeId.ERROR, "Some plugins failed to start...");
+                    logger.log(LogTypeId.ERROR, "");
+                    for (int index = 0; index < wrappers.size(); index++) {
+                        ModuleWrapper<?> wrapper = wrappers.get(index);
+                        logger.log(LogTypeId.ERROR, "===============================================");
+                        logger.log(LogTypeId.ERROR, "");
+                        logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
+                        logger.log(LogTypeId.ERROR, "");
+                        logger.log(LogTypeId.ERROR, "-----------------------------------------------");
+                        logger.log(LogTypeId.ERROR, wrapper.getFailedException());
+                        logger.log(LogTypeId.ERROR, "===============================================");
+                        if (index + 1 != wrappers.size()) {
+                            logger.log(LogTypeId.ERROR, "");
+                            logger.log(LogTypeId.ERROR, "");
+                        }
+                    }
+                    logger.log(LogTypeId.ERROR, "");
+                    logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
+                }
             }
         }
     }

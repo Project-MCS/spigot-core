@@ -159,7 +159,7 @@ public class CommandManager<S> {
     }
 
     public boolean hasGlobal() {
-        return global != null;
+        return global != null && getCommand(global) != null;
     }
 
     public RootNode<S> getGlobal() {
