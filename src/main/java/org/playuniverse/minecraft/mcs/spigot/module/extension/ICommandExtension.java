@@ -28,7 +28,8 @@ public interface ICommandExtension extends IExtension {
     default void configure(MinecraftCommand command) {}
 
     public static int[] register(SpigotModule<?> plugin) {
-        List<ICommandExtension> extensions = new ArrayList<>(); // TODO: Add Extensions
+        List<ICommandExtension> extensions = plugin.getModuleManager().getExtensionManager().getExtensionsOf(plugin.getId(),
+            ICommandExtension.class);
         int[] output = new int[2];
         output[1] = extensions.size();
         if (extensions.isEmpty()) {

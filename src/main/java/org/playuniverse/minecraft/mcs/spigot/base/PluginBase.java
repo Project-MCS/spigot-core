@@ -76,6 +76,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     private CommandManager<MinecraftInfo> commandManager;
 
     private boolean init = false;
+    private boolean ready = false;
 
     private AbstractLogger<?> logger;
 
@@ -456,8 +457,37 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         }
         int size = moduleManager.getModules(ModuleState.CREATED).size();
         logger.log("Loaded " + size + " addons to add functionality!");
+        ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.FAILED_LOAD);
+        if (wrappers.size() != 0) {
+            logger.log(LogTypeId.ERROR, "Some plugins failed to load...");
+            logger.log(LogTypeId.ERROR, "");
+            for (int index = 0; index < wrappers.size(); index++) {
+                ModuleWrapper<?> wrapper = wrappers.get(index);
+                logger.log(LogTypeId.ERROR, "===============================================");
+                logger.log(LogTypeId.ERROR, "");
+                logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
+                logger.log(LogTypeId.ERROR, "");
+                logger.log(LogTypeId.ERROR, "-----------------------------------------------");
+                logger.log(LogTypeId.ERROR, wrapper.getFailedException());
+                logger.log(LogTypeId.ERROR, "===============================================");
+                if (index + 1 != wrappers.size()) {
+                    logger.log(LogTypeId.ERROR, "");
+                    logger.log(LogTypeId.ERROR, "");
+                }
+            }
+            logger.log(LogTypeId.ERROR, "");
+            logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
+        }
         if (size != 0) {
-            ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.FAILED_LOAD);
+            logger.log("Resolving loaded functionality addons...");
+            try {
+                moduleManager.resolveModules();
+            } catch (Throwable throwable) {
+                logger.log(throwable);
+            }
+            size = moduleManager.getModules(ModuleState.RESOLVED).size();
+            logger.log("Resolved " + size + " addons to add functionality!");
+            wrappers = moduleManager.getModules(ModuleState.FAILED_LOAD);
             if (wrappers.size() != 0) {
                 logger.log(LogTypeId.ERROR, "Some plugins failed to load...");
                 logger.log(LogTypeId.ERROR, "");
@@ -478,45 +508,12 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
                 logger.log(LogTypeId.ERROR, "");
                 logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
             }
-        }
-        if (size != 0) {
-            logger.log("Resolving loaded functionality addons...");
-            try {
-                moduleManager.resolveModules();
-            } catch (Throwable throwable) {
-                logger.log(throwable);
-            }
-            size = moduleManager.getModules(ModuleState.RESOLVED).size();
-            logger.log("Loaded " + size + " addons to add functionality!");
-            if (size != 0) {
-                ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.FAILED_LOAD);
-                if (wrappers.size() != 0) {
-                    logger.log(LogTypeId.ERROR, "Some plugins failed to load...");
-                    logger.log(LogTypeId.ERROR, "");
-                    for (int index = 0; index < wrappers.size(); index++) {
-                        ModuleWrapper<?> wrapper = wrappers.get(index);
-                        logger.log(LogTypeId.ERROR, "===============================================");
-                        logger.log(LogTypeId.ERROR, "");
-                        logger.log(LogTypeId.ERROR, "Addon '" + wrapper.getId() + "' by " + wrapper.getDescription().getAuthors());
-                        logger.log(LogTypeId.ERROR, "");
-                        logger.log(LogTypeId.ERROR, "-----------------------------------------------");
-                        logger.log(LogTypeId.ERROR, wrapper.getFailedException());
-                        logger.log(LogTypeId.ERROR, "===============================================");
-                        if (index + 1 != wrappers.size()) {
-                            logger.log(LogTypeId.ERROR, "");
-                            logger.log(LogTypeId.ERROR, "");
-                        }
-                    }
-                    logger.log(LogTypeId.ERROR, "");
-                    logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
-                }
-            }
             if (size != 0) {
                 logger.log("Enabling functionality addons...");
                 moduleManager.enableModules();
                 size = moduleManager.getModules(ModuleState.ENABLED).size();
                 logger.log("Enabled " + size + " addons to add functionality!");
-                ArrayList<ModuleWrapper<SpigotModule<?>>> wrappers = moduleManager.getModules(ModuleState.FAILED_START);
+                wrappers = moduleManager.getModules(ModuleState.FAILED_START);
                 if (wrappers.size() != 0) {
                     logger.log(LogTypeId.ERROR, "Some plugins failed to start...");
                     logger.log(LogTypeId.ERROR, "");
@@ -542,6 +539,10 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     }
 
     public final void readyPlugins() {
+        if(ready) {
+            return;
+        }
+        ready = true;
         ILogger logger = getPluginLogger();
         HashMap<ModuleWrapper<?>, Throwable> map = new HashMap<>();
         logger.log("Readying up plugins...");

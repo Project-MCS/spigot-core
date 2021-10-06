@@ -26,7 +26,8 @@ public interface ISystemCommandExtension extends IExtension {
     RootNode<MinecraftInfo> buildRoot(String name);
 
     public static int[] register(SpigotModule<?> plugin) {
-        List<ISystemCommandExtension> extensions = new ArrayList<>(); // TODO: Add Extensions
+        List<ISystemCommandExtension> extensions = plugin.getModuleManager().getExtensionManager().getExtensionsOf(plugin.getId(),
+            ISystemCommandExtension.class);
         int[] output = new int[2];
         output[1] = extensions.size();
         if (extensions.isEmpty()) {
