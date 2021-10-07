@@ -15,6 +15,7 @@ import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.DefaultPlaceholderStore;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderStore;
 import org.playuniverse.minecraft.mcs.spigot.module.extension.ICommandExtension;
+import org.playuniverse.minecraft.mcs.spigot.module.extension.IListenerExtension;
 import org.playuniverse.minecraft.mcs.spigot.module.extension.ISystemCommandExtension;
 
 import com.syntaxphoenix.avinity.module.Module;
@@ -89,7 +90,15 @@ public abstract class SpigotModule<P extends PluginBase<P>> extends Module imple
         registerPluginCommands();
         logger.log("Registering commands... (System commands) [1 / 2]");
         registerSystemCommands();
+        logger.log("Regisering listeners...");
+        registerListeners();
+        
         logger.log("Successfully started!");
+    }
+
+    private final void registerListeners() {
+        int[] info = IListenerExtension.register(this);
+        logger.log("Registered listeners (" + info[0] + " of " + info[1] + ")!");
     }
 
     private final void registerPluginCommands() {
