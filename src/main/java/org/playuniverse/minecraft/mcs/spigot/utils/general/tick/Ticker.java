@@ -35,6 +35,8 @@ public final class Ticker {
     private int ticks = 0;
     private int tps = 0;
 
+    private int state = 0;
+
     public Ticker() {
         this(nextName(), DEFAULT_TICK_TIME, DEFAULT_DELAY);
     }
@@ -74,7 +76,7 @@ public final class Ticker {
     public boolean remove(ITickReceiver receiver) {
         return receivers.remove(receiver);
     }
-    
+
     public ITickReceiver find(Predicate<ITickReceiver> predicate) {
         return receivers.stream().filter(predicate).findAny().orElse(null);
     }
@@ -107,8 +109,8 @@ public final class Ticker {
         } catch (IllegalArgumentException | InterruptedException ignore) {
             // Delay Sleep Error
         }
-        while (true) {
-            if (receivers.isEmpty()) {
+        while (state != 2) {
+            if (receivers.isEmpty() || state == 1) {
                 time = System.nanoTime();
                 try {
                     Thread.sleep(emptyLength);
@@ -144,8 +146,31 @@ public final class Ticker {
         ticks++;
     }
 
-    public void stop() {
+    public void pause() {
+        state = 1;
         thread.interrupt();
+    }
+
+    public void stop() {
+        state = 2;
+        thread.interrupt();
+    }
+
+    public void start() {
+        state = 0;
+        thread.interrupt();
+    }
+
+    public boolean isRunning() {
+        return state == 0;
+    }
+
+    public boolean isPaused() {
+        return state == 1;
+    }
+
+    public boolean isStopped() {
+        return state == 2;
     }
 
 }
