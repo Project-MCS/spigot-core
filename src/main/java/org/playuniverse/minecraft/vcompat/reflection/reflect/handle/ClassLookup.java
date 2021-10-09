@@ -386,6 +386,18 @@ public class ClassLookup {
      * 
      */
 
+    public boolean putField(String name, Field field) {
+        if (field == null || name == null || field.getDeclaringClass() != owner || fields.containsKey(name)) {
+            return false;
+        }
+        storeField(name, field);
+        return true;
+    }
+
+    /*
+     * 
+     */
+
     private void storeField(String name, Field field) {
         if (!Modifier.isFinal(field.getModifiers())) {
             try {
