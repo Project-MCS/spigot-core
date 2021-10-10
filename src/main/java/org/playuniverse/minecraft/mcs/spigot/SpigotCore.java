@@ -13,6 +13,7 @@ import org.playuniverse.minecraft.mcs.spigot.config.config.AddonConfig;
 import org.playuniverse.minecraft.mcs.spigot.config.config.DebugConfig;
 import org.playuniverse.minecraft.mcs.spigot.helper.task.TaskHelper;
 import org.playuniverse.minecraft.mcs.spigot.module.SpigotCoreModule;
+import org.playuniverse.minecraft.mcs.spigot.utils.wait.Awaiter;
 
 import com.syntaxphoenix.avinity.module.ModuleManager;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
@@ -40,6 +41,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     protected void onLoadup() {
         NAMESPACE.replace(Namespace.of("system")).lock();
         TaskHelper.TASK.start();
+        Awaiter.class.getClass(); // Initialize
     }
 
     @Override
