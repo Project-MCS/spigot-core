@@ -104,7 +104,7 @@
 		<dependency>
 			<groupId>com.syntaxphoenix.avinity</groupId>
 			<artifactId>module</artifactId>
-			<version>1.1.0-2c066820f974f6d1dbe3035cbe12b2fe6b958f3b-SNAPSHOT</version>
+			<version>1.1.0-b632881bcda32169945f3a56aa94be0cbbee1e4d-SNAPSHOT</version>
 		</dependency>
 
 		<!-- System -->
