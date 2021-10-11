@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.spigot.plugin.extension.info;
+package org.playuniverse.minecraft.mcs.spigot.module.extension.info;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

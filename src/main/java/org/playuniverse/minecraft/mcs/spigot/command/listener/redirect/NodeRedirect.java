@@ -1,6 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.command.listener.redirect;
 
-import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
+import org.playuniverse.minecraft.mcs.spigot.command.IModule;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.AbstractRedirect;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.Node;
@@ -9,7 +9,7 @@ public class NodeRedirect extends AbstractRedirect {
 
     private final Node<MinecraftInfo> node;
 
-    public NodeRedirect(Node<MinecraftInfo> node, IPlugin plugin) {
+    public NodeRedirect(Node<MinecraftInfo> node, IModule plugin) {
         super(plugin);
         this.node = node;
     }

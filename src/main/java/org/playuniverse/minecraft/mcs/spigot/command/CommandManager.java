@@ -20,7 +20,7 @@ public class CommandManager<S> {
     
     private String global = null;
 
-    public String[] getAliases(IPlugin plugin) {
+    public String[] getAliases(IModule plugin) {
         ArrayList<String> list = aliases.get(plugin.getId());
         return list == null ? new String[0] : list.toArray(String[]::new);
     }
@@ -113,7 +113,7 @@ public class CommandManager<S> {
         if (!commands.containsKey(root.getName())) {
             commands.put(root.getName(), new ForkNode<>(root.getName(), node));
         }
-        IPlugin plugin = node.getPlugin();
+        IModule plugin = node.getPlugin();
         String[] conflicts = state.hasConflicts() ? state.getAliases() : new String[0];
         ArrayList<String> globalAliases = this.aliases.computeIfAbsent(plugin.getId(), ignore -> new ArrayList<>());
         ArrayList<String> globalConflicts = new ArrayList<>();
@@ -159,7 +159,7 @@ public class CommandManager<S> {
     }
 
     public boolean hasGlobal() {
-        return global != null;
+        return global != null && getCommand(global) != null;
     }
 
     public RootNode<S> getGlobal() {

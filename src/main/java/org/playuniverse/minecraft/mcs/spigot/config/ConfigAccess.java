@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
-import org.pf4j.PluginWrapper;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SafePluginManager;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
+import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.InstanceCreator;
 
+import com.syntaxphoenix.avinity.module.ModuleWrapper;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.utils.java.Files;
 
@@ -65,8 +64,8 @@ public class ConfigAccess {
      * Plugin specific
      */
 
-    public ConfigAccess load(PluginWrapper wrapper) {
-        SpigotPlugin<?> plugin = SpigotPlugin.getByWrapper(wrapper);
+    public ConfigAccess load(ModuleWrapper<?> wrapper) {
+        SpigotModule<?> plugin = SpigotModule.getByWrapper(wrapper);
         if (plugin == null) {
             return this;
         }
@@ -143,11 +142,9 @@ public class ConfigAccess {
         return output;
     }
 
-    public ConfigAccess unload(PluginWrapper wrapper) {
-        SafePluginManager pluginManager = ((SafePluginManager) wrapper.getPluginManager());
+    public ConfigAccess unload(ModuleWrapper<?> wrapper) {
         synchronized (configs) {
-            Class<?>[] classes = configs.keySet().stream().filter(clazz -> pluginManager.isFromPlugin(wrapper, clazz))
-                .toArray(size -> new Class[size]);
+            Class<?>[] classes = configs.keySet().stream().filter(wrapper::isFromModule).toArray(size -> new Class[size]);
             for (int index = 0; index < classes.length; index++) {
                 configs.remove(classes[index]).unload();
             }

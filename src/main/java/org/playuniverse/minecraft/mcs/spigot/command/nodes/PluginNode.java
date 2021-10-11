@@ -3,14 +3,14 @@ package org.playuniverse.minecraft.mcs.spigot.command.nodes;
 import java.util.List;
 
 import org.playuniverse.minecraft.mcs.spigot.command.CommandContext;
-import org.playuniverse.minecraft.mcs.spigot.command.IPlugin;
+import org.playuniverse.minecraft.mcs.spigot.command.IModule;
 
 public class PluginNode<S> extends RootNode<S> {
 
     private final RootNode<S> node;
-    private final IPlugin plugin;
+    private final IModule plugin;
 
-    public PluginNode(IPlugin plugin, RootNode<S> node) {
+    public PluginNode(IModule plugin, RootNode<S> node) {
         super(plugin.getId() + ':' + node.getName());
         if (node instanceof PluginNode) {
             throw new IllegalArgumentException("A plugin node cannot contain another plugin node!");
@@ -19,7 +19,7 @@ public class PluginNode<S> extends RootNode<S> {
         this.node = node;
     }
 
-    public IPlugin getPlugin() {
+    public IModule getPlugin() {
         return plugin;
     }
 

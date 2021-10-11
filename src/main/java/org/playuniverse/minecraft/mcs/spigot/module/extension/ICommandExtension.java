@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.mcs.spigot.plugin.extension;
+package org.playuniverse.minecraft.mcs.spigot.module.extension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,17 +6,20 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.pf4j.ExtensionPoint;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
 import org.playuniverse.minecraft.mcs.spigot.command.listener.redirect.NodeRedirect;
 import org.playuniverse.minecraft.mcs.spigot.command.nodes.RootNode;
-import org.playuniverse.minecraft.mcs.spigot.plugin.SpigotPlugin;
-import org.playuniverse.minecraft.mcs.spigot.plugin.extension.helper.ExtensionHelper;
-import org.playuniverse.minecraft.mcs.spigot.plugin.extension.info.CommandInfo;
+import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
+import org.playuniverse.minecraft.mcs.spigot.module.extension.helper.ExtensionHelper;
+import org.playuniverse.minecraft.mcs.spigot.module.extension.info.CommandInfo;
 
-public interface ICommandExtension extends ExtensionPoint {
+import com.syntaxphoenix.avinity.module.extension.ExtensionPoint;
+import com.syntaxphoenix.avinity.module.extension.IExtension;
+
+@ExtensionPoint
+public interface ICommandExtension extends IExtension {
 
     static final Predicate<String> COMMAND_NAME = Pattern.compile("[\\da-z_]+").asMatchPredicate();
 
@@ -24,8 +27,9 @@ public interface ICommandExtension extends ExtensionPoint {
 
     default void configure(MinecraftCommand command) {}
 
-    public static int[] register(SpigotPlugin<?> plugin) {
-        List<ICommandExtension> extensions = plugin.getBase().getPluginManager().getExtensions(ICommandExtension.class);
+    public static int[] register(SpigotModule<?> plugin) {
+        List<ICommandExtension> extensions = plugin.getModuleManager().getExtensionManager().getExtensionsOf(plugin.getId(),
+            ICommandExtension.class);
         int[] output = new int[2];
         output[1] = extensions.size();
         if (extensions.isEmpty()) {

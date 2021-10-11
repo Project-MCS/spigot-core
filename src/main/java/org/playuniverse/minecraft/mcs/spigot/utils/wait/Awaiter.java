@@ -1,8 +1,6 @@
 package org.playuniverse.minecraft.mcs.spigot.utils.wait;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 import com.syntaxphoenix.syntaxapi.utils.general.Status;
@@ -10,7 +8,12 @@ import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 
 public final class Awaiter<T> {
 
-	private static final Map<Class<?>, WaitFunction<?>> FUNCTIONS = Collections.synchronizedMap(new HashMap<>());
+	private static final ConcurrentHashMap<Class<?>, WaitFunction<?>> FUNCTIONS = new ConcurrentHashMap<>();
+
+    static {
+        register(Status.class, WaitFunction.STATUS);
+        register(Future.class, WaitFunction.FUTURE);
+    }
 
 	@SuppressWarnings("unchecked")
 	public static <T> Awaiter<T> of(T waited) {
@@ -26,11 +29,6 @@ public final class Awaiter<T> {
 			return;
 		}
 		FUNCTIONS.put(clazz, function);
-	}
-
-	static {
-		register(Status.class, WaitFunction.STATUS);
-		register(Future.class, WaitFunction.FUTURE);
 	}
 
 	private final Container<T> waited = Container.of();
