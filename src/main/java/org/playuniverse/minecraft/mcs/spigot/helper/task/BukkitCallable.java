@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-final class BukkitCallable<E> implements Runnable, Future<E> {
+public final class BukkitCallable<E> implements Runnable, Future<E> {
 
 	private final Callable<E> task;
 
@@ -14,7 +14,7 @@ final class BukkitCallable<E> implements Runnable, Future<E> {
 
 	private boolean running = false;
 
-	public BukkitCallable(Callable<E> task) {
+	BukkitCallable(Callable<E> task) {
 		this.task = task;
 	}
 

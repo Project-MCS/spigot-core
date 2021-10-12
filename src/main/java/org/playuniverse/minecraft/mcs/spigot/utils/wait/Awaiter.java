@@ -3,6 +3,9 @@ package org.playuniverse.minecraft.mcs.spigot.utils.wait;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
+import org.playuniverse.minecraft.mcs.spigot.helper.task.BukkitCallable;
+import org.playuniverse.minecraft.mcs.spigot.helper.task.DoneFuture;
+
 import com.syntaxphoenix.syntaxapi.utils.general.Status;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 
@@ -13,6 +16,8 @@ public final class Awaiter<T> {
     static {
         register(Status.class, WaitFunction.STATUS);
         register(Future.class, WaitFunction.FUTURE);
+        register(DoneFuture.class, WaitFunction.DONE_FUTURE);
+        register(BukkitCallable.class, WaitFunction.BUKKIT_FUTURE);
     }
 
 	@SuppressWarnings("unchecked")
