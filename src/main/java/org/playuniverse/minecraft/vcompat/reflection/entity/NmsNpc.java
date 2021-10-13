@@ -22,6 +22,4 @@ public interface NmsNpc extends NmsPlayer {
     
     NmsNpc updatePosition();
     
-    NmsNpc updateMetadata();
-    
 }

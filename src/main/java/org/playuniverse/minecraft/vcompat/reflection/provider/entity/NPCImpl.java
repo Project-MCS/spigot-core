@@ -25,7 +25,6 @@ import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.resources.ResourceKey;
@@ -201,13 +200,6 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
     }
 
     @Override
-    public NPCImpl updateMetadata() {
-        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
-        sendPackets(dataPacket);
-        return this;
-    }
-
-    @Override
     public void show(Player... players) {
         if (players.length == 0) {
             return;
@@ -310,7 +302,11 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             ClassLookupProvider.DEFAULT.getLookup("mjGameProfile").setFieldValue(profile, "name", name);
         }
         
-        updateMetadata();
+        if(name != null || skin != null) {
+            respawn();
+            updatePosition();
+            updateRotation();
+        }
     }
 
     /*
