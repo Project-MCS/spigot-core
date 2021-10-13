@@ -314,10 +314,8 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
         if (name != null) {
             ClassLookupProvider.DEFAULT.getLookup("mjGameProfile").setFieldValue(profile, "name", name);
         }
-
-        if (!(name == null && skin == null)) {
-            respawn();
-        }
+        
+        updateMetadata();
     }
 
     /*
