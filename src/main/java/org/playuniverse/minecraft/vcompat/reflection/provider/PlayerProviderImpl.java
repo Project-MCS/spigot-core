@@ -8,6 +8,7 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.vcompat.reflection.PlayerProvider;
 import org.playuniverse.minecraft.vcompat.reflection.data.persistence.DataDistributor;
+import org.playuniverse.minecraft.vcompat.reflection.entity.NmsNpc;
 import org.playuniverse.minecraft.vcompat.reflection.entity.NmsPlayer;
 import org.playuniverse.minecraft.vcompat.reflection.provider.entity.NPCImpl;
 import org.playuniverse.minecraft.vcompat.reflection.provider.entity.PlayerImpl;
@@ -32,7 +33,7 @@ public class PlayerProviderImpl extends PlayerProvider<VersionControlImpl> {
     }
 
     @Override
-    protected NmsPlayer createNpc(UUID uniqueId) {
+    protected NmsNpc createNpc(UUID uniqueId) {
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
         GameProfile profile = new GameProfile(uniqueId, Keys.generateKey(16));
         ServerLevel level = server.overworld();

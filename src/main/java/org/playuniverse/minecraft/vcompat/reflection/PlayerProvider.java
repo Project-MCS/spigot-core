@@ -6,12 +6,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.vcompat.reflection.data.persistence.PersistentContainer;
+import org.playuniverse.minecraft.vcompat.reflection.entity.NmsNpc;
 import org.playuniverse.minecraft.vcompat.reflection.entity.NmsPlayer;
 
 public abstract class PlayerProvider<V extends VersionControl> extends VersionHandler<V> {
 
     protected final ConcurrentHashMap<UUID, NmsPlayer> players = new ConcurrentHashMap<>();
-    protected final ConcurrentHashMap<UUID, NmsPlayer> npcs = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<UUID, NmsNpc> npcs = new ConcurrentHashMap<>();
 
     protected PlayerProvider(V versionControl) {
         super(versionControl);
@@ -42,15 +43,15 @@ public abstract class PlayerProvider<V extends VersionControl> extends VersionHa
         return nmsPlayer;
     }
     
-    public NmsPlayer newNpc() {
+    public NmsNpc newNpc() {
         return getNpc(UUID.randomUUID());
     }
     
-    public NmsPlayer getNpc(UUID uniqueId) {
+    public NmsNpc getNpc(UUID uniqueId) {
         if(npcs.containsKey(uniqueId)) {
             return npcs.get(uniqueId);
         }
-        NmsPlayer npc = createNpc(uniqueId);
+        NmsNpc npc = createNpc(uniqueId);
         if(npc == null) {
             return null;
         }
@@ -58,7 +59,7 @@ public abstract class PlayerProvider<V extends VersionControl> extends VersionHa
         return npc;
     }
 
-    protected NmsPlayer createNpc(UUID uniqueId) {
+    protected NmsNpc createNpc(UUID uniqueId) {
         return null;
     }
 
