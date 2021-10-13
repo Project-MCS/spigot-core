@@ -14,9 +14,9 @@ public class VersionControlImpl extends VersionControl {
     private final ToolProviderImpl toolProvider = new ToolProviderImpl(this);
     private final TextureProviderImpl textureProvider = new TextureProviderImpl(this);
     private final EntityProviderImpl entityProvider = new EntityProviderImpl(this);
-    private final PlayerProviderImpl playerProvider = new PlayerProviderImpl(this);
     private final BukkitConversionImpl bukkitConversion = new BukkitConversionImpl(this);
     private final DataProviderImpl dataProvider = new DataProviderImpl(this);
+    private final PlayerProviderImpl playerProvider = new PlayerProviderImpl(this);
 
     public VersionControlImpl() {
         rehook();
