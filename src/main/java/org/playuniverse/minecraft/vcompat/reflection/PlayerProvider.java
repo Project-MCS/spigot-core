@@ -1,9 +1,7 @@
 package org.playuniverse.minecraft.vcompat.reflection;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,7 +10,8 @@ import org.playuniverse.minecraft.vcompat.reflection.entity.NmsPlayer;
 
 public abstract class PlayerProvider<V extends VersionControl> extends VersionHandler<V> {
 
-    protected final Map<UUID, NmsPlayer> players = Collections.synchronizedMap(new HashMap<>());
+    protected final ConcurrentHashMap<UUID, NmsPlayer> players = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<UUID, NmsPlayer> npcs = new ConcurrentHashMap<>();
 
     protected PlayerProvider(V versionControl) {
         super(versionControl);
@@ -41,6 +40,26 @@ public abstract class PlayerProvider<V extends VersionControl> extends VersionHa
         NmsPlayer nmsPlayer = createPlayer(player);
         players.put(player.getUniqueId(), nmsPlayer);
         return nmsPlayer;
+    }
+    
+    public NmsPlayer newNpc() {
+        return getNpc(UUID.randomUUID());
+    }
+    
+    public NmsPlayer getNpc(UUID uniqueId) {
+        if(npcs.containsKey(uniqueId)) {
+            return npcs.get(uniqueId);
+        }
+        NmsPlayer npc = createNpc(uniqueId);
+        if(npc == null) {
+            return null;
+        }
+        npcs.put(uniqueId, npc);
+        return npc;
+    }
+
+    protected NmsPlayer createNpc(UUID uniqueId) {
+        return null;
     }
 
     protected abstract NmsPlayer createPlayer(Player player);

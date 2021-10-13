@@ -47,7 +47,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.BiomeManager;
 
-public class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements NmsPlayer {
+public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements NmsPlayer {
 
     private String realName;
     private Skin realSkin;
@@ -68,6 +68,11 @@ public class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements NmsPla
     @Override
     public WrappedContainer getDataAdapter() {
         return dataAdapter;
+    }
+    
+    @Override
+    public boolean isNpc() {
+        return false;
     }
 
     @Override
@@ -198,6 +203,7 @@ public class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements NmsPla
         ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(handle);
         ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(handle,
             (byte) Mth.floor(handle.getYHeadRot() * 256F / 360F));
+        
 
         ArrayList<Pair<EquipmentSlot, ItemStack>> list = new ArrayList<>();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
@@ -289,5 +295,4 @@ public class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements NmsPla
             }
         }
     }
-
 }
