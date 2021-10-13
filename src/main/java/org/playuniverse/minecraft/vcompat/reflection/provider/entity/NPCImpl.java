@@ -189,8 +189,8 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
     public NPCImpl updatePosition() {
         Vec3 pos = handle.position();
         double difX = pos.x - getX();
-        double difY = pos.x - getY();
-        double difZ = pos.x - getZ();
+        double difY = pos.y - getY();
+        double difZ = pos.z - getZ();
         setXYZ(pos.x, pos.y, pos.z);
         String level = handle.level.dimension().location().toString();
         if (Math.abs(difX) <= 8 && Math.abs(difY) <= 8 && Math.abs(difZ) <= 8 && level.equals(getLevel())) {

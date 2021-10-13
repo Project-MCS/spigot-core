@@ -3,6 +3,7 @@ package org.playuniverse.minecraft.vcompat.base.data;
 import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterRegistry;
 import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
 import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;
+import org.playuniverse.minecraft.vcompat.base.data.util.NumberConversion;
 
 import com.syntaxphoenix.syntaxapi.utils.key.IKey;
 import com.syntaxphoenix.syntaxapi.utils.key.NamespacedKey;
@@ -34,13 +35,13 @@ public abstract class AbstractDataContainer<B> implements IDataContainer {
         Object value = registry.getBase().isAssignableFrom(type.getPrimitive()) ? getRaw(key) : get(key);
         if (value == null || !type.isPrimitive(value)) {
             if (Number.class.isAssignableFrom(type.getComplex())) {
-                return type.getComplex().cast(0);
+                return NumberConversion.convert(0, type.getComplex());
             }
             return null;
         }
         E output = type.fromPrimitiveObj(getContext(), value);
         if (output == null && Number.class.isAssignableFrom(type.getComplex())) {
-            return type.getComplex().cast(0);
+            return NumberConversion.convert(0, type.getComplex());
         }
         return output;
     }
