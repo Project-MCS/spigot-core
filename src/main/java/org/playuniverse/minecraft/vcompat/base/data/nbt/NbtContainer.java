@@ -12,7 +12,7 @@ import com.syntaxphoenix.syntaxapi.nbt.utils.NbtStorage;
 
 public class NbtContainer extends AbstractDataContainer<NbtTag> implements IDataAdapterContext, NbtStorage<NbtCompound> {
 
-    private final NbtCompound root;
+    protected final NbtCompound root;
 
     public NbtContainer(IDataAdapterRegistry<NbtTag> registry) {
         this(new NbtCompound(), registry);
@@ -41,7 +41,7 @@ public class NbtContainer extends AbstractDataContainer<NbtTag> implements IData
     public void fromNbt(NbtCompound nbt) {
         root.clear();
         for (String key : nbt.getKeys()) {
-            root.set(key, nbt.get(key));
+            set(key, nbt.get(key));
         }
     }
 
@@ -67,6 +67,10 @@ public class NbtContainer extends AbstractDataContainer<NbtTag> implements IData
 
     @Override
     public void set(String key, NbtTag value) {
+        if(value == null) {
+            remove(key);
+            return;
+        }
         root.set(key, value);
     }
 

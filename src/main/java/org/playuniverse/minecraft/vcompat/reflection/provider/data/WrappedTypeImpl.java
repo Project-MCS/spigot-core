@@ -122,16 +122,16 @@ public abstract class WrappedTypeImpl<H, P0, P1, C0, C1> implements WrapType<P0,
     }
 
     protected static int internalState(Class<?> clazz) {
-        if (clazz.isAssignableFrom(PersistentDataContainer.class)) {
+        if (PersistentDataContainer.class.isAssignableFrom(clazz)) {
             return 1;
         }
-        if (clazz.isAssignableFrom(PersistentDataContainer[].class)) {
+        if (PersistentDataContainer[].class.isAssignableFrom(clazz)) {
             return 2;
         }
-        if (clazz.isAssignableFrom(IDataContainer.class)) {
+        if (IDataContainer.class.isAssignableFrom(clazz)) {
             return 3;
         }
-        if (clazz.isAssignableFrom(IDataContainer[].class)) {
+        if (IDataContainer[].class.isAssignableFrom(clazz)) {
             return 4;
         }
         return 0;

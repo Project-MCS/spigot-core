@@ -133,7 +133,7 @@ public final class BukkitContainerImpl extends WrappedContainer implements Persi
 
     @Override
     public boolean remove(String key) {
-        return false;
+        return container.remove(key);
     }
 
     @Override

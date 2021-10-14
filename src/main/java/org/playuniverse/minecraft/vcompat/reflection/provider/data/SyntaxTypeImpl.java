@@ -70,5 +70,21 @@ public class SyntaxTypeImpl<P0, P1, C0, C1> extends WrappedTypeImpl<PersistentDa
         }
         return toComplexWrapped(type.fromPrimitive(toPrimitiveOriginal(primitive), (PersistentDataAdapterContext) context));
     }
+    
+    /*
+     * 
+     */
+    
+    @SuppressWarnings({
+        "unchecked",
+        "rawtypes"
+    })
+    @Override
+    public IDataType<P0, C0> syntaxType() {
+        if(type instanceof BukkitTypeImpl) {
+            return ((BukkitTypeImpl) type).getHandle();
+        }
+        return this;
+    }
 
 }

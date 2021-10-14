@@ -15,10 +15,10 @@ public class DataProviderImpl extends DataProvider<VersionControlImpl> {
 
     @Override
     public WrappedContainer wrap(Object container) {
-        if(container instanceof PersistentDataContainer) {
+        if (container instanceof PersistentDataContainer) {
             return new SyntaxContainerImpl((PersistentDataContainer) container);
         }
-        if(container instanceof IDataContainer) {
+        if (container instanceof IDataContainer) {
             return new BukkitContainerImpl((IDataContainer) container);
         }
         return null;

@@ -125,7 +125,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
 
     @Override
     public void setSkin(Skin skin) {
-        if (skin == null) {
+        if (skin == null || !skin.isValid()) {
             container.remove("skin");
             return;
         }
@@ -300,7 +300,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
         GameProfile profile = handle.getGameProfile();
 
         Skin skin = getSkin();
-        if (skin != null) {
+        if (skin != null && skin.isValid()) {
             PropertyMap properties = profile.getProperties();
             properties.removeAll("textures");
             properties.put("textures", new Property("textures", skin.getValue(), skin.getSignature()));
@@ -311,7 +311,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             ClassLookupProvider.DEFAULT.getLookup("mjGameProfile").setFieldValue(profile, "name", name);
         }
         
-        if(name != null || skin != null) {
+        if(name != null || (skin != null && skin.isValid())) {
             respawn();
             updatePosition();
             updateRotation();

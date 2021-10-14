@@ -64,4 +64,20 @@ public class BukkitTypeImpl<P0, P1, C0, C1> extends WrappedTypeImpl<IDataType<P1
         return toComplexWrapped(type.fromPrimitive(context, toPrimitiveOriginal(primitive)));
     }
 
+    /*
+     * 
+     */
+
+    @SuppressWarnings({
+        "unchecked",
+        "rawtypes"
+    })
+    @Override
+    public IDataType<P0, C0> syntaxType() {
+        if (type instanceof SyntaxTypeImpl) {
+            return ((SyntaxTypeImpl) type).syntaxType();
+        }
+        return new SyntaxTypeImpl<>(this);
+    }
+
 }

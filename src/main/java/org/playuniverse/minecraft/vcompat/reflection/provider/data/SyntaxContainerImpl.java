@@ -45,6 +45,9 @@ public final class SyntaxContainerImpl extends WrappedContainer implements IData
 
     @Override
     public boolean has(IKey key) {
+        if(container instanceof WrappedContainer) {
+            return ((WrappedContainer) container).has(new SyntaxKey(key));
+        }
         throw new UnsupportedOperationException("Can't be used with PersistentDataContainer of Bukkit");
     }
 
@@ -70,11 +73,17 @@ public final class SyntaxContainerImpl extends WrappedContainer implements IData
 
     @Override
     public Object get(String key) {
+        if(container instanceof WrappedContainer) {
+            return ((WrappedContainer) container).get(key);
+        }
         throw new UnsupportedOperationException("Can't be used with PersistentDataContainer of Bukkit");
     }
 
     @Override
     public Object get(IKey key) {
+        if(container instanceof WrappedContainer) {
+            return ((WrappedContainer) container).get(new SyntaxKey(key));
+        }
         throw new UnsupportedOperationException("Can't be used with PersistentDataContainer of Bukkit");
     }
 
@@ -124,11 +133,17 @@ public final class SyntaxContainerImpl extends WrappedContainer implements IData
 
     @Override
     public boolean has(String key) {
+        if(container instanceof WrappedContainer) {
+            return ((WrappedContainer) container).has(key);
+        }
         throw new UnsupportedOperationException("Can't be used with PersistentDataContainer of Bukkit");
     }
 
     @Override
     public boolean has(WrappedKey<?> key) {
+        if(container instanceof WrappedContainer) {
+            return ((WrappedContainer) container).has(key);
+        }
         throw new UnsupportedOperationException("Can't be used with PersistentDataContainer of Bukkit");
     }
 
@@ -144,6 +159,9 @@ public final class SyntaxContainerImpl extends WrappedContainer implements IData
 
     @Override
     public Object get(WrappedKey<?> key) {
+        if(container instanceof WrappedContainer) {
+            return ((WrappedContainer) container).get(key);
+        }
         throw new UnsupportedOperationException("Can't be used with PersistentDataContainer of Bukkit");
     }
 

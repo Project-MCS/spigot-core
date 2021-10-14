@@ -183,25 +183,9 @@ public class NbtAdapter<P, C extends NbtTag> extends AbstractDataAdapter<P, C, N
         /*
          * Complex
          */
-
-        if (Objects.equals(IDataContainer.class, type)) {
+        
+        if (IDataContainer.class.isAssignableFrom(type)) {
             return new NbtAdapter<IDataContainer, NbtCompound>(IDataContainer.class, NbtCompound.class, container -> {
-                return toNbtCompound(registry, container);
-            }, compound -> {
-                return fromNbtCompound(registry, compound);
-            });
-        }
-
-        if (Objects.equals(AbstractDataContainer.class, type)) {
-            return new NbtAdapter<AbstractDataContainer, NbtCompound>(AbstractDataContainer.class, NbtCompound.class, container -> {
-                return toNbtCompound(registry, container);
-            }, compound -> {
-                return fromNbtCompound(registry, compound);
-            });
-        }
-
-        if (Objects.equals(NbtContainer.class, type)) {
-            return new NbtAdapter<NbtContainer, NbtCompound>(NbtContainer.class, NbtCompound.class, container -> {
                 return toNbtCompound(registry, container);
             }, compound -> {
                 return fromNbtCompound(registry, compound);
@@ -223,6 +207,7 @@ public class NbtAdapter<P, C extends NbtTag> extends AbstractDataAdapter<P, C, N
         if (container instanceof NbtContainer) {
             return ((NbtContainer) container).getRoot().clone();
         }
+        System.out.println(container.getClass());
         NbtCompound compound = new NbtCompound();
         for (String key : container.getKeyspaces()) {
             Object object = container.get(key);
