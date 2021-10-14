@@ -27,6 +27,9 @@ import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -45,6 +48,8 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
     public NPCImpl(WrappedContainer container, ServerPlayer handle) {
         super(handle);
         this.container = container;
+        SynchedEntityData data = handle.getEntityData();
+        data.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), (byte) 0x7F);
     }
 
     @SuppressWarnings("unchecked")
