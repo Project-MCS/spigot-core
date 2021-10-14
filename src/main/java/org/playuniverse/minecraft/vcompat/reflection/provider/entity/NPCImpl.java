@@ -49,6 +49,8 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
     public NPCImpl(WrappedContainer container, ServerPlayer handle) {
         super(handle);
         this.container = container;
+        SynchedEntityData data = handle.getEntityData();
+        data.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), (byte) 0x7F);
     }
 
     @SuppressWarnings("unchecked")
@@ -223,9 +225,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             ClassLookupProvider.DEFAULT.getLookup("mjGameProfile").setFieldValue(profile, "name", name);
         }
 
-        SynchedEntityData data = handle.getEntityData();
-        data.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), (byte) 0x7F);
-        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(handle.getId(), data, true);
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
         sendPackets(dataPacket);
         return this;
     }
