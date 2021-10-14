@@ -35,6 +35,7 @@ import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.JavaHelper;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
+import org.playuniverse.minecraft.vcompat.reflection.VersionControl;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
 import com.syntaxphoenix.avinity.module.ModuleManager;
@@ -347,6 +348,12 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
         injections.setup();
 
+        try {
+            VersionControl.get().rehook();
+        } catch (Exception exp) {
+            logger.log("Failed to load vCompat", exp);
+        }
+
         if (Bukkit.getWorlds().size() != 0) {
             logger.log("Server is already started!");
 
@@ -395,6 +402,12 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
 
         injections.uninjectAll();
         injections.dispose();
+        
+        //
+        // Shutdown vCompat
+        //
+        
+        VersionControl.get().shutdown();
 
         //
         // Shutdown reflections
@@ -539,7 +552,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     }
 
     public final void readyPlugins() {
-        if(ready) {
+        if (ready) {
             return;
         }
         ready = true;

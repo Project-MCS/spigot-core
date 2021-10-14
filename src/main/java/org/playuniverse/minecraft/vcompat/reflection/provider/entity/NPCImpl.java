@@ -93,6 +93,10 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
     }
 
     private void setLevel(String level) {
+        if(level == null) {
+            container.remove("level");
+            return;
+        }
         container.set("level", level, WrapType.STRING);
     }
 
@@ -179,7 +183,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
         ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(handle,
             (byte) Mth.floor(handle.getYHeadRot() * 256F / 360F));
         ClientboundMoveEntityPacket.Rot moreRotationPacket = new ClientboundMoveEntityPacket.Rot(handle.getId(),
-            (byte) (handle.getYHeadRot() * 256 / 360), (byte) (handle.getXRot() * 256 / 360), true);
+            (byte) (handle.getYRot() * 256 / 360), (byte) (handle.getXRot() * 256 / 360), true);
         sendPackets(rotationPacket, moreRotationPacket);
         return this;
     }
