@@ -23,20 +23,22 @@ public final class NetworkHandler {
 
     public void remove(Channel channel) {
         ChannelPipeline pipeline = channel.pipeline();
-        if (pipeline.get(PacketClientHandler.class) != null) {
-            pipeline.remove(client);
+        if (pipeline.get("vclient") != null) {
+            pipeline.remove("vclient");
         }
-        if (pipeline.get(PacketServerHandler.class) != null) {
-            pipeline.remove(server);
+        if (pipeline.get("vserver") != null) {
+            pipeline.remove("vserver");
         }
     }
 
     public void add() {
-        ChannelPipeline pipeline = player.getChannel().pipeline();
-        if (pipeline.get(PacketClientHandler.class) == null) {
+        Channel channel = player.getChannel();
+        remove(channel);
+        ChannelPipeline pipeline = channel.pipeline();
+        if (pipeline.get("vclient") == null) {
             pipeline.addAfter("decoder", "vclient", client);
         }
-        if (pipeline.get(PacketServerHandler.class) == null) {
+        if (pipeline.get("vserver") == null) {
             pipeline.addBefore("encoder", "vserver", client);
         }
     }

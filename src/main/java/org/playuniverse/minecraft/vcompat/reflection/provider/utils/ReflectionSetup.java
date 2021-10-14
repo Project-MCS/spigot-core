@@ -34,7 +34,7 @@ public final class ReflectionSetup extends ClassLookups {
         Field[] fields = lookup.getOwner().getDeclaredFields();
         for (Field field : fields) {
             if (int.class.equals(field.getType())) {
-                lookup.putField("entityId", field, true);
+                lookup.putField("entityId", field, false);
                 break;
             }
         }

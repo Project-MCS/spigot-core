@@ -34,6 +34,7 @@ import org.playuniverse.minecraft.mcs.spigot.module.DefaultModuleListener;
 import org.playuniverse.minecraft.mcs.spigot.module.SafeModuleListener;
 import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.JavaHelper;
+import org.playuniverse.minecraft.mcs.spigot.utils.java.debug.DebugDump;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
 import org.playuniverse.minecraft.vcompat.listener.PlayerListener;
@@ -356,6 +357,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
             VersionControl control = VersionControl.get();
             control.setEventManager(eventManager);
             PlayerListener.register(this);
+            DebugDump.class.getClass();
         } catch (Exception exp) {
             logger.log("Failed to load vCompat", exp);
         }

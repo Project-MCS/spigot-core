@@ -1,8 +1,10 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.entity.npc;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 
+import org.playuniverse.minecraft.mcs.spigot.utils.java.debug.DebugDump;
 import org.playuniverse.minecraft.vcompat.reflection.entity.event.PlayerInteractAtNpcEvent;
 import org.playuniverse.minecraft.vcompat.reflection.entity.event.PlayerInteractAtNpcEvent.Action;
 import org.playuniverse.minecraft.vcompat.reflection.entity.event.PlayerInteractAtNpcEvent.Hand;
@@ -10,6 +12,7 @@ import org.playuniverse.minecraft.vcompat.reflection.provider.entity.PlayerImpl;
 import org.playuniverse.minecraft.vcompat.reflection.provider.network.PacketListener;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.handle.ClassLookup;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.handle.field.IFieldHandle;
 
 import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.utils.general.Status;
@@ -73,9 +76,8 @@ public final class NPCListener extends PacketListener {
         if (eventManager.isEmpty() || interactLookup == null) {
             return false;
         }
-        Object value = interactLookup.getFieldValue(packet, "entityId");
+        Object value = extract(interactLookup.getField("entityId"), packet);
         if (value == null || !(value instanceof Number)) {
-            System.out.println("null");
             return false;
         }
         int id = ((Number) value).intValue();
@@ -90,9 +92,9 @@ public final class NPCListener extends PacketListener {
         PlayerInteractAtNpcEvent event = new PlayerInteractAtNpcEvent(player, npc, interactionHelper.getAction(),
             interactionHelper.getHand());
         Status status = eventManager.get().callAsync(event, service);
-        while(!status.isDone()) {
+        while (!status.isDone()) {
             try {
-                Thread.sleep(4);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 break;
             }
@@ -122,7 +124,10 @@ public final class NPCListener extends PacketListener {
         }
 
         @Override
-        public void onInteraction(InteractionHand hand, Vec3 position) {} // Ignore because never thrown
+        public void onInteraction(InteractionHand hand, Vec3 position) {
+            action = Action.RIGHT_CLICK;
+            this.hand = hand == InteractionHand.MAIN_HAND ? Hand.MAIN : Hand.SECOND;
+        }
 
         public Action getAction() {
             return action;
@@ -135,13 +140,48 @@ public final class NPCListener extends PacketListener {
     }
 
     /*
+     * Reflection stuff
+     */
+
+    private Object extract(IFieldHandle<?> fieldHandle, Object source) {
+        if (fieldHandle == null) {
+            return null;
+        }
+        Object handle = fieldHandle.getHandle();
+        if (!(handle instanceof Field)) {
+            return null;
+        }
+        Field field = (Field) handle;
+        if (!field.canAccess(source)) {
+            field.setAccessible(true);
+            try {
+                return field.get(source);
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                return null;
+            } finally {
+                field.setAccessible(false);
+            }
+        }
+        try {
+            return field.get(source);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            return null;
+        }
+    }
+
+    /*
      * Packet Stuff
      */
 
     @Override
     protected boolean onPacket(ExecutorService service, PlayerImpl player, Packet<?> packet) {
-        PacketHelper<?> helper = map.get(packet.getClass());
-        return helper == null ? false : helper.inject(service, player, packet);
+        try {
+            PacketHelper<?> helper = map.get(packet.getClass());
+            return helper == null ? false : helper.inject(service, player, packet);
+        } catch (Throwable throwable) {
+            DebugDump.dump(throwable);
+            return false;
+        }
     }
 
     protected <T extends Packet<?>> void packet(Class<T> packetType, PacketAcceptor<T> packetUser) {
