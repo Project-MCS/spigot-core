@@ -1,20 +1,32 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.network;
 
-import java.util.UUID;
+import org.playuniverse.minecraft.vcompat.reflection.provider.entity.PlayerImpl;
 
 import io.netty.channel.Channel;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.server.level.ServerPlayer;
 
 public final class NetworkHandler {
-    
+
     private final PacketClientHandler client = new PacketClientHandler(this);
     private final PacketServerHandler server = new PacketServerHandler(this);
-    
-    private final Channel channel;
-    
-    public NetworkHandler(UUID uniqueId, ServerPlayer player) {
-        channel = player.connection.connection.channel;
+
+    private final PacketDistributor distributor;
+
+    private final PlayerImpl player;
+
+    public NetworkHandler(PacketDistributor distributor, PlayerImpl player) {
+        this.distributor = distributor;
+        this.player = player;
+    }
+
+    public void remove() {
+        Channel channel = player.getChannel();
+        channel.pipeline().remove(client);
+        channel.pipeline().remove(server);
+    }
+
+    public void add() {
+        Channel channel = player.getChannel();
         channel.pipeline().addAfter("decoder", "vClientHandler", client);
         channel.pipeline().addBefore("encoder", "vServerHandler", server);
     }
@@ -26,12 +38,25 @@ public final class NetworkHandler {
     public PacketServerHandler getServer() {
         return server;
     }
-    
+
     public boolean receive(Packet<?> packet) {
-        return false;
+        return onPacket(packet);
     }
-    
+
     public boolean send(Packet<?> packet) {
+        return onPacket(packet);
+    }
+
+    private boolean onPacket(Packet<?> packet) {
+        PacketListener[] listeners = distributor.getListenersFor(player.getUniqueId(), packet.getClass());
+        if (listeners.length == 0) {
+            return false;
+        }
+        for (PacketListener listener : listeners) {
+            if (listener.onPacket(player, packet)) {
+                return true;
+            }
+        }
         return false;
     }
 

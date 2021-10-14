@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.playuniverse.minecraft.vcompat.reflection.provider.VersionControlImpl;
 
+import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 
 public abstract class VersionControl {
@@ -22,6 +23,7 @@ public abstract class VersionControl {
     }
 
     protected final Properties properties = new Properties();
+    protected final Container<EventManager> eventManager = Container.of();
 
     public VersionControl() {
         try (FileReader reader = new FileReader(new File("server.properties"))) {
@@ -33,6 +35,17 @@ public abstract class VersionControl {
 
     public Properties getServerProperties() {
         return properties;
+    }
+
+    public final void setEventManager(EventManager eventManager) {
+        if (this.eventManager.isPresent()) {
+            return;
+        }
+        this.eventManager.replace(eventManager).lock();
+    }
+
+    public final Container<EventManager> getEventManager() {
+        return eventManager;
     }
 
     public abstract void rehook();

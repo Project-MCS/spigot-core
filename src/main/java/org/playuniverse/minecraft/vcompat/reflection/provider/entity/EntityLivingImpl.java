@@ -12,7 +12,7 @@ public abstract class EntityLivingImpl<E extends LivingEntity> extends EntityImp
 
     @Override
     public void setCollidable(boolean collidable) {
-        handle.collides = collidable;
+        getHandle().collides = collidable;
     }
 
 }

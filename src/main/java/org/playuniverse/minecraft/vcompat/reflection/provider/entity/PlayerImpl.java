@@ -2,6 +2,7 @@ package org.playuniverse.minecraft.vcompat.reflection.provider.entity;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.UUID;
 
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
@@ -11,6 +12,8 @@ import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.type.SkinDataType;
 import org.playuniverse.minecraft.vcompat.reflection.entity.NmsPlayer;
 import org.playuniverse.minecraft.vcompat.reflection.provider.data.SyntaxContainerImpl;
+import org.playuniverse.minecraft.vcompat.reflection.provider.network.NetworkHandler;
+import org.playuniverse.minecraft.vcompat.reflection.provider.network.PacketDistributor;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 import org.playuniverse.minecraft.vcompat.utils.bukkit.Players;
 import org.playuniverse.minecraft.vcompat.utils.minecraft.MojangProfileServer;
@@ -22,6 +25,7 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
 
+import io.netty.channel.Channel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
@@ -53,23 +57,56 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
     private Skin realSkin;
 
     private final WrappedContainer dataAdapter;
+    private final NetworkHandler networkHandler;
 
-    public PlayerImpl(Player player) {
+    private final UUID uniqueId;
+
+    public PlayerImpl(PacketDistributor distributor, Player player) {
         super(((CraftPlayer) player).getHandle());
-        dataAdapter = new SyntaxContainerImpl(getBukkitPlayer().getPersistentDataContainer());
+        this.uniqueId = player.getUniqueId();
+        this.networkHandler = new NetworkHandler(distributor, this);
+        this.dataAdapter = new SyntaxContainerImpl(getBukkitPlayer().getPersistentDataContainer());
         update(false);
     }
 
     @Override
+    public ServerPlayer getHandle() {
+        ServerPlayer player = super.getHandle();
+        if (!player.hasDisconnected()) {
+            return player;
+        }
+        ServerPlayer updated = player.getServer().getPlayerList().getPlayer(uniqueId);
+        if (updated != null) {
+            updateHandle(updated);
+            update(false);
+            return updated;
+        }
+        return player;
+    }
+
+    @Override
     public CraftPlayer getBukkitPlayer() {
-        return handle.getBukkitEntity();
+        return getHandle().getBukkitEntity();
+    }
+
+    public NetworkHandler getNetworkHandler() {
+        return networkHandler;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return uniqueId;
+    }
+
+    public Channel getChannel() {
+        return null;
     }
 
     @Override
     public WrappedContainer getDataAdapter() {
         return dataAdapter;
     }
-    
+
     @Override
     public boolean isNpc() {
         return false;
@@ -137,7 +174,7 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
 
     @Override
     public int getPing() {
-        return handle.latency;
+        return getHandle().latency;
     }
 
     @Override
@@ -148,68 +185,68 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
     }
 
     private final void sendPlayerListInfo(String header, String footer) {
-        if (handle.connection.isDisconnected()) {
+        if (getHandle().hasDisconnected()) {
             return;
         }
 
         Component headerComponent = header.isEmpty() ? null : CraftChatMessage.fromStringOrNull(header, true);
         Component footerComponent = footer.isEmpty() ? null : CraftChatMessage.fromStringOrNull(footer, true);
 
-        handle.connection.send(new ClientboundTabListPacket(headerComponent, footerComponent));
+        getHandle().connection.send(new ClientboundTabListPacket(headerComponent, footerComponent));
     }
 
     @Override
     public void setTitleTimes(int fadeIn, int stay, int fadeOut) {
-        if (handle.connection.isDisconnected()) {
+        if (getHandle().hasDisconnected()) {
             return;
         }
-        handle.connection.send(new ClientboundSetTitlesAnimationPacket(fadeIn, stay, fadeOut));
+        getHandle().connection.send(new ClientboundSetTitlesAnimationPacket(fadeIn, stay, fadeOut));
     }
 
     @Override
     public void sendSubtitle(String text) {
-        if (handle.connection.isDisconnected()) {
+        if (getHandle().hasDisconnected()) {
             return;
         }
-        handle.connection.send(new ClientboundSetSubtitleTextPacket(CraftChatMessage.fromStringOrNull(text)));
+        getHandle().connection.send(new ClientboundSetSubtitleTextPacket(CraftChatMessage.fromStringOrNull(text)));
     }
 
     @Override
     public void sendTitle(String text) {
-        if (handle.connection.isDisconnected()) {
+        if (getHandle().hasDisconnected()) {
             return;
         }
-        handle.connection.send(new ClientboundSetTitleTextPacket(CraftChatMessage.fromStringOrNull(text)));
+        getHandle().connection.send(new ClientboundSetTitleTextPacket(CraftChatMessage.fromStringOrNull(text)));
     }
 
     @Override
     public void sendActionBar(String text) {
-        if (handle.connection.isDisconnected()) {
+        if (getHandle().hasDisconnected()) {
             return;
         }
-        handle.connection.send(new ClientboundSetActionBarTextPacket(CraftChatMessage.fromStringOrNull(text)));
+        getHandle().connection.send(new ClientboundSetActionBarTextPacket(CraftChatMessage.fromStringOrNull(text)));
     }
 
     @Override
     public void fakeRespawn() {
-        if (handle.connection.isDisconnected()) {
+        if (getHandle().hasDisconnected()) {
             return;
         }
         ClientboundPlayerInfoPacket remInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER,
-            handle);
-        ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, handle);
+            getHandle());
+        ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER,
+            getHandle());
 
-        ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(handle.getId());
-        ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(handle);
-        ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(handle,
-            (byte) Mth.floor(handle.getYHeadRot() * 256F / 360F));
-        
+        ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(getHandle().getId());
+        ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(getHandle());
+        ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(getHandle(),
+            (byte) Mth.floor(getHandle().getYHeadRot() * 256F / 360F));
 
         ArrayList<Pair<EquipmentSlot, ItemStack>> list = new ArrayList<>();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            list.add(Pair.of(slot, handle.getItemBySlot(slot)));
+            list.add(Pair.of(slot, getHandle().getItemBySlot(slot)));
         }
-        ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(handle.getId(), list);
+        ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(getHandle().getId(), list);
 
         Player self = getBukkitPlayer();
         Player[] players = Players.getOnlineWithout(getUniqueId());
@@ -226,18 +263,19 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
             connection.send(equipmentPacket);
         }
 
-        ServerLevel world = (ServerLevel) handle.level;
+        ServerLevel world = (ServerLevel) getHandle().level;
 
         ClientboundRespawnPacket respawnPacket = new ClientboundRespawnPacket(world.dimensionType(), world.dimension(),
-            BiomeManager.obfuscateSeed(world.getSeed()), handle.gameMode.getGameModeForPlayer(),
-            handle.gameMode.getPreviousGameModeForPlayer(), world.isDebug(), world.isFlat(), true);
-        ClientboundPlayerPositionPacket positionPacket = new ClientboundPlayerPositionPacket(handle.getX(), handle.getY(), handle.getZ(),
-            handle.xRotO, handle.yRotO, Collections.emptySet(), 0, false);
-        ClientboundSetCarriedItemPacket itemPacket = new ClientboundSetCarriedItemPacket(handle.getInventory().selected);
-        ClientboundEntityEventPacket statusPacket = new ClientboundEntityEventPacket(handle, (byte) 28);
-        ClientboundSetEntityDataPacket metadataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
+            BiomeManager.obfuscateSeed(world.getSeed()), getHandle().gameMode.getGameModeForPlayer(),
+            getHandle().gameMode.getPreviousGameModeForPlayer(), world.isDebug(), world.isFlat(), true);
+        ClientboundPlayerPositionPacket positionPacket = new ClientboundPlayerPositionPacket(getHandle().getX(), getHandle().getY(),
+            getHandle().getZ(), getHandle().xRotO, getHandle().yRotO, Collections.emptySet(), 0, false);
+        ClientboundSetCarriedItemPacket itemPacket = new ClientboundSetCarriedItemPacket(getHandle().getInventory().selected);
+        ClientboundEntityEventPacket statusPacket = new ClientboundEntityEventPacket(getHandle(), (byte) 28);
+        ClientboundSetEntityDataPacket metadataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData(),
+            true);
 
-        ServerGamePacketListenerImpl connection = handle.connection;
+        ServerGamePacketListenerImpl connection = getHandle().connection;
         connection.send(remInfoPacket);
         connection.send(addInfoPacket);
         connection.send(respawnPacket);
@@ -246,23 +284,23 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
         connection.send(statusPacket);
         connection.send(metadataPacket);
 
-        handle.onUpdateAbilities();
-        handle.resetSentInfo();
-        handle.inventoryMenu.broadcastChanges();
-        handle.inventoryMenu.sendAllDataToRemote();
-        if (handle.containerMenu != handle.inventoryMenu) {
-            handle.containerMenu.broadcastChanges();
-            handle.containerMenu.sendAllDataToRemote();
+        getHandle().onUpdateAbilities();
+        getHandle().resetSentInfo();
+        getHandle().inventoryMenu.broadcastChanges();
+        getHandle().inventoryMenu.sendAllDataToRemote();
+        if (getHandle().containerMenu != getHandle().inventoryMenu) {
+            getHandle().containerMenu.broadcastChanges();
+            getHandle().containerMenu.sendAllDataToRemote();
         }
         self.recalculatePermissions();
     }
 
     @Override
     public void respawn() {
-        if (handle.connection.isDisconnected()) {
+        if (getHandle().hasDisconnected()) {
             return;
         }
-        handle.connection.send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.PERFORM_RESPAWN));
+        getHandle().connection.send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.PERFORM_RESPAWN));
     }
 
     @Override
@@ -275,8 +313,11 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
             realName = MojangProfileServer.getName(getUniqueId());
             realSkin = MojangProfileServer.getSkin(realName, getUniqueId());
         });
+        if (getHandle().hasDisconnected()) {
+            return;
+        }
         if (flag) {
-            GameProfile profile = handle.getGameProfile();
+            GameProfile profile = getHandle().getGameProfile();
 
             Skin skin = getSkin();
             if (skin != null) {

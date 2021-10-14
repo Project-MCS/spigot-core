@@ -14,12 +14,12 @@ public class ArmorStandImpl extends EntityLivingImpl<ArmorStand> implements NmsA
 
     @Override
     public void setSmall(boolean small) {
-        handle.setSmall(small);
+        getHandle().setSmall(small);
     }
 
     @Override
     public boolean isSmall() {
-        return handle.isSmall();
+        return getHandle().isSmall();
     }
 
 }

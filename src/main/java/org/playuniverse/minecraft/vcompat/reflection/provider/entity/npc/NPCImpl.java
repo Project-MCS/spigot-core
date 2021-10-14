@@ -1,4 +1,4 @@
-package org.playuniverse.minecraft.vcompat.reflection.provider.entity;
+package org.playuniverse.minecraft.vcompat.reflection.provider.entity.npc;
 
 import java.util.ArrayList;
 
@@ -10,6 +10,8 @@ import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
 import org.playuniverse.minecraft.vcompat.reflection.data.type.SkinDataType;
 import org.playuniverse.minecraft.vcompat.reflection.entity.NmsNpc;
+import org.playuniverse.minecraft.vcompat.reflection.provider.entity.EntityLivingImpl;
+import org.playuniverse.minecraft.vcompat.reflection.provider.network.PacketDistributor;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 import org.playuniverse.minecraft.vcompat.utils.bukkit.Players;
 import org.playuniverse.minecraft.vcompat.utils.minecraft.Skin;
@@ -18,6 +20,8 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
+import com.syntaxphoenix.syntaxapi.event.EventManager;
+import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
@@ -46,16 +50,28 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
 
     private final WrappedContainer container;
 
-    public NPCImpl(WrappedContainer container, ServerPlayer handle) {
+    private final PacketDistributor distributor;
+    private final NPCListener listener;
+
+    public NPCImpl(Container<EventManager> eventManager, PacketDistributor distributor, WrappedContainer container, ServerPlayer handle) {
         super(handle);
+        this.listener = new NPCListener(eventManager, this);
         this.container = container;
-        SynchedEntityData data = handle.getEntityData();
+        SynchedEntityData data = getHandle().getEntityData();
         data.set(new EntityDataAccessor<>(17, EntityDataSerializers.BYTE), (byte) 0x7F);
+        this.distributor = distributor;
+        distributor.register(listener);
+    }
+
+    @Override
+    public void kill() {
+        super.kill();
+        distributor.unregister(listener);
     }
 
     @SuppressWarnings("unchecked")
     public NPCImpl loadPosition() {
-        MinecraftServer server = handle.getServer();
+        MinecraftServer server = getHandle().getServer();
         ResourceKey<?>[] keys = server.levelKeys().toArray(ResourceKey[]::new);
         String level = getLevel();
         ServerLevel world = server.overworld();
@@ -154,15 +170,15 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
 
     @Override
     public void setLocation(Location location) {
-        handle.setPosRaw(location.getX(), location.getY(), location.getZ());
-        handle.setOldPosAndRot();
-        Vec3 position = handle.position();
-        handle.setPos(position.x, position.y, position.z);
-        if (location.getWorld() == null || handle.getCommandSenderWorld().getWorld() == location.getWorld()) {
+        getHandle().setPosRaw(location.getX(), location.getY(), location.getZ());
+        getHandle().setOldPosAndRot();
+        Vec3 position = getHandle().position();
+        getHandle().setPos(position.x, position.y, position.z);
+        if (location.getWorld() == null || getHandle().getCommandSenderWorld().getWorld() == location.getWorld()) {
             updatePosition();
             return;
         }
-        handle.level = ((CraftWorld) location.getWorld()).getHandle();
+        getHandle().level = ((CraftWorld) location.getWorld()).getHandle();
         updatePosition();
     }
 
@@ -170,48 +186,48 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
     public NPCImpl setRotation(float yaw, float pitch) {
         yaw = Location.normalizeYaw(yaw);
         pitch = Location.normalizePitch(pitch);
-        handle.setYRot(yaw);
-        handle.setXRot(pitch);
-        handle.yRotO = yaw;
-        handle.xRotO = pitch;
-        handle.setYHeadRot(yaw);
+        getHandle().setYRot(yaw);
+        getHandle().setXRot(pitch);
+        getHandle().yRotO = yaw;
+        getHandle().xRotO = pitch;
+        getHandle().setYHeadRot(yaw);
         return this;
     }
 
     @Override
     public NPCImpl updateRotation() {
-        setYawAndPitch(handle.yRotO, handle.xRotO);
-        ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(handle,
-            (byte) Mth.floor(handle.getYHeadRot() * 256F / 360F));
-        ClientboundMoveEntityPacket.Rot moreRotationPacket = new ClientboundMoveEntityPacket.Rot(handle.getId(),
-            (byte) (handle.getYRot() * 256 / 360), (byte) (handle.getXRot() * 256 / 360), true);
+        setYawAndPitch(getHandle().yRotO, getHandle().xRotO);
+        ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(getHandle(),
+            (byte) Mth.floor(getHandle().getYHeadRot() * 256F / 360F));
+        ClientboundMoveEntityPacket.Rot moreRotationPacket = new ClientboundMoveEntityPacket.Rot(getHandle().getId(),
+            (byte) (getHandle().getYRot() * 256 / 360), (byte) (getHandle().getXRot() * 256 / 360), true);
         sendPackets(rotationPacket, moreRotationPacket);
         return this;
     }
 
     @Override
     public NPCImpl updatePosition() {
-        Vec3 pos = handle.position();
+        Vec3 pos = getHandle().position();
         double difX = pos.x - getX();
         double difY = pos.y - getY();
         double difZ = pos.z - getZ();
         setXYZ(pos.x, pos.y, pos.z);
-        String level = handle.level.dimension().location().toString();
+        String level = getHandle().level.dimension().location().toString();
         if (Math.abs(difX) <= 8 && Math.abs(difY) <= 8 && Math.abs(difZ) <= 8 && level.equals(getLevel())) {
-            ClientboundMoveEntityPacket.Pos positionPacket = new ClientboundMoveEntityPacket.Pos(handle.getId(), (short) (difX * 4096),
+            ClientboundMoveEntityPacket.Pos positionPacket = new ClientboundMoveEntityPacket.Pos(getHandle().getId(), (short) (difX * 4096),
                 (short) (difY * 4096), (short) (difZ * 4096), true);
             sendPackets(positionPacket);
             return this;
         }
         setLevel(level);
-        ClientboundTeleportEntityPacket teleportPacket = new ClientboundTeleportEntityPacket(handle);
+        ClientboundTeleportEntityPacket teleportPacket = new ClientboundTeleportEntityPacket(getHandle());
         sendPackets(teleportPacket);
         return this;
     }
 
     @Override
     public NPCImpl updateMetadata() {
-        GameProfile profile = handle.getGameProfile();
+        GameProfile profile = getHandle().getGameProfile();
 
         Skin skin = getSkin();
         if (skin != null && skin.isValid()) {
@@ -225,7 +241,8 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             ClassLookupProvider.DEFAULT.getLookup("mjGameProfile").setFieldValue(profile, "name", name);
         }
 
-        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData(),
+            true);
         sendPackets(dataPacket);
         return this;
     }
@@ -235,18 +252,20 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
         if (players.length == 0) {
             return;
         }
-        ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, handle);
-        ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(handle);
-        ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(handle,
-            (byte) Mth.floor(handle.getYHeadRot() * 256F / 360F));
-        ClientboundMoveEntityPacket.Rot moreRotationPacket = new ClientboundMoveEntityPacket.Rot(handle.getId(),
-            (byte) (handle.getYHeadRot() * 256 / 360), (byte) (handle.getXRot() * 256 / 360), true);
+        ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER,
+            getHandle());
+        ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(getHandle());
+        ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(getHandle(),
+            (byte) Mth.floor(getHandle().getYHeadRot() * 256F / 360F));
+        ClientboundMoveEntityPacket.Rot moreRotationPacket = new ClientboundMoveEntityPacket.Rot(getHandle().getId(),
+            (byte) (getHandle().getYHeadRot() * 256 / 360), (byte) (getHandle().getXRot() * 256 / 360), true);
         ArrayList<Pair<EquipmentSlot, ItemStack>> list = new ArrayList<>();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            list.add(Pair.of(slot, handle.getItemBySlot(slot)));
+            list.add(Pair.of(slot, getHandle().getItemBySlot(slot)));
         }
-        ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(handle.getId(), list);
-        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
+        ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(getHandle().getId(), list);
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData(),
+            true);
 
         for (Player player : players) {
             if (isShown(player)) {
@@ -271,8 +290,8 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             return;
         }
         ClientboundPlayerInfoPacket remInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER,
-            handle);
-        ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(handle.getId());
+            getHandle());
+        ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(getHandle().getId());
         for (Player player : players) {
             if (!isShown(player)) {
                 continue;
@@ -289,22 +308,24 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
     @Override
     public void respawn() {
         ClientboundPlayerInfoPacket remInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER,
-            handle);
-        ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, handle);
+            getHandle());
+        ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER,
+            getHandle());
 
-        ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(handle.getId());
-        ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(handle);
-        ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(handle,
-            (byte) Mth.floor(handle.getYHeadRot() * 256F / 360F));
-        ClientboundMoveEntityPacket.Rot moreRotationPacket = new ClientboundMoveEntityPacket.Rot(handle.getId(),
-            (byte) (handle.getYHeadRot() * 256 / 360), (byte) (handle.getXRot() * 256 / 360), true);
+        ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(getHandle().getId());
+        ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(getHandle());
+        ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(getHandle(),
+            (byte) Mth.floor(getHandle().getYHeadRot() * 256F / 360F));
+        ClientboundMoveEntityPacket.Rot moreRotationPacket = new ClientboundMoveEntityPacket.Rot(getHandle().getId(),
+            (byte) (getHandle().getYHeadRot() * 256 / 360), (byte) (getHandle().getXRot() * 256 / 360), true);
 
         ArrayList<Pair<EquipmentSlot, ItemStack>> list = new ArrayList<>();
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            list.add(Pair.of(slot, handle.getItemBySlot(slot)));
+            list.add(Pair.of(slot, getHandle().getItemBySlot(slot)));
         }
-        ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(handle.getId(), list);
-        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
+        ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(getHandle().getId(), list);
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData(),
+            true);
         sendPackets(remInfoPacket, addInfoPacket, destroyPacket, spawnPacket, rotationPacket, moreRotationPacket, equipmentPacket,
             dataPacket);
     }

@@ -25,16 +25,20 @@ import net.minecraft.world.phys.Vec3;
 
 public abstract class EntityImpl<E extends Entity> implements NmsEntity {
 
-    protected final E handle;
+    private E handle;
 
     protected final List<UUID> visible = Collections.synchronizedList(new ArrayList<>());
 
     public EntityImpl(E handle) {
+        updateHandle(handle);
+    }
+
+    protected void updateHandle(E handle) {
         this.handle = handle;
     }
 
     @Override
-    public final E getHandle() {
+    public E getHandle() {
         return handle;
     }
 

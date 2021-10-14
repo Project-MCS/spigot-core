@@ -24,20 +24,36 @@ public interface IListenerExtension extends IExtension, EventListener {
             return output;
         }
         int registered = 0;
-        for(IListenerExtension extension : extensions) {
+        for (IListenerExtension extension : extensions) {
             Optional<EventInfo> infoOption = ExtensionHelper.getAnnotation(extension.getClass(), EventInfo.class);
-            if(infoOption.isEmpty()) {
+            if (infoOption.isEmpty()) {
                 continue;
             }
+            Target target = infoOption.get().target();
             registered++;
-            if(infoOption.get().bukkit()) {
+            if (target.isBukkit()) {
                 plugin.getBukkitManager().registerEvents(extension);
-                continue;
             }
-            plugin.getEventManager().registerEvents(extension);
+            if (target.isSyntax()) {
+                plugin.getEventManager().registerEvents(extension);
+            }
         }
         output[0] = registered;
         return output;
+    }
+
+    public static enum Target {
+        BUKKIT,
+        SYNTAX,
+        BOTH;
+
+        public boolean isBukkit() {
+            return this != SYNTAX;
+        }
+
+        public boolean isSyntax() {
+            return this != BUKKIT;
+        }
     }
 
 }
