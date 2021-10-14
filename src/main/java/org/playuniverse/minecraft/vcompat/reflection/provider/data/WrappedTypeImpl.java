@@ -45,12 +45,12 @@ public abstract class WrappedTypeImpl<H, P0, P1, C0, C1> implements WrapType<P0,
             return (P0) new SyntaxContainerImpl((PersistentDataContainer) primitive);
         case 2:
             return (P0) Arrays.stream((PersistentDataContainer[]) primitive).map(SyntaxContainerImpl::new)
-                .toArray(SyntaxContainerImpl[]::new);
+                .toArray(IDataContainer[]::new);
         case 3:
             return (P0) new BukkitContainerImpl((IDataContainer) primitive);
         case 4:
             return (P0) Arrays.stream((IDataContainer[]) primitive).map(BukkitContainerImpl::new)
-                .toArray(BukkitContainerImpl[]::new);
+                .toArray(PersistentDataContainer[]::new);
         default:
             return (P0) primitive;
         }
@@ -62,11 +62,11 @@ public abstract class WrappedTypeImpl<H, P0, P1, C0, C1> implements WrapType<P0,
         case 1:
             return (C0) new SyntaxContainerImpl((PersistentDataContainer) complex);
         case 2:
-            return (C0) Arrays.stream((PersistentDataContainer[]) complex).map(SyntaxContainerImpl::new).toArray(SyntaxContainerImpl[]::new);
+            return (C0) Arrays.stream((PersistentDataContainer[]) complex).map(SyntaxContainerImpl::new).toArray(IDataContainer[]::new);
         case 3:
             return (C0) new BukkitContainerImpl((IDataContainer) complex);
         case 4:
-            return (C0) Arrays.stream((IDataContainer[]) complex).map(BukkitContainerImpl::new).toArray(BukkitContainerImpl[]::new);
+            return (C0) Arrays.stream((IDataContainer[]) complex).map(BukkitContainerImpl::new).toArray(PersistentDataContainer[]::new);
         default:
             return (C0) complex;
         }
@@ -79,12 +79,12 @@ public abstract class WrappedTypeImpl<H, P0, P1, C0, C1> implements WrapType<P0,
             return (P1) new BukkitContainerImpl((IDataContainer) primitive);
         case 2:
             return (P1) Arrays.stream((IDataContainer[]) primitive).map(BukkitContainerImpl::new)
-                .toArray(BukkitContainerImpl[]::new);
+                .toArray(PersistentDataContainer[]::new);
         case 3:
             return (P1) new SyntaxContainerImpl((PersistentDataContainer) primitive);
         case 4:
             return (P1) Arrays.stream((PersistentDataContainer[]) primitive).map(SyntaxContainerImpl::new)
-                .toArray(SyntaxContainerImpl[]::new);
+                .toArray(IDataContainer[]::new);
         default:
             return (P1) primitive;
         }
@@ -96,11 +96,11 @@ public abstract class WrappedTypeImpl<H, P0, P1, C0, C1> implements WrapType<P0,
         case 1:
             return (C1) new BukkitContainerImpl((IDataContainer) complex);
         case 2:
-            return (C1) Arrays.stream((IDataContainer[]) complex).map(BukkitContainerImpl::new).toArray(BukkitContainerImpl[]::new);
+            return (C1) Arrays.stream((IDataContainer[]) complex).map(BukkitContainerImpl::new).toArray(PersistentDataContainer[]::new);
         case 3:
             return (C1) new SyntaxContainerImpl((PersistentDataContainer) complex);
         case 4:
-            return (C1) Arrays.stream((PersistentDataContainer[]) complex).map(SyntaxContainerImpl::new).toArray(SyntaxContainerImpl[]::new);
+            return (C1) Arrays.stream((PersistentDataContainer[]) complex).map(SyntaxContainerImpl::new).toArray(IDataContainer[]::new);
         default:
             return (C1) complex;
         }
@@ -109,13 +109,13 @@ public abstract class WrappedTypeImpl<H, P0, P1, C0, C1> implements WrapType<P0,
     protected static Class<?> internalWrap(Class<?> clazz, int state) {
         switch (state) {
         case 1:
-            return SyntaxContainerImpl.class;
+            return IDataContainer.class;
         case 2:
-            return SyntaxContainerImpl[].class;
+            return IDataContainer[].class;
         case 3:
-            return BukkitContainerImpl.class;
+            return PersistentDataContainer.class;
         case 4:
-            return BukkitContainerImpl[].class;
+            return PersistentDataContainer[].class;
         default:
             return clazz;
         }

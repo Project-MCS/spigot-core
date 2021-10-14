@@ -33,6 +33,8 @@ public abstract class AbstractDataContainer<B> implements IDataContainer {
     @Override
     public <E> E get(String key, IDataType<?, E> type) {
         Object value = registry.getBase().isAssignableFrom(type.getPrimitive()) ? getRaw(key) : get(key);
+        System.out.println(value == null ? null : value.getClass());
+        System.out.println(type.getPrimitive());
         if (value == null || !type.isPrimitive(value)) {
             if (Number.class.isAssignableFrom(type.getComplex())) {
                 return NumberConversion.convert(0, type.getComplex());

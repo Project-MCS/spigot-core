@@ -43,7 +43,9 @@ public abstract class AbstractDataAdapterRegistry<B> implements IDataAdapterRegi
         if (base == null) {
             return null;
         }
+        System.out.println(base.getClass());
         IDataAdapter<?, ? extends B, B> adapter = find(base.getClass(), IDataAdapter::getComplexType);
+        System.out.println(adapter == null);
         return adapter == null ? null : adapter.extract(base);
     }
 

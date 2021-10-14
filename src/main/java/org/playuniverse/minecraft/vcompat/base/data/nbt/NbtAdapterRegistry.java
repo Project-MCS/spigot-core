@@ -3,12 +3,21 @@ package org.playuniverse.minecraft.vcompat.base.data.nbt;
 import java.util.function.Function;
 
 import org.playuniverse.minecraft.vcompat.base.data.AbstractDataAdapterRegistry;
+import org.playuniverse.minecraft.vcompat.base.data.AbstractDataContainer;
 import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapter;
+import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
 
 import com.syntaxphoenix.syntaxapi.nbt.NbtTag;
 import com.syntaxphoenix.syntaxapi.nbt.NbtType;
 
 public class NbtAdapterRegistry extends AbstractDataAdapterRegistry<NbtTag> {
+    
+    public NbtAdapterRegistry() {
+        adapters.add(build(IDataContainer.class));
+        adapters.add(build(IDataContainer[].class));
+        adapters.add(build(AbstractDataContainer[].class));
+        adapters.add(build(NbtContainer[].class));
+    }
 
     @Override
     public Object extract(NbtTag base) {

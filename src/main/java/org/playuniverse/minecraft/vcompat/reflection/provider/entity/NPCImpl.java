@@ -212,6 +212,10 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
         GameProfile profile = handle.getGameProfile();
 
         Skin skin = getSkin();
+        if(skin == null) {
+            System.out.println(skin == null);
+            System.out.println(skin != null ? skin.isValid() : false);
+        }
         if (skin != null && skin.isValid()) {
             PropertyMap properties = profile.getProperties();
             properties.removeAll("textures");

@@ -207,7 +207,6 @@ public class NbtAdapter<P, C extends NbtTag> extends AbstractDataAdapter<P, C, N
         if (container instanceof NbtContainer) {
             return ((NbtContainer) container).getRoot().clone();
         }
-        System.out.println(container.getClass());
         NbtCompound compound = new NbtCompound();
         for (String key : container.getKeyspaces()) {
             Object object = container.get(key);

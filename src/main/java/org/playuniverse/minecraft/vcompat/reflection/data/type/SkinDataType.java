@@ -35,9 +35,13 @@ public final class SkinDataType implements IDataType<IDataContainer, Skin> {
 
     @Override
     public Skin fromPrimitive(IDataAdapterContext context, IDataContainer container) {
+        System.out.println(container.getClass());
         String name = container.get("name", IDataType.STRING);
         String value = container.get("value", IDataType.STRING);
         String signature = container.get("signature", IDataType.STRING);
+        System.out.println(name);
+        System.out.println(value);
+        System.out.println(signature);
         if(name == null || value == null || signature == null) {
             return null;
         }
