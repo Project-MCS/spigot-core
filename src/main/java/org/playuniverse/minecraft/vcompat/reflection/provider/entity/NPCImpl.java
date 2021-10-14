@@ -25,6 +25,7 @@ import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -93,7 +94,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
     }
 
     private void setLevel(String level) {
-        if(level == null) {
+        if (level == null) {
             container.remove("level");
             return;
         }
@@ -209,6 +210,27 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
     }
 
     @Override
+    public NPCImpl updateMetadata() {
+        GameProfile profile = handle.getGameProfile();
+
+        Skin skin = getSkin();
+        if (skin != null && skin.isValid()) {
+            PropertyMap properties = profile.getProperties();
+            properties.removeAll("textures");
+            properties.put("textures", new Property("textures", skin.getValue(), skin.getSignature()));
+        }
+
+        String name = getName();
+        if (name != null) {
+            ClassLookupProvider.DEFAULT.getLookup("mjGameProfile").setFieldValue(profile, "name", name);
+        }
+
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
+        sendPackets(dataPacket);
+        return this;
+    }
+
+    @Override
     public void show(Player... players) {
         if (players.length == 0) {
             return;
@@ -224,6 +246,8 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             list.add(Pair.of(slot, handle.getItemBySlot(slot)));
         }
         ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(handle.getId(), list);
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
+
         for (Player player : players) {
             if (isShown(player)) {
                 continue;
@@ -234,6 +258,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             connection.send(rotationPacket);
             connection.send(moreRotationPacket);
             connection.send(equipmentPacket);
+            connection.send(dataPacket);
             synchronized (visible) {
                 visible.add(player.getUniqueId());
             }
@@ -279,7 +304,9 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             list.add(Pair.of(slot, handle.getItemBySlot(slot)));
         }
         ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(handle.getId(), list);
-        sendPackets(remInfoPacket, addInfoPacket, destroyPacket, spawnPacket, rotationPacket, moreRotationPacket, equipmentPacket);
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
+        sendPackets(remInfoPacket, addInfoPacket, destroyPacket, spawnPacket, rotationPacket, moreRotationPacket, equipmentPacket,
+            dataPacket);
     }
 
     private void sendPackets(Packet<?>... packets) {
@@ -297,25 +324,9 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
 
     @Override
     public void update() {
-        GameProfile profile = handle.getGameProfile();
-
-        Skin skin = getSkin();
-        if (skin != null && skin.isValid()) {
-            PropertyMap properties = profile.getProperties();
-            properties.removeAll("textures");
-            properties.put("textures", new Property("textures", skin.getValue(), skin.getSignature()));
-        }
-
-        String name = getName();
-        if (name != null) {
-            ClassLookupProvider.DEFAULT.getLookup("mjGameProfile").setFieldValue(profile, "name", name);
-        }
-        
-        if(name != null || (skin != null && skin.isValid())) {
-            respawn();
-            updatePosition();
-            updateRotation();
-        }
+        updatePosition();
+        updateRotation();
+        updateMetadata();
     }
 
     /*
