@@ -1,10 +1,12 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.network;
 
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import net.minecraft.network.protocol.Packet;
 
+@Sharable
 public final class PacketServerHandler extends ChannelOutboundHandlerAdapter {
 
     private final NetworkHandler handler;
@@ -21,6 +23,9 @@ public final class PacketServerHandler extends ChannelOutboundHandlerAdapter {
         }
         Packet<?> packet = (Packet<?>) msg;
         if (handler.send(packet)) {
+            if (promise == null) {
+                return;
+            }
             promise.cancel(true);
             return;
         }

@@ -2,6 +2,8 @@ package org.playuniverse.minecraft.vcompat.reflection.provider;
 
 import org.playuniverse.minecraft.vcompat.reflection.VersionControl;
 import org.playuniverse.minecraft.vcompat.reflection.provider.data.hook.BukkitContainerAdapterHookImpl;
+import org.playuniverse.minecraft.vcompat.reflection.provider.utils.ReflectionSetup;
+import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
 public class VersionControlImpl extends VersionControl {
 
@@ -19,6 +21,7 @@ public class VersionControlImpl extends VersionControl {
     private final PlayerProviderImpl playerProvider = new PlayerProviderImpl(this);
 
     public VersionControlImpl() {
+        ReflectionSetup.INSTANCE.setup(ClassLookupProvider.DEFAULT);
         rehook();
     }
 

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,8 +37,10 @@ import org.playuniverse.minecraft.mcs.spigot.utils.java.JavaHelper;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.AbstractLogger;
 import org.playuniverse.minecraft.mcs.spigot.utils.log.BukkitLogger;
 import org.playuniverse.minecraft.vcompat.listener.PlayerListener;
+import org.playuniverse.minecraft.vcompat.reflection.PlayerProvider;
 import org.playuniverse.minecraft.vcompat.reflection.VersionControl;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
+import org.playuniverse.minecraft.vcompat.utils.bukkit.Players;
 
 import com.syntaxphoenix.avinity.module.ModuleManager;
 import com.syntaxphoenix.avinity.module.ModuleState;
@@ -559,6 +562,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
             return;
         }
         ready = true;
+        readyPlayers();
         ILogger logger = getPluginLogger();
         HashMap<ModuleWrapper<?>, Throwable> map = new HashMap<>();
         logger.log("Readying up plugins...");
@@ -612,6 +616,13 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         }
         logger.log(LogTypeId.ERROR, "");
         logger.log(LogTypeId.ERROR, "Hope you can fix those soon!");
+    }
+    
+    private final void readyPlayers() {
+        PlayerProvider<?> provider = VersionControl.get().getPlayerProvider();
+        for(Player player : Players.getOnline()) {
+            provider.getPlayer(player);
+        }
     }
 
     /*

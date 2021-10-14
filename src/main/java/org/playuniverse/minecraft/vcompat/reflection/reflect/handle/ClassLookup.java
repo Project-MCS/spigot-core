@@ -387,10 +387,14 @@ public class ClassLookup {
      */
 
     public boolean putField(String name, Field field) {
+        return putField(name, field, false);
+    }
+    
+    public boolean putField(String name, Field field, boolean forceSafe) {
         if (field == null || name == null || field.getDeclaringClass() != owner || fields.containsKey(name)) {
             return false;
         }
-        storeField(name, field);
+        storeField(name, field, forceSafe);
         return true;
     }
 
@@ -399,11 +403,18 @@ public class ClassLookup {
      */
 
     private void storeField(String name, Field field) {
-        if (!Modifier.isFinal(field.getModifiers())) {
+        storeField(name, field, false);
+    }
+
+    private void storeField(String name, Field field, boolean forceSafe) {
+        if (forceSafe || !Modifier.isFinal(field.getModifiers())) {
             try {
                 fields.put(name, new SafeFieldHandle(unreflect(field)));
                 return;
             } catch (IllegalAccessException | SecurityException e) {
+                if(forceSafe) {
+                    return;
+                }
             }
         }
         if (!Modifier.isStatic(field.getModifiers())) {

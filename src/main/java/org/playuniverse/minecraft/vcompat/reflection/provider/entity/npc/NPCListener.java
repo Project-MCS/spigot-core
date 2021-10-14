@@ -1,10 +1,8 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.entity.npc;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.function.BiPredicate;
+import java.util.concurrent.ExecutorService;
 
-import org.playuniverse.minecraft.mcs.spigot.utils.wait.Awaiter;
 import org.playuniverse.minecraft.vcompat.reflection.entity.event.PlayerInteractAtNpcEvent;
 import org.playuniverse.minecraft.vcompat.reflection.entity.event.PlayerInteractAtNpcEvent.Action;
 import org.playuniverse.minecraft.vcompat.reflection.entity.event.PlayerInteractAtNpcEvent.Hand;
@@ -14,7 +12,7 @@ import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider
 import org.playuniverse.minecraft.vcompat.reflection.reflect.handle.ClassLookup;
 
 import com.syntaxphoenix.syntaxapi.event.EventManager;
-import com.syntaxphoenix.syntaxapi.utils.java.Primitives;
+import com.syntaxphoenix.syntaxapi.utils.general.Status;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 
 import net.minecraft.network.protocol.Packet;
@@ -27,41 +25,35 @@ public final class NPCListener extends PacketListener {
     private static class PacketHelper<E extends Packet<?>> {
 
         private final Class<E> packetType;
-        private final BiPredicate<PlayerImpl, E> packetUser;
+        private final PacketAcceptor<E> packetUser;
 
-        private PacketHelper(Class<E> packetType, BiPredicate<PlayerImpl, E> packetUser) {
+        private PacketHelper(Class<E> packetType, PacketAcceptor<E> packetUser) {
             this.packetType = packetType;
             this.packetUser = packetUser;
         }
 
-        public boolean inject(PlayerImpl player, Packet<?> packet) {
+        public boolean inject(ExecutorService service, PlayerImpl player, Packet<?> packet) {
             if (!packetType.isInstance(packet)) {
                 return false;
             }
-            return packetUser.test(player, packetType.cast(packet));
+            return packetUser.accept(service, player, packetType.cast(packet));
         }
 
     }
 
-    static {
-        setupInteraction();
-    }
+    @FunctionalInterface
+    private static interface PacketAcceptor<E extends Packet<?>> {
 
-    private static void setupInteraction() {
-        ClassLookup lookup = ClassLookupProvider.DEFAULT.createLookup("interactPacket", ServerboundInteractPacket.class);
-        Field[] fields = lookup.getOwner().getDeclaredFields();
-        for (Field field : fields) {
-            if (Primitives.fromPrimitive(field.getType()) == Integer.class) {
-                lookup.putField("entityId", field);
-                break;
-            }
-        }
+        boolean accept(ExecutorService service, PlayerImpl player, E packet);
+
     }
 
     private final HashMap<Class<?>, PacketHelper<?>> map = new HashMap<>();
     private final NPCImpl npc;
 
     private final Container<EventManager> eventManager;
+
+    private final ClassLookup interactLookup = ClassLookupProvider.DEFAULT.getLookup("interactionPacket");
 
     public NPCListener(Container<EventManager> eventManager, NPCImpl npc) {
         this.eventManager = eventManager;
@@ -77,12 +69,13 @@ public final class NPCListener extends PacketListener {
      * Packet functions
      */
 
-    private boolean receiveInteract(PlayerImpl player, ServerboundInteractPacket packet) {
-        if (eventManager.isEmpty()) {
+    private boolean receiveInteract(ExecutorService service, PlayerImpl player, ServerboundInteractPacket packet) {
+        if (eventManager.isEmpty() || interactLookup == null) {
             return false;
         }
-        Object value = ClassLookupProvider.DEFAULT.getLookup("interactionPacket").getFieldValue(packet, "entityId");
+        Object value = interactLookup.getFieldValue(packet, "entityId");
         if (value == null || !(value instanceof Number)) {
+            System.out.println("null");
             return false;
         }
         int id = ((Number) value).intValue();
@@ -96,7 +89,14 @@ public final class NPCListener extends PacketListener {
         }
         PlayerInteractAtNpcEvent event = new PlayerInteractAtNpcEvent(player, npc, interactionHelper.getAction(),
             interactionHelper.getHand());
-        Awaiter.of(eventManager.get().call(event)).await();
+        Status status = eventManager.get().callAsync(event, service);
+        while(!status.isDone()) {
+            try {
+                Thread.sleep(4);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
         return event.isCancelled();
     }
 
@@ -139,12 +139,12 @@ public final class NPCListener extends PacketListener {
      */
 
     @Override
-    protected boolean onPacket(PlayerImpl player, Packet<?> packet) {
+    protected boolean onPacket(ExecutorService service, PlayerImpl player, Packet<?> packet) {
         PacketHelper<?> helper = map.get(packet.getClass());
-        return helper == null ? false : helper.inject(player, packet);
+        return helper == null ? false : helper.inject(service, player, packet);
     }
 
-    protected <T extends Packet<?>> void packet(Class<T> packetType, BiPredicate<PlayerImpl, T> packetUser) {
+    protected <T extends Packet<?>> void packet(Class<T> packetType, PacketAcceptor<T> packetUser) {
         packets.add(packetType);
         map.put(packetType, new PacketHelper<>(packetType, packetUser));
     }

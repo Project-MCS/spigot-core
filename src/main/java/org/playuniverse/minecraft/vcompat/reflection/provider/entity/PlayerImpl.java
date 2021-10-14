@@ -76,8 +76,13 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
             return player;
         }
         ServerPlayer updated = player.getServer().getPlayerList().getPlayer(uniqueId);
+        if(updated == player) {
+            return player;
+        }
         if (updated != null) {
+            networkHandler.remove(player.connection.connection.channel);
             updateHandle(updated);
+            networkHandler.add();
             update(false);
             return updated;
         }
@@ -99,7 +104,7 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
     }
 
     public Channel getChannel() {
-        return null;
+        return getHandle().connection.connection.channel;
     }
 
     @Override

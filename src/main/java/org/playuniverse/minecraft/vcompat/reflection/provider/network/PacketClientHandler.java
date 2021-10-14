@@ -1,10 +1,12 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.network;
 
+import io.netty.channel.ChannelHandler.Sharable;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.ReferenceCountUtil;
 import net.minecraft.network.protocol.Packet;
 
+@Sharable
 public final class PacketClientHandler extends ChannelInboundHandlerAdapter {
 
     private final NetworkHandler handler;
@@ -21,7 +23,6 @@ public final class PacketClientHandler extends ChannelInboundHandlerAdapter {
         }
         Packet<?> packet = (Packet<?>) msg;
         if (handler.receive(packet)) {
-            ReferenceCountUtil.release(msg);
             return;
         }
         ctx.fireChannelRead(packet);

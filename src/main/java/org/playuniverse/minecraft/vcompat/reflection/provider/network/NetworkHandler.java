@@ -3,6 +3,7 @@ package org.playuniverse.minecraft.vcompat.reflection.provider.network;
 import org.playuniverse.minecraft.vcompat.reflection.provider.entity.PlayerImpl;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelPipeline;
 import net.minecraft.network.protocol.Packet;
 
 public final class NetworkHandler {
@@ -17,18 +18,27 @@ public final class NetworkHandler {
     public NetworkHandler(PacketDistributor distributor, PlayerImpl player) {
         this.distributor = distributor;
         this.player = player;
+        add();
     }
 
-    public void remove() {
-        Channel channel = player.getChannel();
-        channel.pipeline().remove(client);
-        channel.pipeline().remove(server);
+    public void remove(Channel channel) {
+        ChannelPipeline pipeline = channel.pipeline();
+        if (pipeline.get(PacketClientHandler.class) != null) {
+            pipeline.remove(client);
+        }
+        if (pipeline.get(PacketServerHandler.class) != null) {
+            pipeline.remove(server);
+        }
     }
 
     public void add() {
-        Channel channel = player.getChannel();
-        channel.pipeline().addAfter("decoder", "vClientHandler", client);
-        channel.pipeline().addBefore("encoder", "vServerHandler", server);
+        ChannelPipeline pipeline = player.getChannel().pipeline();
+        if (pipeline.get(PacketClientHandler.class) == null) {
+            pipeline.addAfter("decoder", "vclient", client);
+        }
+        if (pipeline.get(PacketServerHandler.class) == null) {
+            pipeline.addBefore("encoder", "vserver", client);
+        }
     }
 
     public PacketClientHandler getClient() {
@@ -53,7 +63,7 @@ public final class NetworkHandler {
             return false;
         }
         for (PacketListener listener : listeners) {
-            if (listener.onPacket(player, packet)) {
+            if (listener.onPacket(distributor.getPacketServer(), player, packet)) {
                 return true;
             }
         }
