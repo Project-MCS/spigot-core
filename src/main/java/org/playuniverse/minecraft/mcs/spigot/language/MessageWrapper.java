@@ -1,6 +1,5 @@
 package org.playuniverse.minecraft.mcs.spigot.language;
 
-import org.playuniverse.minecraft.mcs.spigot.command.IModule;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.Placeholder;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.PlaceholderStore;
@@ -18,8 +17,8 @@ public final class MessageWrapper<T> {
 
     private final SpigotModule<?> plugin;
 
-    public MessageWrapper(T receiver, IMessageHandler<T> handler, IModule plugin) {
-        this(receiver, handler, SpigotModule.get(plugin.getId()));
+    public MessageWrapper(T receiver, IMessageHandler<T> handler, String plugin) {
+        this(receiver, handler, SpigotModule.get(plugin));
     }
 
     public MessageWrapper(T receiver, IMessageHandler<T> handler, SpigotModule<?> plugin) {
@@ -236,7 +235,7 @@ public final class MessageWrapper<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <S> MessageWrapper<S> of(S receiver, IModule plugin) {
+    public static <S> MessageWrapper<S> of(S receiver, String plugin) {
         IMessageHandler<?> handler = Singleton.Registries.MESSAGE_HANDLER.getFor(receiver);
         if (handler == null) {
             return null;

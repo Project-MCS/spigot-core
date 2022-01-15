@@ -10,9 +10,10 @@ import com.syntaxphoenix.syntaxapi.utils.java.Exceptions;
 import com.syntaxphoenix.syntaxapi.utils.java.Times;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 
+import jline.console.ConsoleReader;
+
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.Main;
-import org.bukkit.craftbukkit.libs.jline.console.ConsoleReader;
 import org.bukkit.plugin.Plugin;
 import org.fusesource.jansi.Ansi;
 import org.playuniverse.minecraft.vcompat.reflection.VersionControl;

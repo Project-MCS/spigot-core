@@ -1,6 +1,6 @@
 package org.playuniverse.minecraft.vcompat.reflection.tools;
 
-import org.bukkit.craftbukkit.libs.jline.console.ConsoleReader;
+import jline.console.ConsoleReader;
 
 public abstract class ServerTools {
 

@@ -14,9 +14,7 @@ import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Commands;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injections;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inventory.GuiListener;
-import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
-import org.playuniverse.minecraft.mcs.spigot.command.IModule;
-import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
+import org.playuniverse.minecraft.mcs.spigot.command.BukkitSource;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigTimer;
 import org.playuniverse.minecraft.mcs.spigot.constant.Singleton;
@@ -31,6 +29,7 @@ import org.playuniverse.minecraft.mcs.spigot.language.message.builder.ComponentM
 import org.playuniverse.minecraft.mcs.spigot.language.message.builder.StringMessageBuilder;
 import org.playuniverse.minecraft.mcs.spigot.listener.ServerLoadListener;
 import org.playuniverse.minecraft.mcs.spigot.module.DefaultModuleListener;
+import org.playuniverse.minecraft.mcs.spigot.module.ModuleIndicator;
 import org.playuniverse.minecraft.mcs.spigot.module.SafeModuleListener;
 import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.JavaHelper;
@@ -43,6 +42,7 @@ import org.playuniverse.minecraft.vcompat.reflection.VersionControl;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 import org.playuniverse.minecraft.vcompat.utils.bukkit.Players;
 
+import com.syntaxphoenix.avinity.command.CommandManager;
 import com.syntaxphoenix.avinity.module.ModuleManager;
 import com.syntaxphoenix.avinity.module.ModuleState;
 import com.syntaxphoenix.avinity.module.ModuleWrapper;
@@ -56,7 +56,7 @@ import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 import com.syntaxphoenix.syntaxapi.version.Version;
 import com.syntaxphoenix.syntaxapi.random.Keys;
 
-public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin implements IModule {
+public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin implements ModuleIndicator {
 
     public static final Keys KEYS = new Keys(73453345478693428L);
 
@@ -79,7 +79,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     private EventManager eventManager;
     private Injections injections;
 
-    private CommandManager<MinecraftInfo> commandManager;
+    private CommandManager<BukkitSource> commandManager;
 
     private boolean init = false;
     private boolean ready = false;
@@ -168,9 +168,8 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     /*
      * 
      */
-
-    @Override
-    public final String getId() {
+    
+    public final String getModuleId() {
         return getName();
     }
 
@@ -206,7 +205,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         return bukkitEventManager;
     }
 
-    public final CommandManager<MinecraftInfo> getCommandManager() {
+    public final CommandManager<BukkitSource> getCommandManager() {
         return commandManager;
     }
 
@@ -649,7 +648,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
         return new ServiceManager(logger);
     }
 
-    protected CommandManager<MinecraftInfo> createCommandManager(ILogger logger) {
+    protected CommandManager<BukkitSource> createCommandManager(ILogger logger) {
         return new CommandManager<>();
     }
 
@@ -659,7 +658,7 @@ public abstract class PluginBase<P extends PluginBase<P>> extends JavaPlugin imp
     }
 
     protected SafeModuleListener createModuleListener(ILogger logger, Container<ClassLookupProvider> provider,
-        CommandManager<MinecraftInfo> commandManager, EventManager eventManager, BukkitEventManager discordEventManager,
+        CommandManager<BukkitSource> commandManager, EventManager eventManager, BukkitEventManager discordEventManager,
         ServiceManager serviceManager) {
         return new DefaultModuleListener(logger, provider, commandManager, eventManager, discordEventManager, serviceManager);
     }

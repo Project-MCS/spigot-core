@@ -3,7 +3,7 @@ package org.playuniverse.minecraft.mcs.spigot.utils.java;
 import java.util.Optional;
 
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
-import org.playuniverse.minecraft.mcs.spigot.command.IModule;
+import org.playuniverse.minecraft.mcs.spigot.module.ModuleIndicator;
 import org.playuniverse.minecraft.mcs.spigot.module.SpigotModule;
 
 import com.syntaxphoenix.avinity.module.ModuleManager;
@@ -26,12 +26,12 @@ public final class CoreTracker {
         return getClassFromStack(1);
     }
 
-    public static Optional<IModule> getCallerCommandPlugin() {
-        return getCallerPlugin().map(plugin -> (IModule) plugin);
+    public static Optional<ModuleIndicator> getCallerCommandPlugin() {
+        return getCallerPlugin().map(plugin -> (ModuleIndicator) plugin);
     }
 
-    public static Optional<IModule> getCommandPlugin(Optional<Class<?>> option) {
-        return getPlugin(option).map(plugin -> (IModule) plugin);
+    public static Optional<ModuleIndicator> getCommandPlugin(Optional<Class<?>> option) {
+        return getPlugin(option).map(plugin -> (ModuleIndicator) plugin);
     }
 
     public static Optional<SpigotModule<?>> getCallerPlugin() {

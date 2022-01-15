@@ -3,7 +3,7 @@ package org.playuniverse.minecraft.vcompat.reflection.provider;
 import java.util.EnumMap;
 import java.util.function.Function;
 
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.playuniverse.minecraft.vcompat.reflection.EntityProvider;
 import org.playuniverse.minecraft.vcompat.reflection.entity.NmsEntity;
 import org.playuniverse.minecraft.vcompat.reflection.entity.NmsEntityType;

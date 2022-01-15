@@ -5,11 +5,6 @@ import java.util.Optional;
 import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
 import org.playuniverse.minecraft.mcs.spigot.bukkit.inject.Injector;
-import org.playuniverse.minecraft.mcs.spigot.command.CommandState;
-import org.playuniverse.minecraft.mcs.spigot.command.IModule;
-import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
-import org.playuniverse.minecraft.mcs.spigot.command.nodes.PluginNode;
-import org.playuniverse.minecraft.mcs.spigot.command.nodes.RootNode;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.mcs.spigot.language.placeholder.DefaultPlaceholderStore;
@@ -24,7 +19,7 @@ import com.syntaxphoenix.syntaxapi.event.EventManager;
 import com.syntaxphoenix.syntaxapi.logging.ILogger;
 import com.syntaxphoenix.syntaxapi.utils.java.Files;
 
-public abstract class SpigotModule<P extends PluginBase<P>> extends Module implements IModule {
+public abstract class SpigotModule<P extends PluginBase<P>> extends Module implements ModuleIndicator {
 
     @SuppressWarnings("unchecked")
     private static final Class<? extends ConfigBase<?, ?>>[] EMPTY_CONFIG = new Class[0];
@@ -58,6 +53,11 @@ public abstract class SpigotModule<P extends PluginBase<P>> extends Module imple
 
     public SpigotModule() {
         this.logger = new ModuleLogger(getBase().getPluginLogger(), this);
+    }
+    
+    @Override
+    public final String getModuleId() {
+        return getId();
     }
 
     public String getPrefix() {
@@ -145,10 +145,6 @@ public abstract class SpigotModule<P extends PluginBase<P>> extends Module imple
 
     public final EventManager getGeneralManager() {
         return getBase().getEventManager();
-    }
-
-    public final CommandState register(RootNode<MinecraftInfo> command, String... aliases) {
-        return getBase().getCommandManager().register(new PluginNode<>(this, command), aliases);
     }
 
     public final void register(Injector<?> injector) {

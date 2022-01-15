@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.playuniverse.minecraft.mcs.spigot.command.CommandManager;
-import org.playuniverse.minecraft.mcs.spigot.command.IModule;
-import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftInfo;
+import org.playuniverse.minecraft.mcs.spigot.command.BukkitSource;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventExecutor;
 import org.playuniverse.minecraft.mcs.spigot.event.BukkitEventManager;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
+import com.syntaxphoenix.avinity.command.CommandManager;
+import com.syntaxphoenix.avinity.command.node.RootNode;
 import com.syntaxphoenix.avinity.module.Module;
 import com.syntaxphoenix.avinity.module.ModuleWrapper;
 import com.syntaxphoenix.avinity.module.event.ModuleDisableEvent;
@@ -30,14 +30,14 @@ public abstract class SafeModuleListener implements EventListener {
 
     protected final ServiceManager service;
 
-    protected final CommandManager<MinecraftInfo> command;
+    protected final CommandManager<BukkitSource> command;
 
     protected final BukkitEventManager bukkitEvent;
     protected final EventManager event;
 
     protected final ILogger logger;
 
-    public SafeModuleListener(ILogger logger, Container<ClassLookupProvider> provider, CommandManager<MinecraftInfo> command,
+    public SafeModuleListener(ILogger logger, Container<ClassLookupProvider> provider, CommandManager<BukkitSource> command,
         EventManager event, BukkitEventManager bukkitEvent, ServiceManager service) {
         this.event = event;
         this.logger = logger;
@@ -92,9 +92,14 @@ public abstract class SafeModuleListener implements EventListener {
             .forEach(service -> this.service.unregister(service));
 
         Module plugin = wrapper.getModule();
-        if (plugin instanceof IModule) {
-            for (String alias : command.getAliases((IModule) plugin)) {
-                command.unregisterCommand(alias);
+        if (plugin instanceof ModuleIndicator) {
+            String[] aliases = command.getAliases();
+            for(String alias : aliases) {
+                RootNode<BukkitSource> node = command.get(alias);
+                if(node == null) {
+                    continue;
+                }
+                
             }
         }
 

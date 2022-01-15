@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.playuniverse.minecraft.mcs</groupId>
 	<artifactId>spigot</artifactId>
-	<version>3.0.0</version>
+	<version>4.0.0</version>
 	<name>SpigotCore</name>
 
 	<pluginRepositories>
@@ -106,17 +106,22 @@
 		</dependency>
 
 		<!-- Stuff -->
-		<dependency>
-			<groupId>com.syntaxphoenix.avinity</groupId>
-			<artifactId>module</artifactId>
-			<version>1.1.0-7d6946004c78f50590938f11deb16fe5f7fec958-SNAPSHOT</version>
-		</dependency>
+        <dependency>
+            <groupId>com.syntaxphoenix.avinity</groupId>
+            <artifactId>module</artifactId>
+            <version>2.0.0-f2a537d88407c7825d60de4a260a881e2b435b5d-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.syntaxphoenix.avinity</groupId>
+            <artifactId>command</artifactId>
+            <version>2.0.0-f2a537d88407c7825d60de4a260a881e2b435b5d-SNAPSHOT</version>
+        </dependency>
 
 		<!-- System -->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot</artifactId>
-			<version>1.17.1-R0.1-SNAPSHOT</version>
+			<version>1.18.1-R0.1-SNAPSHOT</version>
 			<classifier>remapped-mojang</classifier>
 			<scope>provided</scope>
 		</dependency>
@@ -189,6 +194,10 @@
 							<pattern>com.syntaxphoenix.syntaxapi</pattern>
 							<shadedPattern>${project.groupId}.shaded.syapi</shadedPattern>
 						</relocation>
+                        <relocation>
+                            <pattern>com.syntaxphoenix.avinity</pattern>
+                            <shadedPattern>${project.groupId}.shaded.avinity</shadedPattern>
+                        </relocation>
 					</relocations>
 				</configuration>
 			</plugin>
@@ -230,9 +239,9 @@
 						</goals>
 						<id>remap-obf</id>
 						<configuration>
-							<srgIn>org.spigotmc:minecraft-server:1.17.1-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
+							<srgIn>org.spigotmc:minecraft-server:1.18.1-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
 							<reverse>true</reverse>
-							<remappedDependencies>org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>
+							<remappedDependencies>org.spigotmc:spigot:1.18.1-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>
 							<remappedArtifactAttached>true</remappedArtifactAttached>
 							<remappedClassifierName>remapped-obf</remappedClassifierName>
 						</configuration>
@@ -245,8 +254,8 @@
 						<id>remap-spigot</id>
 						<configuration>
 							<inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>
-							<srgIn>org.spigotmc:minecraft-server:1.17.1-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
-							<remappedDependencies>org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>
+							<srgIn>org.spigotmc:minecraft-server:1.18.1-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
+							<remappedDependencies>org.spigotmc:spigot:1.18.1-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>
 						</configuration>
 					</execution>
 				</executions>
@@ -264,7 +273,7 @@
 							<target>
 								<copy
 									file="${project.build.directory}/${project.build.finalName}.jar"
-									tofile="${env.TEST_SERVER_DIR}/1.17.1/plugins/${project.artifactId}-core.jar" />
+									tofile="${env.TEST_SERVER_DIR}/1.18.1/plugins/${project.artifactId}-core.jar" />
 							</target>
 						</configuration>
 					</execution>

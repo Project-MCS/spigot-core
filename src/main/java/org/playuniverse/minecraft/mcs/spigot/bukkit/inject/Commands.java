@@ -9,20 +9,21 @@ import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.plugin.Plugin;
-import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
+import org.playuniverse.minecraft.mcs.spigot.SpigotCore;
+import org.playuniverse.minecraft.mcs.spigot.command.BukkitCommand;
 import org.playuniverse.minecraft.mcs.spigot.registry.Registry;
 import org.playuniverse.minecraft.mcs.spigot.registry.UniqueRegistry;
 import org.playuniverse.minecraft.mcs.spigot.utils.java.JavaHelper;
 import org.playuniverse.minecraft.vcompat.reflection.reflect.ClassLookupProvider;
 
-public class Commands extends Injector<MinecraftCommand> {
+public class Commands extends Injector<BukkitCommand> {
 
-    private final UniqueRegistry<MinecraftCommand> registry = new UniqueRegistry<>();
-    private final Registry<MinecraftCommand, PluginCommand> commands = new Registry<>();
+    private final UniqueRegistry<BukkitCommand> registry = new UniqueRegistry<>();
+    private final Registry<BukkitCommand, PluginCommand> commands = new Registry<>();
 
     @Override
-    public Class<MinecraftCommand> getType() {
-        return MinecraftCommand.class;
+    public Class<BukkitCommand> getType() {
+        return BukkitCommand.class;
     }
 
     @Override
@@ -38,17 +39,17 @@ public class Commands extends Injector<MinecraftCommand> {
     }
 
     @Override
-    protected void inject0(ClassLookupProvider provider, MinecraftCommand transfer) {
-        if (transfer == null || !transfer.isValid() || registry.isRegistered(transfer.getId())) {
+    protected void inject0(ClassLookupProvider provider, BukkitCommand transfer) {
+        if (transfer == null || registry.isRegistered(transfer.getName())) {
             return;
         }
         SimpleCommandMap map = (SimpleCommandMap) provider.getLookup("CraftServer").run(Bukkit.getServer(), "commandMap");
-        PluginCommand command = (PluginCommand) provider.getLookup("PluginCommand").init("init", transfer.getId(), (Plugin) transfer.getOwner());
+        PluginCommand command = (PluginCommand) provider.getLookup("PluginCommand").init("init", transfer.getName(), SpigotCore.get());
         command.setExecutor(transfer);
         command.setTabCompleter(transfer);
         command.setAliases(JavaHelper.fromArray(transfer.getAliases()));
-        if (!map.register(transfer.getFallbackPrefix(), command)) {
-            throw new IllegalStateException("Failed to register command '" + transfer.getFallbackPrefix() + ':' + command.getName() + "'!");
+        if (!map.register(transfer.getPrefix(), command)) {
+            throw new IllegalStateException("Failed to register command '" + transfer.getPrefix() + ':' + command.getName() + "'!");
         }
         registry.register(transfer);
         commands.register(transfer, command);
@@ -56,19 +57,19 @@ public class Commands extends Injector<MinecraftCommand> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected void uninject0(ClassLookupProvider provider, MinecraftCommand transfer) {
-        if (transfer == null || transfer.getId() == null || !registry.isRegistered(transfer.getId())) {
+    protected void uninject0(ClassLookupProvider provider, BukkitCommand transfer) {
+        if (transfer == null || transfer.getName() == null || !registry.isRegistered(transfer.getName())) {
             return;
         }
         SimpleCommandMap commandMap = (SimpleCommandMap) provider.getLookup("CraftServer").run(Bukkit.getServer(), "commandMap");
         Map<String, Command> map = (Map<String, Command>) provider.getLookup("CraftCommandMap").run(commandMap, "sourceMap");
-        MinecraftCommand command = registry.get(transfer.getId());
+        BukkitCommand command = registry.get(transfer.getName());
         PluginCommand bukkitCommand = commands.get(command);
-        registry.unregister(command.getId());
+        registry.unregister(command.getName());
         commands.unregister(command);
         ArrayList<String> aliases = new ArrayList<>(bukkitCommand.getAliases());
         aliases.add(command.getName());
-        Collections.addAll(aliases, aliases.stream().map(string -> command.getFallbackPrefix() + ':' + string).toArray(String[]::new));
+        Collections.addAll(aliases, aliases.stream().map(string -> command.getPrefix() + ':' + string).toArray(String[]::new));
         for (String alias : aliases) {
             if (map.get(alias) != bukkitCommand) {
                 continue;
@@ -83,8 +84,8 @@ public class Commands extends Injector<MinecraftCommand> {
         if (registry.isEmpty()) {
             return;
         }
-        MinecraftCommand[] array = registry.values().toArray(MinecraftCommand[]::new);
-        for (MinecraftCommand transfer : array) {
+        BukkitCommand[] array = registry.values().toArray(BukkitCommand[]::new);
+        for (BukkitCommand transfer : array) {
             uninject0(provider, transfer);
         }
     }

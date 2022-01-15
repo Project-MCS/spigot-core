@@ -1,6 +1,6 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider;
 
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.playuniverse.minecraft.vcompat.base.data.api.IDataAdapterContext;
 import org.playuniverse.minecraft.vcompat.base.data.api.IDataType;

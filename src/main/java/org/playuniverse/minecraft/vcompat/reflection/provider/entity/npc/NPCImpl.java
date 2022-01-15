@@ -3,8 +3,8 @@ package org.playuniverse.minecraft.vcompat.reflection.provider.entity.npc;
 import java.util.ArrayList;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;

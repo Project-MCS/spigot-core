@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.mcs.spigot.base.PluginBase;
-import org.playuniverse.minecraft.mcs.spigot.command.listener.MinecraftCommand;
-import org.playuniverse.minecraft.mcs.spigot.command.listener.redirect.ManagerRedirect;
-import org.playuniverse.minecraft.mcs.spigot.command.nodes.CommandNode;
+import org.playuniverse.minecraft.mcs.spigot.command.BukkitCommand;
+import org.playuniverse.minecraft.mcs.spigot.command.BukkitSource;
 import org.playuniverse.minecraft.mcs.spigot.config.ConfigBase;
 import org.playuniverse.minecraft.mcs.spigot.config.config.AddonConfig;
 import org.playuniverse.minecraft.mcs.spigot.config.config.DebugConfig;
@@ -15,6 +14,8 @@ import org.playuniverse.minecraft.mcs.spigot.helper.task.TaskHelper;
 import org.playuniverse.minecraft.mcs.spigot.module.SpigotCoreModule;
 import org.playuniverse.minecraft.mcs.spigot.utils.wait.Awaiter;
 
+import com.syntaxphoenix.avinity.command.connection.ManagerConnection;
+import com.syntaxphoenix.avinity.command.node.Root;
 import com.syntaxphoenix.avinity.module.ModuleManager;
 import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 import com.syntaxphoenix.syntaxapi.utils.key.Namespace;
@@ -31,7 +32,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
         return get(SpigotCore.class);
     }
 
-    private MinecraftCommand command;
+    private BukkitCommand command;
 
     public SpigotCore() {
         super(SpigotCoreModule.class);
@@ -47,9 +48,9 @@ public class SpigotCore extends PluginBase<SpigotCore> {
     @Override
     protected void onStartup() {
         getCommandManager().setGlobal("help");
-        getInjections()
-            .inject(command = new MinecraftCommand(new ManagerRedirect(getCommandManager(), this), this, "system", "sys", "core"));
-        getCommandManager().register(new CommandNode<>("reload", context -> {
+        getInjections().inject(
+            command = new BukkitCommand(this, new ManagerConnection<>(getCommandManager()), "system", getModuleId(), "sys", "core"));
+        getCommandManager().register(Root.<BukkitSource>of("reload").execute(context -> {
             ModuleManager<?> manager = getModuleManager();
             getPluginLogger().log("Reloading... (0 / 4)");
             manager.disableModules();
@@ -69,7 +70,7 @@ public class SpigotCore extends PluginBase<SpigotCore> {
             get().readyPlugins();
             getPluginLogger().log("Reloading... (4 / 4)");
             getPluginLogger().log("Reload complete!");
-        }));
+        }).build());
     }
 
     @Override

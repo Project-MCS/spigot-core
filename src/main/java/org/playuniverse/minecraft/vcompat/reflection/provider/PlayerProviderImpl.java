@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.vcompat.reflection.PlayerProvider;
 import org.playuniverse.minecraft.vcompat.reflection.data.persistence.DataDistributor;

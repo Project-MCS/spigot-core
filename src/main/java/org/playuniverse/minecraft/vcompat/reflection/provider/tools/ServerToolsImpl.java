@@ -1,9 +1,10 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.tools;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.libs.jline.console.ConsoleReader;
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
 import org.playuniverse.minecraft.vcompat.reflection.tools.ServerTools;
+
+import jline.console.ConsoleReader;
 
 public class ServerToolsImpl extends ServerTools {
 
