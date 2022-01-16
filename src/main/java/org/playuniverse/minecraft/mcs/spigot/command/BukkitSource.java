@@ -5,17 +5,25 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.playuniverse.minecraft.mcs.spigot.language.MessageWrapper;
+import org.playuniverse.minecraft.mcs.spigot.module.ModuleIndicator;
 
 import com.syntaxphoenix.avinity.command.ISource;
 
 public final class BukkitSource implements ISource {
 
     private final CommandSender sender;
+    private final MessageWrapper<?> wrapper;
 
-    public BukkitSource(CommandSender sender) {
+    public BukkitSource(CommandSender sender, ModuleIndicator indicator) {
         this.sender = sender;
+        this.wrapper = MessageWrapper.of(sender, indicator);
     }
 
+    public MessageWrapper<?> getWrapper() {
+        return wrapper;
+    }
+    
     public CommandSender getSender() {
         return sender;
     }

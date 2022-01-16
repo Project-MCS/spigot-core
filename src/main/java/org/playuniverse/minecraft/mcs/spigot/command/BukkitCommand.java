@@ -8,6 +8,7 @@ import java.util.Objects;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.playuniverse.minecraft.mcs.spigot.language.MessageWrapper;
 import org.playuniverse.minecraft.mcs.spigot.module.ModuleIndicator;
 import org.playuniverse.minecraft.mcs.spigot.registry.IUnique;
 
@@ -71,7 +72,7 @@ public class BukkitCommand implements TabExecutor, IUnique {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         ArrayList<String> list = new ArrayList<>();
-        CommandContext<BukkitSource> context = connection.parse(new BukkitSource(sender), args);
+        CommandContext<BukkitSource> context = connection.parse(new BukkitSource(sender, owner), args);
         if (context.isPermitted()) {
             connection.suggest(list, context);
         }
@@ -80,29 +81,26 @@ public class BukkitCommand implements TabExecutor, IUnique {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        CommandContext<BukkitSource> context = connection.parse(new BukkitSource(sender), args);
+        CommandContext<BukkitSource> context = connection.parse(new BukkitSource(sender, owner), args);
+        MessageWrapper<?> wrapper = context.getSource().getWrapper();
         if (context.hasException() && !context.hasCommand()) {
-            // TODO: Send command exception message
-            sender.sendMessage(context.getException().getMessage());
+            wrapper.send("$prefix " + context.getException().getMessage());
             return false;
         }
         if (!context.hasCommand()) {
-            // TODO: Send command not found message
-            sender.sendMessage("Command not found");
+            wrapper.send("$prefix Command not found");
             return false;
         }
         IPermission permission;
         if ((permission = context.hasPermission()) != null) {
-            // TODO: Send not permitted
-            sender.sendMessage("You are lacking the permission '" + permission.id() + "'!");
+            wrapper.send("$prefix You are lacking the permission '" + permission.id() + "'!");
             return false;
         }
         try {
             context.getCommand().execute(context);
         } catch (Exception exp) {
-            // TODO: Send command failed to execute message
-            sender.sendMessage("Failed!");
-            sender.sendMessage(Exceptions.getError(exp));
+            wrapper.send("$prefix Failed!");
+            wrapper.send("&7" + Exceptions.getError(exp));
         }
         return false;
     }

@@ -54,6 +54,10 @@
               <shadedPattern>${project.groupId}.shaded.slf4j</shadedPattern>
             </relocation>
             <relocation>
+              <pattern>org.apache</pattern>
+              <shadedPattern>${project.groupId}.shaded.apache</shadedPattern>
+            </relocation>
+            <relocation>
               <pattern>com.google</pattern>
               <shadedPattern>${project.groupId}.shaded.google</shadedPattern>
             </relocation>
