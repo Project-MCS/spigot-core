@@ -15,8 +15,8 @@ public enum Axis {
     }
 
     Quaternion asQuaternion(double angle) {
-        double sin = Math.sin(angle / 2);
-        return Quaternion.of(Math.cos(angle / 2), sin * x, sin * y, sin * z).normalize();
+        double sin = Math.sin(angle);
+        return Quaternion.of(Math.cos(angle), sin * x, sin * y, sin * z).normalize();
     }
 
 }
