@@ -130,8 +130,13 @@ public final class Quaternion implements Cloneable {
         return tmp1;
     }
 
-    public Quaternion rotate(Axis axis, float angle) {
-        return multiply((axis == null ? Axis.Z : axis).asQuaternion(angle));
+    public Quaternion rotate(Axis axis, double angle) {
+        axis = (axis == null ? Axis.Z : axis);
+        return axis.asQuaternion(angle).multiply(this).multiply(axis.asQuaternion(-angle));
+    }
+
+    public Quaternion rotateDegrees(Axis axis, double angle) {
+        return rotate(axis, Math.toRadians(angle));
     }
 
     public Vector getAxis(Axis axis) {
