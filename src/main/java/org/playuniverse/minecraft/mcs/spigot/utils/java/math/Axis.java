@@ -2,21 +2,21 @@ package org.playuniverse.minecraft.mcs.spigot.utils.java.math;
 
 public enum Axis {
 
-    X(1f, 0f, 0f),
-    Y(0f, 1f, 0f),
-    Z(0f, 0f, 1f);
+    X(1d, 0d, 0d),
+    Y(0d, 1d, 0d),
+    Z(0d, 0d, 1d);
 
-    private final float x, y, z;
+    private final double x, y, z;
 
-    private Axis(float x, float y, float z) {
+    private Axis(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    Quaternion asQuaternion(float angle) {
-        float sin = Maths.sin(angle);
-        return Quaternion.of(Maths.cos(angle), sin * x, sin * y, sin * z);
+    Quaternion asQuaternion(double angle) {
+        double sin = Math.sin(angle);
+        return Quaternion.of(Math.cos(angle), sin * x, sin * y, sin * z);
     }
 
 }

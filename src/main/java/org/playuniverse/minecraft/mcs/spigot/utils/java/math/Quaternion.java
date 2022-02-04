@@ -4,30 +4,30 @@ import org.bukkit.util.Vector;
 
 public final class Quaternion implements Cloneable {
 
-    public static final float NORMALIZATION_TOLERANCE = 1.0E-6f;
-    public static final float PARALLEL_TOLERANCE = 1.0E-6f;
+    public static final double NORMALIZATION_TOLERANCE = 1.0E-6;
+    public static final double PARALLEL_TOLERANCE = 1.0E-6;
 
-    private float w, x, y, z;
+    private double w, x, y, z;
 
     private Quaternion() {
         identity();
     }
 
-    private Quaternion(float x, float y, float z) {
+    private Quaternion(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
         computeW();
     }
 
-    private Quaternion(float w, float x, float y, float z) {
+    private Quaternion(double w, double x, double y, double z) {
         this.w = w;
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public Quaternion set(float w, float x, float y, float z) {
+    public Quaternion set(double w, double x, double y, double z) {
         this.w = w;
         this.x = x;
         this.y = y;
@@ -51,7 +51,7 @@ public final class Quaternion implements Cloneable {
         return this;
     }
 
-    public Quaternion multiply(float value) {
+    public Quaternion multiply(double value) {
         this.w *= value;
         this.x *= value;
         this.y *= value;
@@ -60,22 +60,16 @@ public final class Quaternion implements Cloneable {
     }
 
     public Quaternion multiply(Quaternion value) {
-        float ow = w * value.w - x * value.x - y * value.y + z * value.z;
-        float ox = w * value.x + x * value.w + y * value.z + z * value.y;
-        float oy = w * value.y - x * value.z + y * value.w + z * value.x;
-        float oz = w * value.z + x * value.y - y * value.x + z * value.w;
-        return set(ow, ox, oy, oz);
+        return set(w * value.w - x * value.x - y * value.y + z * value.z, w * value.x + x * value.w + y * value.z + z * value.y,
+            w * value.y - x * value.z + y * value.w + z * value.x, w * value.z + x * value.y - y * value.x + z * value.w);
     }
 
     public Quaternion multiplyLeft(Quaternion value) {
-        float ow = value.w * w - value.x * x - value.y * y + value.z * z;
-        float ox = value.x * w + value.w * x + value.z * y + value.y * z;
-        float oy = value.y * w - value.z * x + value.w * y + value.x * z;
-        float oz = value.z * w + value.y * x - value.x * y + value.w * z;
-        return set(ow, ox, oy, oz);
+        return set(value.w * w - value.x * x - value.y * y + value.z * z, value.x * w + value.w * x + value.z * y + value.y * z,
+            value.y * w - value.z * x + value.w * y + value.x * z, value.z * w + value.y * x - value.x * y + value.w * z);
     }
 
-    public Quaternion divide(float value) {
+    public Quaternion divide(double value) {
         this.w /= value;
         this.x /= value;
         this.y /= value;
@@ -95,16 +89,16 @@ public final class Quaternion implements Cloneable {
     }
 
     public Quaternion normalize() {
-        float length = lengthSquared();
+        double length = lengthSquared();
         if (length != 0 && (Math.abs(length - 1.0) > NORMALIZATION_TOLERANCE)) {
-            return multiply(FastMath.Q_rsqrt(length, 2));
+            return multiply(Math.sqrt(length));
         }
         return this;
     }
 
     public Quaternion computeW() {
-        float t = 1.0f - (x * x) - (y * y) - (z * z);
-        this.w = t < 0.0 ? 0.0f : -Maths.sqrt(t);
+        double t = 1.0f - (x * x) - (y * y) - (z * z);
+        this.w = t < 0.0 ? 0.0f : -Math.sqrt(t);
         return this;
     }
 
@@ -112,15 +106,15 @@ public final class Quaternion implements Cloneable {
         return set(1, 0, 0, 0);
     }
 
-    public float lengthSquared() {
+    public double lengthSquared() {
         return w * w + x * x + y * y + z * z;
     }
 
-    public float length() {
-        return Double.valueOf(Math.sqrt(lengthSquared())).floatValue();
+    public double length() {
+        return Math.sqrt(lengthSquared());
     }
 
-    public float dot(Quaternion value) {
+    public double dot(Quaternion value) {
         return w * value.w + x * value.x + y * value.y + z * value.z;
     }
 
@@ -152,8 +146,8 @@ public final class Quaternion implements Cloneable {
     }
 
     public Vector getXAxis() {
-        float fTy = 2f * y;
-        float fTz = 2f * z;
+        double fTy = 2f * y;
+        double fTz = 2f * z;
         return new Vector(1 - (fTy * y + fTz * z), fTy * x + fTz * w, fTz * x - fTy * w);
     }
 
@@ -169,6 +163,32 @@ public final class Quaternion implements Cloneable {
         return new Vector(fTx * z + fTy * w, fTy * z - fTx * w, 1 - (fTx * x + fTy * y));
     }
 
+    public Vector toEuler() {
+        double test = x * y + z * w;
+        double ea = Math.asin(2 * x * y + 2 * z * w);
+        if (test == 0.5) {
+            return new Vector(0, 2 * Math.atan2(x, w), ea);
+        }
+        if (test == -0.5) {
+            return new Vector(0, -2 * Math.atan2(x, w), ea);
+        }
+        return new Vector(Math.atan2(2 * x * w - 2 * y * z, 1 - 2 * (x * x) - 2 * (z * z)),
+            Math.atan2(2 * y * w - 2 * x * z, 1 - 2 * (y * y) - 2 * (z * z)), ea);
+    }
+
+    public Vector toEulerDegrees() {
+        double test = x * y + z * w;
+        double ea = Math.toDegrees(Math.asin(2 * x * y + 2 * z * w));
+        if (test == 0.5) {
+            return new Vector(0, Math.toDegrees(2 * Math.atan2(x, w)), ea);
+        }
+        if (test == -0.5) {
+            return new Vector(0, Math.toDegrees(-2 * Math.atan2(x, w)), ea);
+        }
+        return new Vector(Math.toDegrees(Math.atan2(2 * x * w - 2 * y * z, 1 - 2 * (x * x) - 2 * (z * z))),
+            Math.toDegrees(Math.atan2(2 * y * w - 2 * x * z, 1 - 2 * (y * y) - 2 * (z * z))), ea);
+    }
+
     public Quaternion clone() {
         return new Quaternion(w, x, y, z);
     }
@@ -177,11 +197,27 @@ public final class Quaternion implements Cloneable {
         return new Quaternion();
     }
 
-    public static Quaternion of(float x, float y, float z) {
+    public static Quaternion of(double x, double y, double z) {
         return new Quaternion(x, y, z);
     }
 
-    public static Quaternion of(float w, float x, float y, float z) {
+    public static Quaternion ofEuler(double x, double y, double z) {
+        double c1 = Math.cos(y);
+        double c2 = Math.cos(z);
+        double c3 = Math.cos(x);
+        double s1 = Math.sin(y);
+        double s2 = Math.sin(z);
+        double s3 = Math.sin(x);
+        double w = Math.sqrt(1 + c1 * c2 + c1 * c3 - s1 * s2 * s3 + c2 * c3) / 2;
+        return new Quaternion(w, (c2 * s3 + c1 * s3 + s1 * s2 * c3) / (4 * w), (s1 * c2 + s1 * c3 + c1 * s2 * s3) / (4 * w),
+            (-s1 * s3 + c1 * s2 * c3 + s2) / (4 * w));
+    }
+
+    public static Quaternion ofEulerDegrees(double x, double y, double z) {
+        return ofEuler(Math.toRadians(x), Math.toRadians(y), Math.toRadians(z));
+    }
+
+    public static Quaternion of(double w, double x, double y, double z) {
         return new Quaternion(w, x, y, z);
     }
 
