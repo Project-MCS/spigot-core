@@ -27,6 +27,22 @@ public final class Quaternion implements Cloneable {
         this.z = z;
     }
 
+    public double getW() {
+        return w;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
     public Quaternion set(double w, double x, double y, double z) {
         this.w = w;
         this.x = x;
@@ -60,7 +76,7 @@ public final class Quaternion implements Cloneable {
     }
 
     public Quaternion multiply(Quaternion value) {
-        return set(w * value.w - x * value.x - y * value.y - z * value.z, x * value.w + w * value.x + y * value.z - z * value.y,
+        return set(w * value.w - x * value.x - y * value.y - z * value.z, w * value.x + x * value.w + y * value.z - z * value.y,
             w * value.y - x * value.z + y * value.w + z * value.x, w * value.z + x * value.y - y * value.x + z * value.w);
     }
 
@@ -126,9 +142,7 @@ public final class Quaternion implements Cloneable {
     }
 
     public Quaternion rotate(Axis axis, double angle) {
-        axis = (axis == null ? Axis.Z : axis);
-        Quaternion rotation = axis.asQuaternion(angle / 2);
-        return rotation.multiply(this).multiply(rotation.conjugate()).normalize();
+        return multiply((axis == null ? Axis.Z : axis).asQuaternion(angle));
     }
 
     public Quaternion rotateDegrees(Axis axis, double angle) {
@@ -169,7 +183,7 @@ public final class Quaternion implements Cloneable {
         if (test > 0.499) {
             return new Vector(0, 2 * Math.atan2(x, w), Math.PI / 2);
         }
-        if (test == -0.499) {
+        if (test < -0.499) {
             return new Vector(0, -2 * Math.atan2(x, w), -Math.PI / 2);
         }
         return new Vector(Math.atan2(2 * x * w - 2 * y * z, 1 - 2 * (x * x) - 2 * (z * z)), Math.asin(2 * test),
@@ -206,6 +220,18 @@ public final class Quaternion implements Cloneable {
         return new Quaternion(x, y, z);
     }
 
+    public static Quaternion of(double w, double x, double y, double z) {
+        return new Quaternion(w, x, y, z);
+    }
+
+    public static Quaternion ofXYZ(double x, double y, double z) {
+        return new Quaternion(0, x, y, z);
+    }
+
+    public static Quaternion ofXYZ(Vector vector) {
+        return new Quaternion(0, vector.getX(), vector.getY(), vector.getZ());
+    }
+
     public static Quaternion ofEuler(double x, double y, double z) {
         double c1 = Math.cos(y);
         double c2 = Math.cos(z);
@@ -220,10 +246,6 @@ public final class Quaternion implements Cloneable {
 
     public static Quaternion ofEulerDegrees(double x, double y, double z) {
         return ofEuler(Math.toRadians(x), Math.toRadians(y), Math.toRadians(z));
-    }
-
-    public static Quaternion of(double w, double x, double y, double z) {
-        return new Quaternion(w, x, y, z);
     }
 
 }
