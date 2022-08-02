@@ -107,7 +107,7 @@ public final class TaskHelper {
     }
 
     private <E> Future<E> executeBukkit(Callable<E> callable) {
-        BukkitCallable<E> task = new BukkitCallable<>(callable);
+        TaskFuture<E> task = new TaskFuture<>(callable);
         Bukkit.getScheduler().runTask(SpigotCore.get(), task);
         return task;
     }

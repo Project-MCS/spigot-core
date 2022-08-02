@@ -2,7 +2,7 @@ package org.playuniverse.minecraft.mcs.spigot.utils.wait;
 
 import java.util.concurrent.Future;
 
-import org.playuniverse.minecraft.mcs.spigot.helper.task.BukkitCallable;
+import org.playuniverse.minecraft.mcs.spigot.helper.task.TaskFuture;
 import org.playuniverse.minecraft.mcs.spigot.helper.task.DoneFuture;
 
 import com.syntaxphoenix.syntaxapi.utils.general.Status;
@@ -14,7 +14,7 @@ public interface WaitFunction<E> {
 	public static final WaitFunction<Status> STATUS = Status::isDone;
 	public static final WaitFunction<Future> FUTURE = Future::isDone;
     public static final WaitFunction<DoneFuture> DONE_FUTURE = DoneFuture::isDone;
-    public static final WaitFunction<BukkitCallable> BUKKIT_FUTURE = BukkitCallable::isDone;
+    public static final WaitFunction<TaskFuture> BUKKIT_FUTURE = TaskFuture::isDone;
 
 	/*
 	 * 
