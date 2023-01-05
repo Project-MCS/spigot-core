@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.vcompat.reflection.PlayerProvider;
 import org.playuniverse.minecraft.vcompat.reflection.data.persistence.DataDistributor;
@@ -44,7 +44,7 @@ public class PlayerProviderImpl extends PlayerProvider<VersionControlImpl> {
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
         GameProfile profile = new GameProfile(uniqueId, Keys.generateKey(16));
         ServerLevel level = server.overworld();
-        ServerPlayer player = new ServerPlayer(server, level, profile);
+        ServerPlayer player = new ServerPlayer(server, level, profile, null);
         return new NPCImpl(eventManager, packetDistributor, dataProvider.wrap(npcData.get(uniqueId)), player);
     }
 

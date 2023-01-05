@@ -1,7 +1,7 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.tools;
 
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_18_R1.block.CraftSkull;
+import org.bukkit.craftbukkit.v1_19_R1.block.CraftSkull;
 import org.playuniverse.minecraft.vcompat.reflection.tools.BlockTools;
 import org.playuniverse.minecraft.vcompat.utils.constants.MinecraftConstants;
 

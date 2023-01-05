@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_18_R1.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
@@ -269,10 +269,10 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
         }
 
         ServerLevel world = (ServerLevel) getHandle().level;
-
-        ClientboundRespawnPacket respawnPacket = new ClientboundRespawnPacket(world.dimensionType(), world.dimension(),
+        
+        ClientboundRespawnPacket respawnPacket = new ClientboundRespawnPacket(world.dimensionTypeId(), world.dimension(),
             BiomeManager.obfuscateSeed(world.getSeed()), getHandle().gameMode.getGameModeForPlayer(),
-            getHandle().gameMode.getPreviousGameModeForPlayer(), world.isDebug(), world.isFlat(), true);
+            getHandle().gameMode.getPreviousGameModeForPlayer(), world.isDebug(), world.isFlat(), true, getHandle().getLastDeathLocation());
         ClientboundPlayerPositionPacket positionPacket = new ClientboundPlayerPositionPacket(getHandle().getX(), getHandle().getY(),
             getHandle().getZ(), getHandle().xRotO, getHandle().yRotO, Collections.emptySet(), 0, false);
         ClientboundSetCarriedItemPacket itemPacket = new ClientboundSetCarriedItemPacket(getHandle().getInventory().selected);
