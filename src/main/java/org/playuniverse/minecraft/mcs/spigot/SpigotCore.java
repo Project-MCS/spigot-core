@@ -52,8 +52,15 @@ public class SpigotCore extends PluginBase<SpigotCore> {
             command = new BukkitCommand(this, new ManagerConnection<>(getCommandManager()), "system", getModuleId(), "sys", "core"));
         getCommandManager().register(Root.<BukkitSource>of("reload").execute(context -> {
             ModuleManager<?> manager = getModuleManager();
+            BukkitSource source = context.getSource();
+            if(!source.isConsole()) {
+                source.getSender().sendMessage("Reloading... (0 / 4)");
+            }
             getPluginLogger().log("Reloading... (0 / 4)");
             manager.disableModules();
+            if(!source.isConsole()) {
+                source.getSender().sendMessage("Reloading... (1 / 4)");
+            }
             getPluginLogger().log("Reloading... (1 / 4)");
             manager.unloadModules();
             System.gc();
@@ -61,13 +68,23 @@ public class SpigotCore extends PluginBase<SpigotCore> {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
             }
+            if(!source.isConsole()) {
+                source.getSender().sendMessage("Reloading... (2 / 4)");
+            }
             getPluginLogger().log("Reloading... (2 / 4)");
             get().loadPlugins();
+            if(!source.isConsole()) {
+                source.getSender().sendMessage("Reloading... (3 / 4)");
+            }
             getPluginLogger().log("Reloading... (3 / 4)");
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.closeInventory();
             }
             get().readyPlugins();
+            if(!source.isConsole()) {
+                source.getSender().sendMessage("Reloading... (4 / 4)");
+                source.getSender().sendMessage("Reload complete!");
+            }
             getPluginLogger().log("Reloading... (4 / 4)");
             getPluginLogger().log("Reload complete!");
         }).build());
