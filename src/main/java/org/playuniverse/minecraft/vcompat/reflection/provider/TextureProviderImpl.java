@@ -10,10 +10,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlockEntityState;
-import org.bukkit.craftbukkit.v1_19_R1.block.CraftSkull;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R2.block.CraftBlockEntityState;
+import org.bukkit.craftbukkit.v1_19_R2.block.CraftSkull;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.playuniverse.minecraft.vcompat.reflection.TextureProvider;
@@ -38,9 +38,9 @@ public class TextureProviderImpl extends TextureProvider<VersionControlImpl> {
 
     private final AbstractReflect craftEntityStateRef = new Reflect(CraftBlockEntityState.class).searchField("tileEntity", "tileEntity");
     private final AbstractReflect craftItemStackRef = new Reflect(CraftItemStack.class).searchField("handle", "handle");
-    private final AbstractReflect craftMetaSkullRef = new Reflect("org.bukkit.craftbukkit.v1_19_R1.inventory.CraftMetaSkull")
+    private final AbstractReflect craftMetaSkullRef = new Reflect("org.bukkit.craftbukkit.v1_19_R2.inventory.CraftMetaSkull")
         .searchField("serialized", "serializedProfile").searchField("profile", "profile");
-    private final AbstractReflect craftOfflinePlayerRef = new Reflect(" org.bukkit.craftbukkit.v1_19_R1.CraftOfflinePlayer")
+    private final AbstractReflect craftOfflinePlayerRef = new Reflect(" org.bukkit.craftbukkit.v1_19_R2.CraftOfflinePlayer")
         .searchField("profile", "profile");
 
     private final JsonParser parser = new JsonParser();

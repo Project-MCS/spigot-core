@@ -1,10 +1,11 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.entity.npc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
@@ -26,12 +27,14 @@ import com.syntaxphoenix.syntaxapi.utils.java.tools.Container;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRotateHeadPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -241,8 +244,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             ClassLookupProvider.DEFAULT.getLookup("mjGameProfile").setFieldValue(profile, "name", name);
         }
 
-        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData(),
-            true);
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData().getNonDefaultValues());
         sendPackets(dataPacket);
         return this;
     }
@@ -252,8 +254,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
         if (players.length == 0) {
             return;
         }
-        ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER,
-            getHandle());
+        ClientboundPlayerInfoUpdatePacket addInfoPacket = new ClientboundPlayerInfoUpdatePacket(Action.ADD_PLAYER, getHandle());
         ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(getHandle());
         ClientboundRotateHeadPacket rotationPacket = new ClientboundRotateHeadPacket(getHandle(),
             (byte) Mth.floor(getHandle().getYHeadRot() * 256F / 360F));
@@ -264,8 +265,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             list.add(Pair.of(slot, getHandle().getItemBySlot(slot)));
         }
         ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(getHandle().getId(), list);
-        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData(),
-            true);
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData().getNonDefaultValues());
 
         for (Player player : players) {
             if (isShown(player)) {
@@ -289,8 +289,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
         if (players.length == 0) {
             return;
         }
-        ClientboundPlayerInfoPacket remInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER,
-            getHandle());
+        ClientboundPlayerInfoRemovePacket remInfoPacket = new ClientboundPlayerInfoRemovePacket(Arrays.asList(getHandle().getUUID()));
         ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(getHandle().getId());
         for (Player player : players) {
             if (!isShown(player)) {
@@ -307,10 +306,8 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
 
     @Override
     public void respawn() {
-        ClientboundPlayerInfoPacket remInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER,
-            getHandle());
-        ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER,
-            getHandle());
+        ClientboundPlayerInfoRemovePacket remInfoPacket = new ClientboundPlayerInfoRemovePacket(Arrays.asList(getHandle().getUUID()));
+        ClientboundPlayerInfoUpdatePacket addInfoPacket = new ClientboundPlayerInfoUpdatePacket(Action.ADD_PLAYER, getHandle());
 
         ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(getHandle().getId());
         ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(getHandle());
@@ -324,8 +321,7 @@ public class NPCImpl extends EntityLivingImpl<ServerPlayer> implements NmsNpc {
             list.add(Pair.of(slot, getHandle().getItemBySlot(slot)));
         }
         ClientboundSetEquipmentPacket equipmentPacket = new ClientboundSetEquipmentPacket(getHandle().getId(), list);
-        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData(),
-            true);
+        ClientboundSetEntityDataPacket dataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData().getNonDefaultValues());
         sendPackets(remInfoPacket, addInfoPacket, destroyPacket, spawnPacket, rotationPacket, moreRotationPacket, equipmentPacket,
             dataPacket);
     }

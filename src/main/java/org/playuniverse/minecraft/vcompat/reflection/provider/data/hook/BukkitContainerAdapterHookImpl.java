@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R1.persistence.CraftPersistentDataContainer;
-import org.bukkit.craftbukkit.v1_19_R1.persistence.CraftPersistentDataTypeRegistry;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R2.persistence.CraftPersistentDataContainer;
+import org.bukkit.craftbukkit.v1_19_R2.persistence.CraftPersistentDataTypeRegistry;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.playuniverse.minecraft.vcompat.base.data.api.IDataContainer;
 import org.playuniverse.minecraft.vcompat.base.data.nbt.NbtContainer;

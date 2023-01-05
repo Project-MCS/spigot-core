@@ -1,11 +1,12 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrapType;
 import org.playuniverse.minecraft.vcompat.reflection.data.WrappedContainer;
@@ -29,7 +30,9 @@ import io.netty.channel.Channel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundAddPlayerPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action;
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
@@ -237,10 +240,8 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
         if (getHandle().hasDisconnected()) {
             return;
         }
-        ClientboundPlayerInfoPacket remInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER,
-            getHandle());
-        ClientboundPlayerInfoPacket addInfoPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER,
-            getHandle());
+        ClientboundPlayerInfoRemovePacket remInfoPacket = new ClientboundPlayerInfoRemovePacket(Arrays.asList(uniqueId));
+        ClientboundPlayerInfoUpdatePacket addInfoPacket = new ClientboundPlayerInfoUpdatePacket(Action.ADD_PLAYER, getHandle());
 
         ClientboundRemoveEntitiesPacket destroyPacket = new ClientboundRemoveEntitiesPacket(getHandle().getId());
         ClientboundAddPlayerPacket spawnPacket = new ClientboundAddPlayerPacket(getHandle());
@@ -272,13 +273,12 @@ public final class PlayerImpl extends EntityLivingImpl<ServerPlayer> implements 
         
         ClientboundRespawnPacket respawnPacket = new ClientboundRespawnPacket(world.dimensionTypeId(), world.dimension(),
             BiomeManager.obfuscateSeed(world.getSeed()), getHandle().gameMode.getGameModeForPlayer(),
-            getHandle().gameMode.getPreviousGameModeForPlayer(), world.isDebug(), world.isFlat(), true, getHandle().getLastDeathLocation());
+            getHandle().gameMode.getPreviousGameModeForPlayer(), world.isDebug(), world.isFlat(), (byte) 1, getHandle().getLastDeathLocation());
         ClientboundPlayerPositionPacket positionPacket = new ClientboundPlayerPositionPacket(getHandle().getX(), getHandle().getY(),
             getHandle().getZ(), getHandle().xRotO, getHandle().yRotO, Collections.emptySet(), 0, false);
         ClientboundSetCarriedItemPacket itemPacket = new ClientboundSetCarriedItemPacket(getHandle().getInventory().selected);
         ClientboundEntityEventPacket statusPacket = new ClientboundEntityEventPacket(getHandle(), (byte) 28);
-        ClientboundSetEntityDataPacket metadataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData(),
-            true);
+        ClientboundSetEntityDataPacket metadataPacket = new ClientboundSetEntityDataPacket(getHandle().getId(), getHandle().getEntityData().getNonDefaultValues());
 
         ServerGamePacketListenerImpl connection = getHandle().connection;
         connection.send(remInfoPacket);

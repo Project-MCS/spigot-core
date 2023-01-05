@@ -8,9 +8,9 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.playuniverse.minecraft.vcompat.reflection.entity.NmsEntity;
 import org.playuniverse.minecraft.vcompat.reflection.utils.NmsBoundingBox;
@@ -180,7 +180,7 @@ public abstract class EntityImpl<E extends Entity> implements NmsEntity {
             return;
         }
         ClientboundAddEntityPacket packet = new ClientboundAddEntityPacket(handle);
-        ClientboundSetEntityDataPacket metadataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData(), true);
+        ClientboundSetEntityDataPacket metadataPacket = new ClientboundSetEntityDataPacket(handle.getId(), handle.getEntityData().getNonDefaultValues());
         ServerGamePacketListenerImpl connection;
         for (Player player : players) {
             if (isShown(player)) {

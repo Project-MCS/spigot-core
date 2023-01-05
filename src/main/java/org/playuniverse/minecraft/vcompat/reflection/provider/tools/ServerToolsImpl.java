@@ -1,7 +1,7 @@
 package org.playuniverse.minecraft.vcompat.reflection.provider.tools;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.playuniverse.minecraft.vcompat.reflection.tools.ServerTools;
 
 import jline.console.ConsoleReader;
